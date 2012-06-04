@@ -1,0 +1,72 @@
+/*
+  Place all the styles related to the matching controller here.
+  They will automatically be included in application.css.
+*/
+
+#new {
+  width: 60%;
+}
+
+#show {
+  width: 90%;
+}
+
+/*** Table Styles ***/
+table.options {
+  margin: 0 0 15px 10px;
+  border: 0;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.results {
+  margin: 0;
+  border: 0;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.report_details {
+  margin: 0;
+  border: 0;
+  width: 70%;
+  border-collapse: collapse;
+}
+
+th {
+  white-space: normal;
+  font-size: 14px;
+}
+
+th, td {
+  padding: 3px 5px 3px 5px;
+  text-align: left;
+}
+
+th a, a:hover {
+  text-decoration: underline;
+  border: none;
+}
+
+td {
+  white-space: normal;
+  font-size: 12px;
+}
+
+td a.detailed_report, td a.detailed_report a:hover {
+  color: #783C3C;
+  text-decoration: none;
+  border: none;
+}
+
+tr.odd {
+  background-color: #ffffff;
+}
+
+tr.even {
+  background-color: #dcdcdc;
+}
+
+/*** End ***/
+
+

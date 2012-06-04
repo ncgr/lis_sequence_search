@@ -1,0 +1,7 @@
+/.bundle
+/log/*.log
+/tmp
+/quorum/blastdb
+/quorum/gff3
+/quorum/log
+/quorum/tmp
