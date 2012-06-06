@@ -1,18 +1,12 @@
 <div id="show">
   <h1>Search Results</h1>
-  <p class="small right"><%= link_to raw("Search Again &raquo;"), :jobs %></p>
-  <!-- Tabs -->
-  <!-- To remove an algorithm from the view, simply comment out the -->
-  <!-- div#tabs ul li and corresponding div#tabs-(tab number) -->
+  <p class="small"><%= link_to raw("Search Again &raquo;"), :jobs %></p>
   <div id="tabs">
     <ul>
       <li><a href="#tabs-1">Blastn</a></li>
-      <!-- <li><a href="#tabs-2">Blastx</a></li> -->
-      <li><a href="#tabs-3">Tblastn</a></li>
-      <!-- <li><a href="#tabs-4">Blastp</a></li> -->
+      <li><a href="#tabs-2">Tblastn</a></li>
     </ul>
 
-    <!-- Search results per algorithm -->
     <div id="tabs-1">
       <h2>Blastn</h2>
       <div id="blastn-results">
@@ -20,57 +14,23 @@
       </div>
     </div>
 
-    <!--
     <div id="tabs-2">
-      <h2>Blastx</h2>
-      <div id="blastx-results">
-        Searching... <% image_tag "quorum/loading.gif" %>
-      </div>
-    </div>
-    -->
-
-    <div id="tabs-3">
       <h2>Tblastn</h2>
       <div id="tblastn-results">
         Searching... <%= image_tag "quorum/loading.gif" %>
       </div>
     </div>
-
-    <!--
-    <div id="tabs-4">
-      <h2>Blastp</h2>
-      <div id="blastp-results">
-        Searching... <% image_tag "quorum/loading.gif" %>
-      </div>
-    </div>
-    -->
   </div>
-  <!-- End Tabs -->
-  <p class="small right"><%= link_to raw("Search Again &raquo;"), :jobs %></p>
-
-  <!-- Detailed report element -->
-  <div id="detailed_report_dialog" title="Quorum Report Details"></div>
-</div>
-<div id="quorum">
-  <hr class="big" />
-  <p>
-    Powered by <%= link_to "Quorum", "https://github.com/ncgr/quorum" %>
-  </p>
+  <div id="detailed_report_dialog" title="Report Details"></div>
 </div>
 
-<!-- Templates -->
 <%= render :partial => "quorum/jobs/templates/blast_template" %>
 <%= render :partial => "quorum/jobs/templates/blast_detailed_report_template" %>
 
+<script type="text/javascript" src="/assets/lss.js"></script>
+<script type="text/javascript" src="/assets/d3.v2.js"></script>
 <script type="text/javascript">
   $(function() {
-    //
-    // Asynchronously poll Quorum for search results.
-    //
-    //  pollResults(id, interval)
-    //    id: Job.id
-    //    interval: poll interval in milliseconds. 5000 default.
-    //
-    QUORUM.pollResults(<%= @jobs.id %>);
+      LSS.pollResults(<%= @jobs.id %>);
   });
 </script>

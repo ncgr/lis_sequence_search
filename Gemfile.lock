@@ -1,3 +1,14 @@
+PATH
+  remote: ~/projects/web/quorum
+  specs:
+    quorum (0.3.1)
+      bio-blastxmlparser (~> 1.0.1)
+      jquery-rails
+      net-ssh (~> 2.3.0)
+      rails (~> 3.1)
+      resque (~> 1.19.0)
+      resque-result (~> 1.0.1)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -74,13 +85,6 @@ GEM
     net-ssh (2.3.0)
     nokogiri (1.5.3)
     polyglot (0.3.3)
-    quorum (0.3.1)
-      bio-blastxmlparser (~> 1.0.1)
-      jquery-rails
-      net-ssh (~> 2.3.0)
-      rails (~> 3.1)
-      resque (~> 1.19.0)
-      resque-result (~> 1.0.1)
     rack (1.4.1)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -160,7 +164,7 @@ DEPENDENCIES
   debugger
   jquery-rails
   mysql2
-  quorum
+  quorum!
   rails (= 3.2.5)
   sass-rails (~> 3.2.3)
   therubyracer

@@ -1,4 +1,5 @@
 /.bundle
+/db/*.rdb
 /log/*.log
 /tmp
 /quorum/blastdb

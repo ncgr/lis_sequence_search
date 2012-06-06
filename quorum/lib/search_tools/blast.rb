@@ -295,7 +295,7 @@ module Quorum
                 @data[:hsp_num]     = hsp.hsp_num
                 @data[:bit_score]   = hsp.bit_score
                 @data[:score]       = hsp.score
-                @data[:evalue]      = format_evalue(hsp.evalue)
+                @data[:evalue]      = hsp.evalue
                 @data[:query_from]  = hsp.query_from
                 @data[:query_to]    = hsp.query_to
                 @data[:hit_from]    = hsp.hit_from

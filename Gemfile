@@ -11,7 +11,7 @@ group :assets do
 end
 
 gem 'jquery-rails'
-gem 'quorum'
+gem 'quorum', :path => '~/projects/web/quorum'
 
 group :development do
   gem 'debugger'
