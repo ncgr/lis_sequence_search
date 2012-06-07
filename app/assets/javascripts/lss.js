@@ -1,8 +1,43 @@
+//
+// LSS Object.
+//
 var LSS = LSS || {};
 
+//
+// Contains indecies of top hit nodes for initialization.
+//
+LSS.topHits = [];
+
+//
+// Flag top hit per sequence query by adding property
+// "top_hit": true
+// to object.
+//
+LSS.flagTopHitPerQuery = function(data) {
+
+  var self = this,
+      query;
+
+  _.each(data, function(d) {
+    if (query !== d.query) {
+      _.extend(d, { "top_hit": true });
+      query = d.query;
+    }
+  });
+
+  return data;
+
+};
+
+//
+// Format groups for d3 tree layout.
+//
 LSS.formatGroups = function(data) {
 
-  var groups = {};
+  var self = this,
+      groups = {};
+
+  data = self.flagTopHitPerQuery(data);
 
   groups = _.groupBy(data, 'hit_display_id');
 
@@ -16,19 +51,23 @@ LSS.formatGroups = function(data) {
 
 };
 
+//
+// Format JSON data.
+//
 LSS.formatResults = function(data, algo) {
 
   if (data[0].results === false) {
     return {};
   }
 
-  var groups = {},
+  var self = this,
+      groups = {},
       formatted = {
         "name": algo,
         "children": []
       };
 
-  groups = LSS.formatGroups(data);
+  groups = self.formatGroups(data);
 
   keys = _.keys(groups);
 
@@ -60,9 +99,13 @@ LSS.formatResults = function(data, algo) {
 
 };
 
+//
+// Renders an interactive d3 tree.
+//
 LSS.renderTree = function(data, algo, id) {
 
-  var margin = { top: 20, right: 120, bottom: 20, left: 120 },
+  var self = this,
+      margin = { top: 20, right: 120, bottom: 20, left: 120 },
       width = 1280 - margin.right - margin.left,
       height = 800 - margin.top - margin.bottom,
       i = 0,
@@ -84,7 +127,7 @@ LSS.renderTree = function(data, algo, id) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  formatted = LSS.formatResults(data, algo);
+  formatted = self.formatResults(data, algo);
 
   if (_.isEmpty(formatted)) {
     return $(results).html(
@@ -96,14 +139,38 @@ LSS.renderTree = function(data, algo, id) {
   root.x0 = height / 2;
   root.y0 = 0;
 
-  function collapse(d) {
+  // Toggle children.
+  function toggle(d) {
     if (d.children) {
       d._children = d.children;
-      d._children.forEach(collapse);
       d.children = null;
+    } else {
+      d.children = d._children;
+      d._children = null;
     }
   }
 
+  // Toggle all.
+  function toggleAll(d) {
+    if (d.children) {
+      d.children.forEach(toggleAll);
+      toggle(d);
+    }
+  }
+
+  // Locate and store indecies of top hits for tree initialization.
+  function topHits(d) {
+    var i, j;
+    for (i = 0; i < d._children.length; i++) {
+      for (j = 0; j < d._children[i]._children.length; j++) {
+        if (d._children[i]._children[j].top_hit) {
+          self.topHits.push([i, j]);
+        }
+      }
+    }
+  }
+
+  // Update the tree.
   function update(source) {
 
     // Compute the new tree layout.
@@ -120,7 +187,7 @@ LSS.renderTree = function(data, algo, id) {
     var nodeEnter = node.enter().append("g")
       .attr("class", "node")
       .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-      .on("click", click);
+      .on("click", function(d) { toggle(d); update(d); });
 
     nodeEnter.append("circle")
       .attr("r", 1e-6)
@@ -134,6 +201,19 @@ LSS.renderTree = function(data, algo, id) {
       .style("fill-opacity", 1e-6)
       .attr("onclick", function(d) {
         return (d.children || d._children) ? "" : "QUORUM.viewDetailedReport(" + id + "," + d.id + ",'" + d.query + "','" + algo + "')";
+      })
+      .attr("class", function(d) {
+        var r;
+        if (d.children || d._children) {
+          r = "";
+        } else {
+          if (d.top_hit) {
+            r = "top-hit pointer";
+          } else {
+            r = "pointer";
+          }
+        }
+        return r;
       });
 
     // Transition nodes to their new position.
@@ -184,7 +264,7 @@ LSS.renderTree = function(data, algo, id) {
         var o = { x: source.x, y: source.y };
         return diagonal({ source: o, target: o });
       })
-    .remove();
+      .remove();
 
     // Stash the old positions for transition.
     nodes.forEach(function(d) {
@@ -193,25 +273,25 @@ LSS.renderTree = function(data, algo, id) {
     });
   }
 
-  // Toggle children on click.
-  function click(d) {
-    if (d.children) {
-      d._children = d.children;
-      d.children = null;
-    } else {
-      d.children = d._children;
-      d._children = null;
-    }
-    update(d);
-  }
+  root.children.forEach(toggleAll);
+  root.children.forEach(topHits);
 
-  root.children.forEach(collapse);
+  // Initialize tree with top hits.
+  _.each(self.topHits, function(h) {
+    toggle(root.children[h[0]]);
+    toggle(root.children[h[0]].children[h[1]]);
+  });
+
   update(root);
 };
 
+//
+// Override Quorum's pollResults.
+//
 LSS.pollResults = function(id, interval, algos) {
 
-  var interval = interval || 5000,
+  var self = this,
+      interval = interval || 5000,
       algos = algos || QUORUM.algorithms,
       times = 4;
 
@@ -221,13 +301,13 @@ LSS.pollResults = function(id, interval, algos) {
       function(data) {
         if (data.length === 0) {
           setTimeout(function() {
-            LSS.pollResults(id, interval, [a]);
+            self.pollResults(id, interval, [a]);
           }, interval);
         } else {
-          LSS.renderTree(data, a, id);
+          self.renderTree(data, a, id);
         }
       }
-      );
+    );
   });
 
 };

@@ -15,3 +15,10 @@ path.link {
   stroke-width: 1.5px;
 }
 
+text.pointer:hover {
+  cursor: pointer;
+}
+
+text.top-hit {
+  fill: #ff0000;
+}

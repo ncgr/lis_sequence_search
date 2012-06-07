@@ -10,7 +10,7 @@ then
 fi
 
 # Start resque workers
-for n in 1 2 3 4
+for n in 1
 do
     bundle exec rake environment resque:work RAILS_ENV=development QUEUE=system_queue &
     echo $! >> ./tmp/pids/resque.pid
