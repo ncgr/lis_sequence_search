@@ -1,17 +1,16 @@
 //
-// LSS Object.
+// LIS Sequence Search
+//
+// d3 interactive tree harvested from
+// http://mbostock.github.com/d3/talk/20111018/tree.html
+//
+// Author: Ken Seal
 //
 var LSS = LSS || {};
 
 //
-// Contains indecies of top hit nodes for initialization.
-//
-LSS.topHits = [];
-
-//
 // Flag top hit per sequence query by adding property
-// "top_hit": true
-// to object.
+// "top_hit": true to each object.
 //
 LSS.flagTopHitPerQuery = function(data) {
 
@@ -41,9 +40,13 @@ LSS.formatGroups = function(data) {
 
   groups = _.groupBy(data, 'hit_display_id');
 
+  // Extend each object with name and size properties for d3.
+  // To avoid d3 tree node id property collisions, rename hit id
+  // to quorum_id.
   _.each(groups, function(v, k) {
     _.each(v, function(d) {
-      _.extend(d, { "name": d.evalue, "size": parseFloat(d.evalue, 10) });
+      _.extend(d, { "name": d.evalue, "size": parseFloat(d.evalue, 10), "quorum_id": d.id });
+      delete d.id;
     });
   });
 
@@ -52,7 +55,7 @@ LSS.formatGroups = function(data) {
 };
 
 //
-// Format JSON data.
+// Format data into nested JSON.
 //
 LSS.formatResults = function(data, algo) {
 
@@ -109,6 +112,7 @@ LSS.renderTree = function(data, algo, id) {
       width = 1280 - margin.right - margin.left,
       height = 800 - margin.top - margin.bottom,
       i = 0,
+      k,
       duration = 500,
       root,
       results = "#" + algo.toLowerCase() + "-results";
@@ -164,7 +168,7 @@ LSS.renderTree = function(data, algo, id) {
     for (i = 0; i < d._children.length; i++) {
       for (j = 0; j < d._children[i]._children.length; j++) {
         if (d._children[i]._children[j].top_hit) {
-          self.topHits.push([i, j]);
+          self.topHits[algo].push([i, j]);
         }
       }
     }
@@ -200,7 +204,7 @@ LSS.renderTree = function(data, algo, id) {
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
       .attr("onclick", function(d) {
-        return (d.children || d._children) ? "" : "QUORUM.viewDetailedReport(" + id + "," + d.id + ",'" + d.query + "','" + algo + "')";
+        return (d.children || d._children) ? "" : "QUORUM.viewDetailedReport(" + id + "," + d.quorum_id + ",'" + d.query + "','" + algo + "')";
       })
       .attr("class", function(d) {
         var r;
@@ -277,9 +281,12 @@ LSS.renderTree = function(data, algo, id) {
   root.children.forEach(topHits);
 
   // Initialize tree with top hits.
-  _.each(self.topHits, function(h) {
-    toggle(root.children[h[0]]);
-    toggle(root.children[h[0]].children[h[1]]);
+  _.each(self.topHits[algo], function(h) {
+    if (k !== h[0]) {
+      k = h[0];
+      toggle(root.children[h[0]]);
+      toggle(root.children[h[0]].children[h[1]]);
+    }
   });
 
   update(root);
@@ -304,6 +311,11 @@ LSS.pollResults = function(id, interval, algos) {
             self.pollResults(id, interval, [a]);
           }, interval);
         } else {
+          // Create topHits object to results per algo.
+          self.topHits = {};
+          self.topHits[a] = [];
+
+          // Render the tree.
           self.renderTree(data, a, id);
         }
       }
