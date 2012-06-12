@@ -4,22 +4,23 @@
   <div id="tabs">
     <ul>
       <li><a href="#tabs-1">Blastn</a></li>
-      <li><a href="#tabs-2">Tblastn</a></li>
     </ul>
 
     <div id="tabs-1">
       <h2>Blastn</h2>
+      <div id="blastn-eval-filter" class="filter">
+        <input type="text" name="blastn-eval" id="blastn-eval" value="" placeholder="Evalue filter" />
+        <button type="button" id="blastn-eval-button">
+          filter
+        </button>
+      </div>
       <div id="blastn-results">
-        Searching... <%= image_tag "quorum/loading.gif" %>
+        <div id="blastn-searching">
+          Searching... <%= image_tag "quorum/loading.gif" %>
+        </div>
       </div>
     </div>
 
-    <div id="tabs-2">
-      <h2>Tblastn</h2>
-      <div id="tblastn-results">
-        Searching... <%= image_tag "quorum/loading.gif" %>
-      </div>
-    </div>
   </div>
   <div id="detailed_report_dialog" title="Report Details"></div>
 </div>
@@ -31,6 +32,12 @@
 <script type="text/javascript" src="/assets/d3.v2.js"></script>
 <script type="text/javascript">
   $(function() {
+      $("#blastn-eval-filter").hide();
+      $("#blastn-eval-button").click(function() {
+        var algo = "blastn";
+        var val = $("#blastn-eval").val();
+        LSS.filterData(val, algo, <%= @jobs.id %>);
+      });
       LSS.pollResults(<%= @jobs.id %>);
   });
 </script>

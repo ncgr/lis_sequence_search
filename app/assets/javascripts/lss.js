@@ -8,6 +8,22 @@
 //
 var LSS = LSS || {};
 
+LSS.filterData = function(value, algo, id) {
+
+  var self = this,
+      data = self.data[algo],
+      value = value || "0.0",
+      results = "#" + algo.toLowerCase() + "-results";
+
+  data = _.reject(data, function(d) {
+    return parseFloat(d.evalue) > parseFloat(value);
+  });
+
+  $(results).empty();
+
+  self.renderTree(data, algo, id);
+}
+
 //
 // Flag top hit per sequence query by adding property
 // "top_hit": true to each object.
@@ -46,7 +62,7 @@ LSS.formatGroups = function(data) {
   // to quorum_id.
   _.each(groups, function(v, k) {
     _.each(v, function(d) {
-      _.extend(d, { "name": d.evalue, "size": parseFloat(d.evalue, 10), "quorum_id": d.id });
+      _.extend(d, { "name": "Evalue: " + d.evalue, "size": parseFloat(d.evalue), "quorum_id": d.id });
       delete d.id;
     });
   });
@@ -60,6 +76,21 @@ LSS.formatGroups = function(data) {
 
 };
 
+LSS.formatHsps = function(data) {
+
+  var self = this,
+      hsps = [];
+
+  _.each(data, function(d) {
+    hsps.push({
+      "name": "q:" + d.query_from + "-" + d.query_to + "::h:" + d.hit_from + "-" + d.hit_to,
+      "children": [d]
+    });
+  });
+
+  return hsps;
+};
+
 //
 // Format queries for d3 tree layout.
 //
@@ -71,7 +102,7 @@ LSS.formatQueries = function(data) {
   _.each(data, function(v, k) {
     queries.push({
       "name": k,
-      "children": v
+      "children": self.formatHsps(v)
     });
   });
 
@@ -140,9 +171,12 @@ LSS.renderTree = function(data, algo, id) {
       k,
       duration = 500,
       root,
-      results = "#" + algo.toLowerCase() + "-results";
+      results = "#" + algo.toLowerCase() + "-results",
+      searching = "#" + algo.toLowerCase() + "-searching",
+      filter = "#" + algo.toLowerCase() + "-eval-filter";
 
-  $(results).empty();
+  $(searching).empty();
+  $(filter).show();
 
   var tree = d3.layout.tree()
     .size([height, width]);
@@ -184,18 +218,6 @@ LSS.renderTree = function(data, algo, id) {
     if (d.children) {
       d.children.forEach(toggleAll);
       toggle(d);
-    }
-  }
-
-  // Locate and store indecies of top hits for tree initialization.
-  function topHits(d) {
-    var i, j;
-    for (i = 0; i < d._children.length; i++) {
-      for (j = 0; j < d._children[i]._children.length; j++) {
-        if (d._children[i]._children[j].top_hit) {
-          self.topHits[algo].push([i, j]);
-        }
-      }
     }
   }
 
@@ -302,18 +324,6 @@ LSS.renderTree = function(data, algo, id) {
     });
   }
 
-  root.children.forEach(toggleAll);
-  root.children.forEach(topHits);
-
-  // Initialize tree with top hits.
-  _.each(self.topHits[algo], function(h) {
-    if (k !== h[0]) {
-      k = h[0];
-      toggle(root.children[h[0]]);
-      toggle(root.children[h[0]].children[h[1]]);
-    }
-  });
-
   update(root);
 };
 
@@ -327,6 +337,9 @@ LSS.pollResults = function(id, interval, algos) {
       algos = algos || QUORUM.algorithms,
       times = 4;
 
+  self.topHits = {};
+  self.data = {};
+
   _.each(algos, function(a) {
     $.getJSON(
       '/quorum/jobs/' + id + '/get_quorum_search_results.json?algo=' + a,
@@ -337,8 +350,10 @@ LSS.pollResults = function(id, interval, algos) {
           }, interval);
         } else {
           // Create topHits object to results per algo.
-          self.topHits = {};
           self.topHits[a] = [];
+
+          // Copy datasets.
+          self.data[a] = data;
 
           // Render the tree.
           self.renderTree(data, a, id);
