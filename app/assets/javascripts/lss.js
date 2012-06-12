@@ -8,7 +8,71 @@
 //
 var LSS = LSS || {};
 
-LSS.filterData = function(value, algo, id) {
+//
+// Expand top hit per query sequence.
+//
+LSS.expandTopHits = function(algo, id) {
+
+  var self = this,
+      data = self.data[algo],
+      results = "#" + algo.toLowerCase() + "-results";
+
+  $(results).empty();
+
+  data = _.reject(data, function(d) {
+    return _.isUndefined(d.top_hit);
+  });
+
+  self.renderTree(data, algo, id);
+
+};
+
+//
+// Expand top hit per reference dataset.
+//
+LSS.expandTopHitPerReference = function(algo, id) {
+
+  var self = this,
+      data = self.data[algo],
+      results = "#" + algo.toLowerCase() + "-results",
+      found,
+      keys,
+      ref = [];
+
+  $(results).empty();
+
+  _.each(data, function(d) {
+    found = _.find(ref, function(r) {
+      return r.hit_display_id === d.hit_display_id && r.query === d.query;
+    });
+    if (!found) {
+      ref.push(d);
+    }
+  });
+
+  self.renderTree(ref, algo, id);
+
+};
+
+//
+// Expand tree using original dataset.
+//
+LSS.expandTree = function(algo, id) {
+
+  var self = this,
+      data = self.data[algo],
+      results = "#" + algo.toLowerCase() + "-results";
+
+  $(results).empty();
+
+  self.renderTree(data, algo, id);
+
+};
+
+//
+// Filter dataset on evalue.
+//
+LSS.evalueFilter = function(value, algo, id) {
 
   var self = this,
       data = self.data[algo],
@@ -22,7 +86,7 @@ LSS.filterData = function(value, algo, id) {
   $(results).empty();
 
   self.renderTree(data, algo, id);
-}
+};
 
 //
 // Flag top hit per sequence query by adding property
@@ -33,12 +97,16 @@ LSS.flagTopHitPerQuery = function(data) {
   var self = this,
       query;
 
-  _.each(data, function(d) {
-    if (query !== d.query) {
-      _.extend(d, { "top_hit": true });
-      query = d.query;
-    }
-  });
+  if (!self.flagged) {
+    _.each(data, function(d) {
+      if (query !== d.query) {
+        _.extend(d, { "top_hit": true });
+        query = d.query;
+      }
+    });
+  }
+
+  self.flagged = true;
 
   return data;
 
@@ -166,7 +234,7 @@ LSS.renderTree = function(data, algo, id) {
   var self = this,
       margin = { top: 20, right: 120, bottom: 20, left: 120 },
       width = 1280 - margin.right - margin.left,
-      height = 800 - margin.top - margin.bottom,
+      height = 1200 - margin.top - margin.bottom,
       i = 0,
       k,
       duration = 500,

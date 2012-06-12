@@ -9,6 +9,15 @@
     <div id="tabs-1">
       <h2>Blastn</h2>
       <div id="blastn-eval-filter" class="filter">
+        <button type="button" id="blastn-top-hits">
+          top hit(s)
+        </button>
+        <button type="button" id="blastn-top-hit-ref">
+          top hit(s) per reference sequence
+        </button>
+        <button type="button" id="blastn-expand-tree">
+          expand tree
+        </button>
         <input type="text" name="blastn-eval" id="blastn-eval" value="" placeholder="Evalue filter" />
         <button type="button" id="blastn-eval-button">
           filter
@@ -33,11 +42,24 @@
 <script type="text/javascript">
   $(function() {
       $("#blastn-eval-filter").hide();
-      $("#blastn-eval-button").click(function() {
-        var algo = "blastn";
-        var val = $("#blastn-eval").val();
-        LSS.filterData(val, algo, <%= @jobs.id %>);
+
+      $("#blastn-top-hits").click(function() {
+        LSS.expandTopHits("blastn", <%= @jobs.id %>);
       });
+
+      $("#blastn-top-hit-ref").click(function() {
+        LSS.expandTopHitPerReference("blastn", <%= @jobs.id %>);
+      });
+
+      $("#blastn-expand-tree").click(function() {
+        LSS.expandTree("blastn", <%= @jobs.id %>);
+      });
+
+      $("#blastn-eval-button").click(function() {
+        var val = $("#blastn-eval").val();
+        LSS.evalueFilter(val, "blastn", <%= @jobs.id %>);
+        });
+
       LSS.pollResults(<%= @jobs.id %>);
   });
 </script>
