@@ -38,6 +38,7 @@ LSS.formatGroups = function(data) {
 
   data = self.flagTopHitPerQuery(data);
 
+  // Group by hit_display_id.
   groups = _.groupBy(data, 'hit_display_id');
 
   // Extend each object with name and size properties for d3.
@@ -50,7 +51,31 @@ LSS.formatGroups = function(data) {
     });
   });
 
+  // Group each sub group by query.
+  _.each(groups, function(v, k) {
+    groups[k] = _.groupBy(v, 'query');
+  });
+
   return groups;
+
+};
+
+//
+// Format queries for d3 tree layout.
+//
+LSS.formatQueries = function(data) {
+
+  var self = this,
+      queries = [];
+
+  _.each(data, function(v, k) {
+    queries.push({
+      "name": k,
+      "children": v
+    });
+  });
+
+  return queries;
 
 };
 
@@ -83,7 +108,7 @@ LSS.formatResults = function(data, algo) {
         "name": hit[0],
         "children": [{
           "name": hit[1],
-          "children": groups[key]
+          "children": self.formatQueries(groups[key])
         }]
       });
     } else {
@@ -91,7 +116,7 @@ LSS.formatResults = function(data, algo) {
         if (v.name === hit[0]) {
           v.children.push({
             "name": hit[1],
-            "children": groups[key]
+            "children": self.formatQueries(groups[key])
           });
         }
       });
