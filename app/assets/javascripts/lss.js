@@ -61,13 +61,8 @@ LSS.expandTopHitPerRef = function(algo, id) {
   var self = this,
       data = self.data[algo],
       results = "#" + algo.toLowerCase() + "-results",
-      keys,
-      hit,
-      top_hits,
-      th_keys,
-      i = 0,
-      ref = {},
-      ret = [];
+      found,
+      ref = [];
 
   $(results).empty();
 
@@ -77,34 +72,16 @@ LSS.expandTopHitPerRef = function(algo, id) {
     _.extend(d, { "ref": hit[0] });
   });
 
-  // Extract the top hits.
-  top_hits = _.reject(data, function(d) {
-    return _.isUndefined(d.top_hit);
+  _.each(data, function(d) {
+    found = _.find(ref, function(r) {
+      return r.ref === d.ref && r.query === d.query;
+    });
+    if (!found) {
+      ref.push(d);
+    }
   });
 
-  top_hits = _.sortBy(top_hits, function(t) { return t.ref; });
-
-  th_keys = _.keys(_.groupBy(top_hits, 'ref'));
-
-  // Group by ref.
-  data = _.groupBy(data, 'ref');
-
-  // Add the top hits.
-  _.each(th_keys, function(k) {
-    ret.push(data[k][0]);
-  });
-
-  keys = _.difference(_.keys(data), th_keys);
-
-  _.each(keys, function(k) {
-    ref[k] = _.sortBy(data[k], function(d) { return parseFloat(d.evalue); });
-  });
-
-  _.each(ref, function(r) {
-    ret.push(r[0]);
-  });
-
-  self.renderTree(ret, algo, id);
+  self.renderTree(ref, algo, id);
 
 };
 
