@@ -12,7 +12,7 @@
         <button type="button" id="blastn-top-hits">
           top hit(s)
         </button>
-        <button type="button" id="blastn-top-hit-ref">
+        <button type="button" id="blastn-top-hit-ref-seq">
           top hit(s) per reference sequence
         </button>
         <button type="button" id="blastn-expand-tree">
@@ -47,8 +47,8 @@
         LSS.expandTopHits("blastn", <%= @jobs.id %>);
       });
 
-      $("#blastn-top-hit-ref").click(function() {
-        LSS.expandTopHitPerReference("blastn", <%= @jobs.id %>);
+      $("#blastn-top-hit-ref-seq").click(function() {
+        LSS.expandTopHitPerRefSeq("blastn", <%= @jobs.id %>);
       });
 
       $("#blastn-expand-tree").click(function() {

@@ -28,9 +28,9 @@ LSS.expandTopHits = function(algo, id) {
 };
 
 //
-// Expand top hit per reference dataset.
+// Expand top hit per reference sequence.
 //
-LSS.expandTopHitPerReference = function(algo, id) {
+LSS.expandTopHitPerRefSeq = function(algo, id) {
 
   var self = this,
       data = self.data[algo],
@@ -131,7 +131,6 @@ LSS.formatGroups = function(data) {
   _.each(groups, function(v, k) {
     _.each(v, function(d) {
       _.extend(d, { "name": "Evalue: " + d.evalue, "size": parseFloat(d.evalue), "quorum_id": d.id });
-      delete d.id;
     });
   });
 
