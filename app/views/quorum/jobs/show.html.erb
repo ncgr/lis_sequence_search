@@ -47,26 +47,26 @@
       $("#blastn-eval-filter").hide();
 
       $("#blastn-top-hits").click(function() {
-        LSS.expandTopHits("blastn", <%= @jobs.id %>);
+        LSS.expandTopHits("blastn");
       });
 
       $("#blastn-top-hit-ref-seq").click(function() {
-        LSS.expandTopHitPerRefSeq("blastn", <%= @jobs.id %>);
+        LSS.expandTopHitPerRefSeq("blastn");
       });
 
       $("#blastn-top-hit-ref").click(function() {
-        LSS.expandTopHitPerRef("blastn", <%= @jobs.id %>);
+        LSS.expandTopHitPerRef("blastn");
       });
 
       $("#blastn-expand-tree").click(function() {
-        LSS.expandTree("blastn", <%= @jobs.id %>);
+        LSS.expandTree("blastn");
       });
 
       $("#blastn-eval-button").click(function() {
         var val = $("#blastn-eval").val();
-        LSS.evalueFilter(val, "blastn", <%= @jobs.id %>);
-        });
+        LSS.evalueFilter(val, "blastn");
+      });
 
-      LSS.pollResults(<%= @jobs.id %>);
+      QUORUM.pollResults(<%= @jobs.id %>, LSS.collectResults, LSS);
   });
 </script>

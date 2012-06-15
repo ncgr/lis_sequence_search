@@ -9,9 +9,14 @@
 var LSS = LSS || {};
 
 //
+// Store LSS data returned from Quorum.
+//
+LSS.data = LSS.data || {};
+
+//
 // Expand top hit per query sequence.
 //
-LSS.expandTopHits = function(algo, id) {
+LSS.expandTopHits = function(algo) {
 
   var self = this,
       data = self.data[algo],
@@ -23,14 +28,14 @@ LSS.expandTopHits = function(algo, id) {
     return _.isUndefined(d.top_hit);
   });
 
-  self.renderTree(data, algo, id);
+  self.renderTree(data, algo);
 
 };
 
 //
 // Expand top hit per reference sequence.
 //
-LSS.expandTopHitPerRefSeq = function(algo, id) {
+LSS.expandTopHitPerRefSeq = function(algo) {
 
   var self = this,
       data = self.data[algo],
@@ -49,14 +54,14 @@ LSS.expandTopHitPerRefSeq = function(algo, id) {
     }
   });
 
-  self.renderTree(ref, algo, id);
+  self.renderTree(ref, algo);
 
 };
 
 //
 // Expand top hit per reference.
 //
-LSS.expandTopHitPerRef = function(algo, id) {
+LSS.expandTopHitPerRef = function(algo) {
 
   var self = this,
       data = self.data[algo],
@@ -81,14 +86,14 @@ LSS.expandTopHitPerRef = function(algo, id) {
     }
   });
 
-  self.renderTree(ref, algo, id);
+  self.renderTree(ref, algo);
 
 };
 
 //
 // Expand tree using original dataset.
 //
-LSS.expandTree = function(algo, id) {
+LSS.expandTree = function(algo) {
 
   var self = this,
       data = self.data[algo],
@@ -96,14 +101,14 @@ LSS.expandTree = function(algo, id) {
 
   $(results).empty();
 
-  self.renderTree(data, algo, id);
+  self.renderTree(data, algo);
 
 };
 
 //
 // Filter dataset on evalue.
 //
-LSS.evalueFilter = function(value, algo, id) {
+LSS.evalueFilter = function(value, algo) {
 
   var self = this,
       data = self.data[algo],
@@ -116,7 +121,7 @@ LSS.evalueFilter = function(value, algo, id) {
 
   $(results).empty();
 
-  self.renderTree(data, algo, id);
+  self.renderTree(data, algo);
 };
 
 //
@@ -258,9 +263,10 @@ LSS.formatResults = function(data, algo) {
 //
 // Renders an interactive d3 tree.
 //
-LSS.renderTree = function(data, algo, id) {
+LSS.renderTree = function(data, algo) {
 
   var self = this,
+      id = self.quorum_id,
       margin = { top: 20, right: 120, bottom: 20, left: 120 },
       width = 1280 - margin.right - margin.left,
       height = 1200 - margin.top - margin.bottom,
@@ -425,39 +431,19 @@ LSS.renderTree = function(data, algo, id) {
 };
 
 //
-// Override Quorum's pollResults.
+// Collects Quorum's results.
 //
-LSS.pollResults = function(id, interval, algos) {
+LSS.collectResults = function(id, data, algo) {
 
-  var self = this,
-      interval = interval || 5000,
-      algos = algos || QUORUM.algorithms,
-      times = 4;
+  var self = this;
 
-  self.topHits = {};
-  self.data = {};
+  self.quorum_id = self.quorum_id || id;
 
-  _.each(algos, function(a) {
-    $.getJSON(
-      '/quorum/jobs/' + id + '/get_quorum_search_results.json?algo=' + a,
-      function(data) {
-        if (data.length === 0) {
-          setTimeout(function() {
-            self.pollResults(id, interval, [a]);
-          }, interval);
-        } else {
-          // Create topHits object to results per algo.
-          self.topHits[a] = [];
+  // Copy datasets.
+  self.data[algo] = data;
 
-          // Copy datasets.
-          self.data[a] = data;
-
-          // Render the tree.
-          self.renderTree(data, a, id);
-        }
-      }
-    );
-  });
+  // Render the tree.
+  self.renderTree(data, algo);
 
 };
 
