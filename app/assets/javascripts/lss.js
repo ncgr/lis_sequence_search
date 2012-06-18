@@ -19,12 +19,12 @@ LSS.data = LSS.data || {};
 LSS.expandTopHits = function(algo) {
 
   var self = this,
-      data = self.data[algo],
+      data,
       results = "#" + algo.toLowerCase() + "-results";
 
   $(results).empty();
 
-  data = _.reject(data, function(d) {
+  data = _.reject(self.data[algo], function(d) {
     return _.isUndefined(d.top_hit);
   });
 
@@ -38,14 +38,13 @@ LSS.expandTopHits = function(algo) {
 LSS.expandTopHitPerRefSeq = function(algo) {
 
   var self = this,
-      data = self.data[algo],
       results = "#" + algo.toLowerCase() + "-results",
       found,
       ref = [];
 
   $(results).empty();
 
-  _.each(data, function(d) {
+  _.each(self.data[algo], function(d) {
     found = _.find(ref, function(r) {
       return r.hit_display_id === d.hit_display_id && r.query === d.query;
     });
@@ -64,7 +63,6 @@ LSS.expandTopHitPerRefSeq = function(algo) {
 LSS.expandTopHitPerRef = function(algo) {
 
   var self = this,
-      data = self.data[algo],
       results = "#" + algo.toLowerCase() + "-results",
       found,
       ref = [];
@@ -72,12 +70,12 @@ LSS.expandTopHitPerRef = function(algo) {
   $(results).empty();
 
   // Add ref property to each object.
-  _.each(data, function(d) {
+  _.each(self.data[algo], function(d) {
     hit = d.hit_display_id.split(":");
     _.extend(d, { "ref": hit[0] });
   });
 
-  _.each(data, function(d) {
+  _.each(self.data[algo], function(d) {
     found = _.find(ref, function(r) {
       return r.ref === d.ref && r.query === d.query;
     });
@@ -96,12 +94,11 @@ LSS.expandTopHitPerRef = function(algo) {
 LSS.expandTree = function(algo) {
 
   var self = this,
-      data = self.data[algo],
       results = "#" + algo.toLowerCase() + "-results";
 
   $(results).empty();
 
-  self.renderTree(data, algo);
+  self.renderTree(self.data[algo], algo);
 
 };
 
@@ -111,11 +108,11 @@ LSS.expandTree = function(algo) {
 LSS.evalueFilter = function(value, algo) {
 
   var self = this,
-      data = self.data[algo],
+      data,
       value = value || "0.0",
       results = "#" + algo.toLowerCase() + "-results";
 
-  data = _.reject(data, function(d) {
+  data = _.reject(self.data[algo], function(d) {
     return parseFloat(d.evalue) > parseFloat(value);
   });
 

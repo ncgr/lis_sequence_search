@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.5'
+gem 'rails', '3.2.6'
 gem 'mysql2'
 
 group :assets do
@@ -11,7 +11,7 @@ group :assets do
 end
 
 gem 'jquery-rails'
-gem 'quorum', :path => '~/projects/web/quorum'
+gem 'quorum', :git => 'git://github.com/ncgr/quorum.git', :branch => 'callback'
 
 group :development do
   gem 'debugger'
