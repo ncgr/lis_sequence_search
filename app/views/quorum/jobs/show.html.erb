@@ -8,7 +8,7 @@
 
     <div id="tabs-1">
       <h2>Blastn</h2>
-      <div id="blastn-eval-filter" class="filter">
+      <div id="blastn-filter" class="filter">
         <button type="button" id="blastn-top-hits">
           top hit(s)
         </button>
@@ -26,10 +26,9 @@
           filter
         </button>
       </div>
-      <div id="blastn-results">
-        <div id="blastn-searching">
-          Searching... <%= image_tag "quorum/loading.gif" %>
-        </div>
+      <div id="blastn-results"></div>
+      <div id="blastn-searching">
+        Searching... <%= image_tag "quorum/loading.gif" %>
       </div>
     </div>
 
@@ -37,36 +36,12 @@
   <div id="detailed_report_dialog" title="Report Details"></div>
 </div>
 
-<%= render :partial => "quorum/jobs/templates/blast_template" %>
 <%= render :partial => "quorum/jobs/templates/blast_detailed_report_template" %>
 
-<script type="text/javascript" src="/assets/lss.js"></script>
 <script type="text/javascript" src="/assets/d3.v2.js"></script>
+<script type="text/javascript" src="/assets/lss.js"></script>
 <script type="text/javascript">
   $(function() {
-      $("#blastn-eval-filter").hide();
-
-      $("#blastn-top-hits").click(function() {
-        LSS.expandTopHits("blastn");
-      });
-
-      $("#blastn-top-hit-ref-seq").click(function() {
-        LSS.expandTopHitPerRefSeq("blastn");
-      });
-
-      $("#blastn-top-hit-ref").click(function() {
-        LSS.expandTopHitPerRef("blastn");
-      });
-
-      $("#blastn-expand-tree").click(function() {
-        LSS.expandTree("blastn");
-      });
-
-      $("#blastn-eval-button").click(function() {
-        var val = $("#blastn-eval").val();
-        LSS.evalueFilter(val, "blastn");
-      });
-
-      QUORUM.pollResults(<%= @jobs.id %>, LSS.collectResults, LSS);
+    QUORUM.pollResults(<%= @jobs.id %>, LSS.collectResults, LSS);
   });
 </script>

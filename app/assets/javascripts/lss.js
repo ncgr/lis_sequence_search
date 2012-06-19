@@ -9,7 +9,7 @@
 var LSS = LSS || {};
 
 //
-// Store LSS data returned from Quorum.
+// Store original dataset returned from Quorum.
 //
 LSS.data = LSS.data || {};
 
@@ -19,8 +19,9 @@ LSS.data = LSS.data || {};
 LSS.expandTopHits = function(algo) {
 
   var self = this,
+      algo = algo.toLowerCase(),
       data,
-      results = "#" + algo.toLowerCase() + "-results";
+      results = "#" + algo + "-results";
 
   $(results).empty();
 
@@ -38,7 +39,8 @@ LSS.expandTopHits = function(algo) {
 LSS.expandTopHitPerRefSeq = function(algo) {
 
   var self = this,
-      results = "#" + algo.toLowerCase() + "-results",
+      algo = algo.toLowerCase(),
+      results = "#" + algo + "-results",
       found,
       ref = [];
 
@@ -63,7 +65,8 @@ LSS.expandTopHitPerRefSeq = function(algo) {
 LSS.expandTopHitPerRef = function(algo) {
 
   var self = this,
-      results = "#" + algo.toLowerCase() + "-results",
+      algo = algo.toLowerCase(),
+      results = "#" + algo + "-results",
       found,
       ref = [];
 
@@ -94,7 +97,8 @@ LSS.expandTopHitPerRef = function(algo) {
 LSS.expandTree = function(algo) {
 
   var self = this,
-      results = "#" + algo.toLowerCase() + "-results";
+      algo = algo.toLowerCase(),
+      results = "#" + algo + "-results";
 
   $(results).empty();
 
@@ -108,9 +112,10 @@ LSS.expandTree = function(algo) {
 LSS.evalueFilter = function(value, algo) {
 
   var self = this,
+      algo = algo.toLowerCase(),
       data,
       value = value || "0.0",
-      results = "#" + algo.toLowerCase() + "-results";
+      results = "#" + algo + "-results";
 
   data = _.reject(self.data[algo], function(d) {
     return parseFloat(d.evalue) > parseFloat(value);
@@ -130,15 +135,12 @@ LSS.flagTopHitPerQuery = function(data) {
   var self = this,
       query;
 
-  if (!self.flagged) {
-    _.each(data, function(d) {
-      if (query !== d.query) {
-        _.extend(d, { "top_hit": true });
-        query = d.query;
-      }
-    });
-    self.flagged = true;
-  }
+  _.each(data, function(d) {
+    if (query !== d.query) {
+      _.extend(d, { "top_hit": true });
+      query = d.query;
+    }
+  });
 
   return data;
 
@@ -220,10 +222,12 @@ LSS.formatResults = function(data, algo) {
 
   var self = this,
       groups = {},
-      formatted = {
-        "name": algo,
-        "children": []
-      };
+      formatted = {};
+
+  formatted = {
+    "name": algo,
+    "children": []
+  };
 
   groups = self.formatGroups(data);
 
@@ -263,6 +267,7 @@ LSS.formatResults = function(data, algo) {
 LSS.renderTree = function(data, algo) {
 
   var self = this,
+      algo = algo.toLowerCase(),
       id = self.quorum_id,
       margin = { top: 20, right: 120, bottom: 20, left: 120 },
       width = 1280 - margin.right - margin.left,
@@ -271,10 +276,11 @@ LSS.renderTree = function(data, algo) {
       k,
       duration = 500,
       root,
-      results = "#" + algo.toLowerCase() + "-results",
-      searching = "#" + algo.toLowerCase() + "-searching",
-      filter = "#" + algo.toLowerCase() + "-eval-filter";
+      results = "#" + algo + "-results",
+      searching = "#" + algo + "-searching",
+      filter = "#" + algo + "-filter";
 
+  $(results).empty();
   $(searching).empty();
   $(filter).show();
 
@@ -443,4 +449,36 @@ LSS.collectResults = function(id, data, algo) {
   self.renderTree(data, algo);
 
 };
+
+//
+// Add the event handlers for each algorithm.
+//
+$(function() {
+  _.each(QUORUM.algorithms, function(a) {
+    if (!_.isUndefined(a)) {
+      $("#" + a + "-filter").hide();
+
+      $("#" + a + "-top-hits").click(function() {
+        LSS.expandTopHits(a);
+      });
+
+      $("#" + a + "-top-hit-ref-seq").click(function() {
+        LSS.expandTopHitPerRefSeq(a);
+      });
+
+      $("#" + a + "-top-hit-ref").click(function() {
+        LSS.expandTopHitPerRef(a);
+      });
+
+      $("#" + a + "-expand-tree").click(function() {
+        LSS.expandTree(a);
+      });
+
+      $("#" + a + "-eval-button").click(function() {
+        var val = $("#" + a + "-eval").val();
+        LSS.evalueFilter(val, a);
+      });
+    }
+  });
+});
 
