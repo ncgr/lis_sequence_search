@@ -9,7 +9,7 @@
 var LSS = LSS || {};
 
 //
-// Store original dataset returned from Quorum.
+// Cache the datasets returned from Quorum per algorithm.
 //
 LSS.data = LSS.data || {};
 
@@ -20,6 +20,7 @@ LSS.expandTopHits = function(algo) {
 
   var self = this,
       algo = algo.toLowerCase(),
+      cached = algo + "-cached",
       data,
       results = "#" + algo + "-results";
 
@@ -28,6 +29,9 @@ LSS.expandTopHits = function(algo) {
   data = _.reject(self.data[algo], function(d) {
     return _.isUndefined(d.top_hit);
   });
+
+  // Cache the result for further filtering.
+  self.data[cached] = data;
 
   self.renderTree(data, algo);
 
@@ -40,6 +44,7 @@ LSS.expandTopHitPerRefSeq = function(algo) {
 
   var self = this,
       algo = algo.toLowerCase(),
+      cached = algo + "-cached",
       results = "#" + algo + "-results",
       found,
       ref = [];
@@ -55,6 +60,9 @@ LSS.expandTopHitPerRefSeq = function(algo) {
     }
   });
 
+  // Cache the result for further filtering.
+  self.data[cached] = ref;
+
   self.renderTree(ref, algo);
 
 };
@@ -66,6 +74,7 @@ LSS.expandTopHitPerRef = function(algo) {
 
   var self = this,
       algo = algo.toLowerCase(),
+      cached = algo + "-cached",
       results = "#" + algo + "-results",
       found,
       ref = [];
@@ -87,6 +96,9 @@ LSS.expandTopHitPerRef = function(algo) {
     }
   });
 
+  // Cache the result for further filtering.
+  self.data[cached] = ref;
+
   self.renderTree(ref, algo);
 
 };
@@ -98,9 +110,13 @@ LSS.expandTree = function(algo) {
 
   var self = this,
       algo = algo.toLowerCase(),
+      cached = algo + "-cached",
       results = "#" + algo + "-results";
 
   $(results).empty();
+
+  // Destroy any cached data.
+  self.data[cached] = null;
 
   self.renderTree(self.data[algo], algo);
 
@@ -113,11 +129,16 @@ LSS.evalueFilter = function(value, algo) {
 
   var self = this,
       algo = algo.toLowerCase(),
+      cached = algo + "-cached",
       data,
       value = value || "0.0",
       results = "#" + algo + "-results";
 
-  data = _.reject(self.data[algo], function(d) {
+  // Perform the filter on the cached data if applicable.
+  // Otherwise use the original dataset.
+  data = self.data[cached] || self.data[algo];
+
+  data = _.reject(data, function(d) {
     return parseFloat(d.evalue) > parseFloat(value);
   });
 
