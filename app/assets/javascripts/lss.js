@@ -289,6 +289,7 @@ LSS.renderTree = function(data, algo) {
 
   var self = this,
       algo = algo.toLowerCase(),
+      data = data || self.data[algo],
       id = self.quorum_id,
       margin = { top: 20, right: 120, bottom: 20, left: 120 },
       width = 1280 - margin.right - margin.left,
@@ -297,13 +298,11 @@ LSS.renderTree = function(data, algo) {
       k,
       duration = 500,
       root,
-      results = "#" + algo + "-results",
-      searching = "#" + algo + "-searching",
-      filter = "#" + algo + "-filter";
+      results = "#search-results",
+      filters = "#filters";
 
+  // Empty results before calling d3.
   $(results).empty();
-  $(searching).empty();
-  $(filter).show();
 
   var tree = d3.layout.tree()
     .size([height, width]);
@@ -320,10 +319,12 @@ LSS.renderTree = function(data, algo) {
   formatted = self.formatResults(data, algo);
 
   if (_.isEmpty(formatted)) {
-    return $(results).html(
-      "Your search returned 0 hits."
-    );
+    $(filters).hide();
+    $(results).html("<h4>Your search returned 0 hits.</h4>");
+    return;
   }
+
+  $(filters).show();
 
   root = formatted;
   root.x0 = height / 2;
@@ -455,6 +456,24 @@ LSS.renderTree = function(data, algo) {
 };
 
 //
+// Render interactive menu.
+//
+LSS.renderMenu = function(algo) {
+
+  var self = this,
+      algo = algo.toLowerCase(),
+      loading = $("#menu-loading"),
+      selectable = $("#selectable-algorithms");
+
+  loading.empty();
+
+  selectable.append(
+    "<li class='ui-widget-content ui-selectee'>" + algo + "</li>"
+  );
+
+};
+
+//
 // Collects Quorum's results.
 //
 LSS.collectResults = function(id, data, algo) {
@@ -466,39 +485,34 @@ LSS.collectResults = function(id, data, algo) {
   // Copy datasets.
   self.data[algo] = data;
 
-  // Render the tree.
-  self.renderTree(data, algo);
+  // Render menu
+  self.renderMenu(algo);
 
 };
 
-//
-// Add the event handlers for each algorithm.
-//
 $(function() {
-  _.each(QUORUM.algorithms, function(a) {
-    if (!_.isUndefined(a)) {
-      $("#" + a + "-filter").hide();
+  $("#filters").hide();
 
-      $("#" + a + "-top-hits").click(function() {
-        LSS.expandTopHits(a);
-      });
+  //
+  // Add jQuery-UI selectable to filters
+  //
+  $("#selectable-filters").selectable({
+    stop: function() {
+      var selected = [];
+    }
+  });
 
-      $("#" + a + "-top-hit-ref-seq").click(function() {
-        LSS.expandTopHitPerRefSeq(a);
-      });
+  //
+  // Add jQuery-UI selectable to algorithms.
+  //
+  $("#selectable-algorithms").selectable({
+    stop: function() {
+      var selected = $(".ui-selected", this).html();
+      LSS.renderTree(null, selected);
+    },
 
-      $("#" + a + "-top-hit-ref").click(function() {
-        LSS.expandTopHitPerRef(a);
-      });
+    unselected: function() {
 
-      $("#" + a + "-expand-tree").click(function() {
-        LSS.expandTree(a);
-      });
-
-      $("#" + a + "-eval-button").click(function() {
-        var val = $("#" + a + "-eval").val();
-        LSS.evalueFilter(val, a);
-      });
     }
   });
 });

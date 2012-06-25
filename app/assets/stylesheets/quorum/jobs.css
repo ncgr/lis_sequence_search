@@ -8,7 +8,27 @@
 }
 
 #show {
-  width: 90%;
+  width: 100%;
+}
+
+#results {
+  background-color: #fff;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+#results-menu {
+  margin: 0;
+  padding: 15px;
+  float: left;
+  width: 10%;
+}
+
+#search-results {
+  float: right;
+  width: 85%;
 }
 
 /*** Table Styles ***/
