@@ -14,6 +14,45 @@ var LSS = LSS || {};
 LSS.data = LSS.data || {};
 
 //
+// Remove unwanted properties.
+//
+LSS.trimData = function(data) {
+
+  var self = this,
+      wanted,
+      len = data.length,
+      i, d;
+
+  // Return data without result set.
+  if (data[0].results === false) {
+    return data;
+  }
+
+  // Properties to preserve.
+  wanted = [
+    "id",
+    "evalue",
+    "query",
+    "hit_display_id",
+    "query_from",
+    "query_to",
+    "hit_from",
+    "hit_to"
+  ];
+
+  for (i = 0; i < len; i++) {
+    for (d in data[i]) {
+      if (!_.include(wanted, d)) {
+        delete data[i][d];
+      }
+    }
+  }
+
+  return data;
+
+};
+
+//
 // Expand top hit per query sequence.
 //
 LSS.expandTopHits = function(algo) {
@@ -468,7 +507,8 @@ LSS.renderMenu = function(algo) {
   loading.empty();
 
   selectable.append(
-    "<li class='ui-widget-content ui-selectee'>" + algo + "</li>"
+    "<li class='ui-widget-content ui-selectee ui-corner-all'>" +
+    algo + "</li>"
   );
 
 };
@@ -482,8 +522,8 @@ LSS.collectResults = function(id, data, algo) {
 
   self.quorum_id = self.quorum_id || id;
 
-  // Copy datasets.
-  self.data[algo] = data;
+  // Copy trimmed datasets.
+  self.data[algo] = self.trimData(data);
 
   // Render menu
   self.renderMenu(algo);
