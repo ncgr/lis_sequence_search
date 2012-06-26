@@ -150,7 +150,7 @@ LSS.expandTree = function(algo) {
   var self = this,
       algo = algo.toLowerCase(),
       cached = algo + "-cached",
-      results = "#" + algo + "-results";
+      results = "#search-results";
 
   $(results).empty();
 
@@ -171,7 +171,7 @@ LSS.evalueFilter = function(value, algo) {
       cached = algo + "-cached",
       data,
       value = value || "0.0",
-      results = "#" + algo + "-results";
+      results = "#search-results";
 
   // Perform the filter on the cached data if applicable.
   // Otherwise use the original dataset.
@@ -276,7 +276,7 @@ LSS.formatQueries = function(data) {
 //
 LSS.formatResults = function(data, algo) {
 
-  if (data[0].results === false) {
+  if (_.isEmpty(data) || data[0].results === false) {
     return {};
   }
 
@@ -338,7 +338,7 @@ LSS.renderTree = function(data, algo) {
       duration = 500,
       root,
       results = "#search-results",
-      filters = "#filters";
+      tools = "#tools";
 
   // Empty results before calling d3.
   $(results).empty();
@@ -358,12 +358,12 @@ LSS.renderTree = function(data, algo) {
   formatted = self.formatResults(data, algo);
 
   if (_.isEmpty(formatted)) {
-    $(filters).hide();
+    $(tools).hide();
     $(results).html("<h4>Your search returned 0 hits.</h4>");
     return;
   }
 
-  $(filters).show();
+  $(tools).show();
 
   root = formatted;
   root.x0 = height / 2;
@@ -501,15 +501,28 @@ LSS.renderMenu = function(algo) {
 
   var self = this,
       algo = algo.toLowerCase(),
+      view = $("#view"),
       loading = $("#menu-loading"),
-      selectable = $("#selectable-algorithms");
+      algorithms = $("#algorithms");
 
   loading.empty();
 
-  selectable.append(
-    "<li class='ui-widget-content ui-selectee ui-corner-all'>" +
-    algo + "</li>"
+  algorithms.append(
+    "<input type='checkbox' id='" + algo + "' value='" + algo + "'/>" +
+    "<label for='" + algo + "'>" + algo + "</label><br />"
   );
+
+  // Format the checkboxes
+  $("input:checkbox", algorithms).button();
+
+  // Add the click event handler
+  $("input:checkbox", algorithms).click(function() {
+    if ($("input:checkbox:checked", algorithms).length > 0) {
+      view.show();
+    } else {
+      view.hide();
+    }
+  });
 
 };
 
@@ -530,29 +543,79 @@ LSS.collectResults = function(id, data, algo) {
 
 };
 
+//
+// jQuery event handlers
+//
 $(function() {
-  $("#filters").hide();
+  $("#view").hide();
+  $("#tools").hide();
+  $("input:checkbox, button", "#results-menu").button();
 
-  //
-  // Add jQuery-UI selectable to filters
-  //
-  $("#selectable-filters").selectable({
-    stop: function() {
-      var selected = [];
+  // View
+  $("#view").click(function() {
+    var algorithms = $("#algorithms input:checkbox:checked");
+
+    LSS.renderTree(null, algorithms.val());
+  });
+
+  // Expand Tree
+  $("#expand-tree").click(function() {
+    var algos = [];
+    $("input:checkbox:checked", "#algorithms").each(function() {
+      algos.push($(this).val());
+    });
+
+    if (!_.isEmpty(algos)) {
+      LSS.expandTree(algos.join("-"));
     }
   });
 
-  //
-  // Add jQuery-UI selectable to algorithms.
-  //
-  $("#selectable-algorithms").selectable({
-    stop: function() {
-      var selected = $(".ui-selected", this).html();
-      LSS.renderTree(null, selected);
-    },
+  // Top Hits
+  $("#top-hits").click(function() {
+    var algos = [];
+    $("input:checkbox:checked", "#algorithms").each(function() {
+      algos.push($(this).val());
+    });
 
-    unselected: function() {
+    if (!_.isEmpty(algos)) {
+      LSS.expandTopHits(algos.join("-"));
+    }
+  });
 
+  // Top Hits Per Reference Sequence
+  $("#top-hits-per-ref-seq").click(function() {
+    var algos = [];
+    $("input:checkbox:checked", "#algorithms").each(function() {
+      algos.push($(this).val());
+    });
+
+    if (!_.isEmpty(algos)) {
+      LSS.expandTopHitPerRefSeq(algos.join("-"));
+    }
+  });
+
+  // Top Hits Per Reference
+  $("#top-hits-per-ref").click(function() {
+    var algos = [];
+    $("input:checkbox:checked", "#algorithms").each(function() {
+      algos.push($(this).val());
+    });
+
+    if (!_.isEmpty(algos)) {
+      LSS.expandTopHitPerRef(algos.join("-"));
+    }
+  });
+
+  // Evalue Filter
+  $("#filter-evalue").click(function() {
+    var val = $("#evalue").val();
+    var algos = [];
+    $("input:checkbox:checked", "#algorithms").each(function() {
+      algos.push($(this).val());
+    });
+
+    if (!_.isEmpty(algos)) {
+      LSS.evalueFilter(val, algos.join("-"));
     }
   });
 });

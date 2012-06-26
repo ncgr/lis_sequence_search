@@ -6,19 +6,16 @@
       <div id="menu-loading">
         <p>Loading... <%= image_tag "quorum/loading.gif" %></p>
       </div>
-      <ol id="selectable-algorithms" class="selectable"></ol>
-      <div id="filters">
+      <div id="algorithms"></div>
+      <button id="view">view selected</button>
+      <div id="tools">
         <p><hr /></p>
-        <ol id="selectable-filters" class="selectable">
-          <li class="ui-widget-content ui-selectee ui-corner-all">top hit(s)</li>
-          <li class="ui-widget-content ui-selectee ui-corner-all">top hit(s) per reference sequence</li>
-          <li class="ui-widget-content ui-selectee ui-corner-all">top hit(s) per reference</li>
-          <li class="ui-widget-content ui-selectee ui-corner-all">expand tree</li>
-        </ol>
-        <input size=5 type="text" name="eval" id="eval" value="" placeholder="Evalue" />
-        <button id="eval-button">
-          filter
-        </button>
+        <button id="expand-tree">expand tree</button>
+        <button id="top-hits">top hit(s)</button>
+        <button id="top-hits-per-ref-seq">top hit(s) per reference sequence</button>
+        <button id="top-hits-per-ref">top hit(s) per reference</button>
+        <input size=5 type="text" name="evalue" id="evalue" value="" placeholder="Evalue" />
+        <button id="filter-evalue">filter</button>
       </div>
     </div>
     <div id="search-results"></div>
@@ -39,27 +36,6 @@
 <script src="/assets/lss.js"></script>
 <script type="text/javascript">
   $(function() {
-    //
-    // Asynchronously poll Quorum for search results.
-    //
-    //  QUORUM.pollResults(id, callback, callback_obj, interval)
-    //    id: Job.id
-    //    callback: Define your own callback function to override the default.
-    //      callback should expect the following params.
-    //        id: Job.id (Int),
-    //        data: JSON data (JSON),
-    //        algorithm: Supported algorithm (String).
-    //    callback_obj: Callback object.
-    //    interval: poll interval in milliseconds. 5000 default.
-    //
-    //  Example:
-    //    QUORUM.pollResults(<%= @jobs.id %>, MYAPP.myCoolCallback, MYAPP, 5000);
-    //
-    //  Example callback:
-    //    MYAPP.myCoolCallback = function(id, data, algo) {
-    //      // awesome logic
-    //    };
-    //
     QUORUM.pollResults(<%= @jobs.id %>, LSS.collectResults, LSS);
   });
 </script>
