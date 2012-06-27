@@ -14,9 +14,9 @@ var LSS = LSS || {};
 LSS.data = LSS.data || {};
 
 //
-// Remove unwanted properties.
+// Remove unwanted properties and add algo property to each object.
 //
-LSS.trimData = function(data) {
+LSS.trimData = function(data, algo) {
 
   var self = this,
       wanted,
@@ -46,6 +46,7 @@ LSS.trimData = function(data) {
         delete data[i][d];
       }
     }
+    _.extend(data[i], { "algo": algo });
   }
 
   return data;
@@ -55,101 +56,119 @@ LSS.trimData = function(data) {
 //
 // Expand top hit per query sequence.
 //
-LSS.expandTopHits = function(algo) {
+LSS.expandTopHits = function(algos) {
 
   var self = this,
-      algo = algo.toLowerCase(),
-      cached = algo + "-cached",
-      data,
-      results = "#" + algo + "-results";
+      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
+      cached = algos.join("-") + "-cached",
+      data = [],
+      results = "#search-results";
 
   $(results).empty();
 
-  data = _.reject(self.data[algo], function(d) {
-    return _.isUndefined(d.top_hit);
+  _.each(algos, function(a) {
+    data.push(_.reject(self.data[a], function(d) {
+      return _.isUndefined(d.top_hit);
+    }));
   });
 
   // Cache the result for further filtering.
   self.data[cached] = data;
 
-  self.renderTree(data, algo);
+  self.renderTree(data, algos);
 
 };
 
 //
 // Expand top hit per reference sequence.
 //
-LSS.expandTopHitPerRefSeq = function(algo) {
+LSS.expandTopHitPerRefSeq = function(algos) {
 
   var self = this,
-      algo = algo.toLowerCase(),
-      cached = algo + "-cached",
-      results = "#" + algo + "-results",
+      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
+      cached = algos.join("-") + "-cached",
+      results = "#search-results",
       found,
+      tmp = [],
       ref = [];
 
   $(results).empty();
 
-  _.each(self.data[algo], function(d) {
-    found = _.find(ref, function(r) {
-      return r.hit_display_id === d.hit_display_id && r.query === d.query;
+  _.each(algos, function(a) {
+    _.each(self.data[a], function(d) {
+      if (!_.isNull(d.hit_display_id)) {
+        found = _.find(tmp, function(t) {
+          return t.hit_display_id === d.hit_display_id && t.query === d.query;
+        });
+        if (!found) {
+          tmp.push(d);
+        }
+      }
     });
-    if (!found) {
-      ref.push(d);
-    }
+    ref.push(tmp);
+    tmp = [];
   });
 
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderTree(ref, algo);
+  self.renderTree(ref, algos);
 
 };
 
 //
 // Expand top hit per reference.
 //
-LSS.expandTopHitPerRef = function(algo) {
+LSS.expandTopHitPerRef = function(algos) {
 
   var self = this,
-      algo = algo.toLowerCase(),
-      cached = algo + "-cached",
-      results = "#" + algo + "-results",
+      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
+      cached = algos.join("-") + "-cached",
+      results = "#search-results",
       found,
+      tmp = [],
       ref = [];
 
   $(results).empty();
 
-  // Add ref property to each object.
-  _.each(self.data[algo], function(d) {
-    hit = d.hit_display_id.split(":");
-    _.extend(d, { "ref": hit[0] });
-  });
-
-  _.each(self.data[algo], function(d) {
-    found = _.find(ref, function(r) {
-      return r.ref === d.ref && r.query === d.query;
+  _.each(algos, function(a) {
+    // Add ref property to each object.
+    _.each(self.data[a], function(d) {
+      if (!_.isNull(d.hit_display_id)) {
+        hit = d.hit_display_id.split(":");
+        _.extend(d, { "ref": hit[0] });
+      }
     });
-    if (!found) {
-      ref.push(d);
-    }
+
+    _.each(self.data[a], function(d) {
+      if (!_.isNull(d.hit_display_id)) {
+        found = _.find(tmp, function(t) {
+          return t.ref === d.ref && t.query === d.query;
+        });
+        if (!found) {
+          tmp.push(d);
+        }
+      }
+    });
+    ref.push(tmp);
+    tmp = [];
   });
 
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderTree(ref, algo);
+  self.renderTree(ref, algos);
 
 };
 
 //
 // Expand tree using original dataset.
 //
-LSS.expandTree = function(algo) {
+LSS.expandTree = function(algos) {
 
   var self = this,
-      algo = algo.toLowerCase(),
-      cached = algo + "-cached",
+      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
+      cached = algos.join("-") + "-cached",
       results = "#search-results";
 
   $(results).empty();
@@ -157,33 +176,43 @@ LSS.expandTree = function(algo) {
   // Destroy any cached data.
   self.data[cached] = null;
 
-  self.renderTree(self.data[algo], algo);
+  self.renderTree(null, algos);
 
 };
 
 //
 // Filter dataset on evalue.
 //
-LSS.evalueFilter = function(value, algo) {
+LSS.evalueFilter = function(value, algos) {
 
   var self = this,
-      algo = algo.toLowerCase(),
-      cached = algo + "-cached",
+      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
+      cached = algos.join("-") + "-cached",
       data,
+      tmp = [],
+      i,
       value = value || "0.0",
       results = "#search-results";
 
   // Perform the filter on the cached data if applicable.
-  // Otherwise use the original dataset.
-  data = self.data[cached] || self.data[algo];
+  // Otherwise use the original data.
+  if (_.isNull(self.data[cached])) {
+    data = self.gatherCheckedData(algos);
+  } else {
+    data = self.data[cached];
+  }
 
-  data = _.reject(data, function(d) {
-    return parseFloat(d.evalue) > parseFloat(value);
-  });
+  for (i = 0; i < algos.length; i++) {
+    tmp.push(_.reject(data[i], function(d) {
+      if (!_.isUndefined(d.evalue)) {
+        return parseFloat(d.evalue) > parseFloat(value);
+      }
+    }));
+  }
 
   $(results).empty();
 
-  self.renderTree(data, algo);
+  self.renderTree(tmp, algos);
 };
 
 //
@@ -221,10 +250,14 @@ LSS.formatGroups = function(data) {
 
   // Extend each object with name and size properties for d3.
   // To avoid d3 tree node id property collisions, rename hit id
-  // to quorum_id.
+  // to quorum_hit_id.
   _.each(groups, function(v, k) {
     _.each(v, function(d) {
-      _.extend(d, { "name": "Evalue: " + d.evalue, "size": parseFloat(d.evalue), "quorum_id": d.id });
+      _.extend(d, {
+        "name": "Evalue: " + parseFloat(d.evalue).toPrecision(3),
+        "size": parseFloat(d.evalue).toPrecision(3),
+        "quorum_hit_id": d.id
+      });
     });
   });
 
@@ -237,6 +270,9 @@ LSS.formatGroups = function(data) {
 
 };
 
+//
+// Format HSPs.
+//
 LSS.formatHsps = function(data) {
 
   var self = this,
@@ -253,7 +289,7 @@ LSS.formatHsps = function(data) {
 };
 
 //
-// Format queries for d3 tree layout.
+// Format queries.
 //
 LSS.formatQueries = function(data) {
 
@@ -272,13 +308,9 @@ LSS.formatQueries = function(data) {
 };
 
 //
-// Format data into nested JSON.
+// Format single data set.
 //
-LSS.formatResults = function(data, algo) {
-
-  if (_.isEmpty(data) || data[0].results === false) {
-    return {};
-  }
+LSS.formatData = function(data, algo) {
 
   var self = this,
       groups = {},
@@ -288,6 +320,10 @@ LSS.formatResults = function(data, algo) {
     "name": algo,
     "children": []
   };
+
+  if (_.isEmpty(data) || data[0].results === false) {
+    return formatted;
+  }
 
   groups = self.formatGroups(data);
 
@@ -322,15 +358,58 @@ LSS.formatResults = function(data, algo) {
 };
 
 //
-// Renders an interactive d3 tree.
+// Format results into nested JSON.
 //
-LSS.renderTree = function(data, algo) {
+LSS.formatResults = function(data, algos) {
 
   var self = this,
-      algo = algo.toLowerCase(),
-      data = data || self.data[algo],
+      formatted,
+      i;
+
+  // If multiple data sets are selected, combine into a single tree.
+  if (data.length > 1) {
+    formatted = {
+      "name": self.quorum_id,
+      "children": []
+    };
+
+    for (i = 0; i < data.length; i++) {
+      formatted.children.push(self.formatData(data[i], algos[i]));
+    }
+  } else {
+    formatted = self.formatData(data[0], algos[0]);
+  }
+
+  return formatted;
+
+};
+
+//
+// Gather data set per algorithm.
+//
+LSS.gatherCheckedData = function(algos) {
+
+  var self = this,
+      data = [];
+
+  _.each(algos, function(a) {
+    data.push(self.data[a]);
+  });
+
+  return data;
+
+};
+
+//
+// Renders an interactive d3 tree.
+//
+LSS.renderTree = function(data, algos) {
+
+  var self = this,
+      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
+      data,
       id = self.quorum_id,
-      margin = { top: 20, right: 120, bottom: 20, left: 120 },
+      margin = { top: 20, right: 0, bottom: 20, left: 45 },
       width = 1280 - margin.right - margin.left,
       height = 1200 - margin.top - margin.bottom,
       i = 0,
@@ -355,13 +434,12 @@ LSS.renderTree = function(data, algo) {
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  formatted = self.formatResults(data, algo);
-
-  if (_.isEmpty(formatted)) {
-    $(tools).hide();
-    $(results).html("<h4>Your search returned 0 hits.</h4>");
-    return;
+  // Gather data sets if data is null.
+  if (_.isNull(data)) {
+    data = self.gatherCheckedData(algos);
   }
+
+  formatted = self.formatResults(data, algos);
 
   $(tools).show();
 
@@ -418,7 +496,15 @@ LSS.renderTree = function(data, algo) {
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
       .attr("onclick", function(d) {
-        return (d.children || d._children) ? "" : "QUORUM.viewDetailedReport(" + id + "," + d.quorum_id + ",'" + d.query + "','" + algo + "')";
+        var h;
+        if (d.children || d._children) {
+          h = "";
+        } else {
+          h = "QUORUM.viewDetailedReport(" +
+            id + "," + d.quorum_hit_id + ",'" + d.query + "','" + d.algo +
+          "')";
+        }
+        return h;
       })
       .attr("class", function(d) {
         var r;
@@ -536,7 +622,7 @@ LSS.collectResults = function(id, data, algo) {
   self.quorum_id = self.quorum_id || id;
 
   // Copy trimmed datasets.
-  self.data[algo] = self.trimData(data);
+  self.data[algo] = self.trimData(data, algo);
 
   // Render menu
   self.renderMenu(algo);
@@ -551,71 +637,67 @@ $(function() {
   $("#tools").hide();
   $("input:checkbox, button", "#results-menu").button();
 
-  // View
-  $("#view").click(function() {
-    var algorithms = $("#algorithms input:checkbox:checked");
-
-    LSS.renderTree(null, algorithms.val());
-  });
-
-  // Expand Tree
-  $("#expand-tree").click(function() {
+  var checkedAlgos = function() {
     var algos = [];
     $("input:checkbox:checked", "#algorithms").each(function() {
       algos.push($(this).val());
     });
 
+    return algos;
+  };
+
+  // View
+  $("#view").click(function() {
+    var algos = checkedAlgos();
+
     if (!_.isEmpty(algos)) {
-      LSS.expandTree(algos.join("-"));
+      LSS.renderTree(null, algos);
+    }
+  });
+
+  // Expand Tree
+  $("#expand-tree").click(function() {
+    var algos = checkedAlgos();
+
+    if (!_.isEmpty(algos)) {
+      LSS.expandTree(algos);
     }
   });
 
   // Top Hits
   $("#top-hits").click(function() {
-    var algos = [];
-    $("input:checkbox:checked", "#algorithms").each(function() {
-      algos.push($(this).val());
-    });
+    var algos = checkedAlgos();
 
     if (!_.isEmpty(algos)) {
-      LSS.expandTopHits(algos.join("-"));
+      LSS.expandTopHits(algos);
     }
   });
 
   // Top Hits Per Reference Sequence
   $("#top-hits-per-ref-seq").click(function() {
-    var algos = [];
-    $("input:checkbox:checked", "#algorithms").each(function() {
-      algos.push($(this).val());
-    });
+    var algos = checkedAlgos();
 
     if (!_.isEmpty(algos)) {
-      LSS.expandTopHitPerRefSeq(algos.join("-"));
+      LSS.expandTopHitPerRefSeq(algos);
     }
   });
 
   // Top Hits Per Reference
   $("#top-hits-per-ref").click(function() {
-    var algos = [];
-    $("input:checkbox:checked", "#algorithms").each(function() {
-      algos.push($(this).val());
-    });
+    var algos = checkedAlgos();
 
     if (!_.isEmpty(algos)) {
-      LSS.expandTopHitPerRef(algos.join("-"));
+      LSS.expandTopHitPerRef(algos);
     }
   });
 
   // Evalue Filter
   $("#filter-evalue").click(function() {
     var val = $("#evalue").val();
-    var algos = [];
-    $("input:checkbox:checked", "#algorithms").each(function() {
-      algos.push($(this).val());
-    });
+    var algos = checkedAlgos();
 
     if (!_.isEmpty(algos)) {
-      LSS.evalueFilter(val, algos.join("-"));
+      LSS.evalueFilter(val, algos);
     }
   });
 });
