@@ -6,3 +6,4 @@
 /quorum/gff3
 /quorum/log
 /quorum/tmp
+config/database.yml
