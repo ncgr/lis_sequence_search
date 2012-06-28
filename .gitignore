@@ -2,8 +2,8 @@
 /db/*.rdb
 /log/*.log
 /tmp
-/quorum/blastdb
-/quorum/gff3
-/quorum/log
-/quorum/tmp
+/lss_quorum/blastdb
+/lss_quorum/gff3
+/lss_quorum/log
+/lss_quorum/tmp
 config/database.yml

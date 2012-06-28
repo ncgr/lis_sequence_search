@@ -54,6 +54,22 @@ LSS.trimData = function(data, algo) {
 };
 
 //
+// Gather data set per algorithm.
+//
+LSS.gatherCheckedData = function(algos) {
+
+  var self = this,
+      data = [];
+
+  _.each(algos, function(a) {
+    data.push(self.data[a]);
+  });
+
+  return data;
+
+};
+
+//
 // Expand top hit per query sequence.
 //
 LSS.expandTopHits = function(algos) {
@@ -196,7 +212,7 @@ LSS.evalueFilter = function(value, algos) {
 
   // Perform the filter on the cached data if applicable.
   // Otherwise use the original data.
-  if (_.isNull(self.data[cached])) {
+  if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
     data = self.gatherCheckedData(algos);
   } else {
     data = self.data[cached];
@@ -381,22 +397,6 @@ LSS.formatResults = function(data, algos) {
   }
 
   return formatted;
-
-};
-
-//
-// Gather data set per algorithm.
-//
-LSS.gatherCheckedData = function(algos) {
-
-  var self = this,
-      data = [];
-
-  _.each(algos, function(a) {
-    data.push(self.data[a]);
-  });
-
-  return data;
 
 };
 
