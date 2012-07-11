@@ -11,7 +11,8 @@ group :assets do
 end
 
 gem 'jquery-rails'
-gem 'quorum', '~> 0.3.2'
+gem 'quorum', :git => 'https://github.com/ncgr/quorum.git',
+  :branch => 'data_export'
 
 group :development do
   gem 'debugger'

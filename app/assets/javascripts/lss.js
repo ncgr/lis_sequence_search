@@ -410,29 +410,22 @@ LSS.renderTree = function(data, algos) {
       data,
       id = self.quorum_id,
       margin = { top: 20, right: 0, bottom: 20, left: 45 },
-      width = 1280 - margin.right - margin.left,
-      height = 1200 - margin.top - margin.bottom,
+      width = 1280 - margin.right - margin.left, // default width
+      height = 800 - margin.top - margin.bottom, // default height
       i = 0,
       k,
       duration = 500,
-      root,
       results = "#search-results",
-      tools = "#tools";
+      tools = "#tools",
+      root,
+      tree,
+      diagonal,
+      vis,
+      leaf_size = 12, // pixels per leaf node
+      total_leaf_size = 0;
 
   // Empty results before calling d3.
   $(results).empty();
-
-  var tree = d3.layout.tree()
-    .size([height, width]);
-
-  var diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
-
-  var vis = d3.select(results).append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // Gather data sets if data is null.
   if (_.isNull(data)) {
@@ -441,11 +434,41 @@ LSS.renderTree = function(data, algos) {
 
   formatted = self.formatResults(data, algos);
 
+  // Recursively calculate the total number of leaves in the tree.
+  function totalLeafSize(d) {
+    if (d.children) {
+      d.children.forEach(totalLeafSize);
+    } else {
+      total_leaf_size += leaf_size;
+    }
+  }
+
+  totalLeafSize(formatted);
+
+  // If the calculated total_leaf_size is > than the default height,
+  // set height to the total_leaf_size to ensure each leaf node has
+  // approximately 12x12 px of space.
+  if (total_leaf_size > height) {
+    height = total_leaf_size - margin.top - margin.bottom;
+  }
+
   $(tools).show();
 
   root = formatted;
   root.x0 = height / 2;
   root.y0 = 0;
+
+  tree = d3.layout.tree()
+    .size([height, width]);
+
+  diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+  vis = d3.select(results).append("svg")
+    .attr("width", width + margin.right + margin.left)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // Toggle children.
   function toggle(d) {
@@ -458,7 +481,7 @@ LSS.renderTree = function(data, algos) {
     }
   }
 
-  // Toggle all.
+  // Recursively toggle all nodes deeper than level 1.
   function toggleAll(d) {
     if (d.children) {
       d.children.forEach(toggleAll);
@@ -477,7 +500,7 @@ LSS.renderTree = function(data, algos) {
 
     // Update the nodes…
     var node = vis.selectAll("g.node")
-      .data(nodes, function(d) { return d.id || (d.id = ++i); });
+      .data(nodes, function(d) { return d.id || (d.id = i += 1); });
 
     // Enter any new nodes at the parent's previous position.
     var nodeEnter = node.enter().append("g")
