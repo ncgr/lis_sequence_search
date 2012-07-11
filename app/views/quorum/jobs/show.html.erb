@@ -32,8 +32,6 @@
 
 <%= render :partial => "quorum/jobs/templates/blast_detailed_report_template" %>
 
-<script src="/assets/d3.v2.js"></script>
-<script src="/assets/lss.js"></script>
 <script type="text/javascript">
   $(function() {
     QUORUM.pollResults(<%= @jobs.id %>, LSS.collectResults, LSS);
