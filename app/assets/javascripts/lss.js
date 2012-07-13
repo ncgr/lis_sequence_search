@@ -9,6 +9,16 @@
 var LSS = LSS || {};
 
 //
+// Third party URLs used to view result sets.
+//
+LSS.exportUrls = {
+  cmtv: "http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys." +
+    "CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/" +
+    "Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40" +
+    document.URL + "/get_quorum_search_results.gff%3F"
+};
+
+//
 // Cache the datasets returned from Quorum per algorithm.
 //
 LSS.data = LSS.data || {};
@@ -422,7 +432,8 @@ LSS.renderTree = function(data, algos) {
       diagonal,
       vis,
       leaf_size = 12, // pixels per leaf node
-      total_leaf_size = 0;
+      total_leaf_size = 0,
+      leaf_data;
 
   // Empty results before calling d3.
   $(results).empty();
@@ -432,6 +443,7 @@ LSS.renderTree = function(data, algos) {
     data = self.gatherCheckedData(algos);
   }
 
+  // Stuff data into a nested JSON.
   formatted = self.formatResults(data, algos);
 
   // Recursively calculate the total number of leaves in the tree.
@@ -452,6 +464,7 @@ LSS.renderTree = function(data, algos) {
     height = total_leaf_size - margin.top - margin.bottom;
   }
 
+  // Display tools
   $(tools).show();
 
   root = formatted;
@@ -482,6 +495,7 @@ LSS.renderTree = function(data, algos) {
   }
 
   // Recursively toggle all nodes deeper than level 1.
+  // Call this function if you choose to collapse the tree.
   function toggleAll(d) {
     if (d.children) {
       d.children.forEach(toggleAll);
@@ -601,6 +615,42 @@ LSS.renderTree = function(data, algos) {
   }
 
   update(root);
+
+  // Recursively gather visible node data.
+  function gatherVisibleLeafNodeData(d) {
+    if (d.children) {
+      d.children.forEach(gatherVisibleLeafNodeData);
+    } else {
+      if (_.isArray(leaf_data[d.algo])) {
+        leaf_data[d.algo].push(d.id);
+      } else {
+        leaf_data[d.algo] = [];
+        leaf_data[d.algo].push(d.id);
+      }
+    }
+  }
+
+  // Export data set
+  function exportDataSet() {
+    var cmtv = self.exportUrls.cmtv;
+    leaf_data = {};
+
+    gatherVisibleLeafNodeData(root);
+
+    cmtv += "algo%3D" + _.keys(leaf_data).join(",");
+    _.each(leaf_data, function(v, k) {
+      cmtv += "%26" + k + "_id%3D" + v.join(",");
+    });
+
+    window.open(cmtv);
+  }
+
+  // View in cmtv event handler.
+  // Hack to ensure only one event handler is bound.
+  // TODO: Make this purdy.
+  $('#cmtv').unbind('click').bind('click', function() {
+    exportDataSet()
+  });
 };
 
 //

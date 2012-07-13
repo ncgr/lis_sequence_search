@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncgr/quorum.git
-  revision: 139350c7289f6075d5993f260dbd5682b2fd3ac6
+  revision: 9d9c615752d40ca9511d6759e460785cab998ca6
   branch: data_export
   specs:
     quorum (0.3.2)
