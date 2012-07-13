@@ -19,7 +19,6 @@ tar -czf lis_sequence_search-release.tar.gz \
     lis_sequence_search/Rakefile \
     lis_sequence_search/README.rdoc \
     lis_sequence_search/script \
-    lis_sequence_search/spec \
     lis_sequence_search/start_redis_server.bash \
     lis_sequence_search/vendor
 
