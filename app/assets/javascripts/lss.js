@@ -9,13 +9,14 @@
 var LSS = LSS || {};
 
 //
-// Third party URLs used to view result sets.
+// URLs used to view result sets.
 //
 LSS.exportUrls = {
   cmtv: "http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys." +
-    "CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/" +
-    "Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40" +
-    document.URL + "/get_quorum_search_results.gff%3F"
+    "CompMapViewerService@--style@http://velarde.ncgr.org:7070/isys/bin/" +
+    "Components/cmtv/conf/cmtv_combined_map_style.xml@--combined_display@" +
+    document.URL + "/get_quorum_search_results.gff?",
+  tab: document.URL + "/get_quorum_search_results.txt?"
 };
 
 //
@@ -631,25 +632,46 @@ LSS.renderTree = function(data, algos) {
   }
 
   // Export data set
-  function exportDataSet() {
-    var cmtv = self.exportUrls.cmtv;
+  function exportDataSet(type, encode) {
+    var url = self.exportUrls[type];
+    encode = encode || false;
     leaf_data = {};
 
     gatherVisibleLeafNodeData(root);
 
-    cmtv += "algo%3D" + _.keys(leaf_data).join(",");
+    url += "algo=" + _.keys(leaf_data).join(",");
     _.each(leaf_data, function(v, k) {
-      cmtv += "%26" + k + "_id%3D" + v.join(",");
+      url += "&" + k + "_id=" + v.join(",");
     });
 
-    window.open(cmtv);
+    // Encode URI.
+    if (encode) {
+      url = url.replace(/[@=&\?]/g, function(c) {
+        var chars = {
+          '&' : '%26',
+          '=' : '%3D',
+          '?' : '%3F',
+          '@' : '%40'
+        };
+        return chars[c];
+      });
+    }
+
+    window.open(url);
   }
 
   // View in cmtv event handler.
   // Hack to ensure only one event handler is bound.
   // TODO: Make this purdy.
   $('#cmtv').unbind('click').bind('click', function() {
-    exportDataSet()
+    exportDataSet("cmtv", true);
+  });
+
+  // View tab delimited results event handler.
+  // Hack to ensure only one event handler is bound.
+  // TODO: Make this purdy.
+  $('#tab').unbind('click').bind('click', function() {
+    exportDataSet("tab", false);
   });
 };
 
