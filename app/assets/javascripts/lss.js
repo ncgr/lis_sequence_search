@@ -13,9 +13,9 @@ var LSS = LSS || {};
 //
 LSS.exportUrls = {
   cmtv: "http://velarde.ncgr.org:7070/isys/launch?svc=org.ncgr.cmtv.isys." +
-    "CompMapViewerService@--style@http://velarde.ncgr.org:7070/isys/bin/" +
-    "Components/cmtv/conf/cmtv_combined_map_style.xml@--combined_display@" +
-    document.URL + "/get_quorum_search_results.gff?",
+    "CompMapViewerService%40--style%40http://velarde.ncgr.org:7070/isys/bin/" +
+    "Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40" +
+    document.URL + "/get_quorum_search_results.gff%3F",
   tab: document.URL + "/get_quorum_search_results.txt?"
 };
 
@@ -633,20 +633,21 @@ LSS.renderTree = function(data, algos) {
 
   // Export data set
   function exportDataSet(type, encode) {
-    var url = self.exportUrls[type];
+    var base = self.exportUrls[type],
+        query;
     encode = encode || false;
     leaf_data = {};
 
     gatherVisibleLeafNodeData(root);
 
-    url += "algo=" + _.keys(leaf_data).join(",");
+    query += "algo=" + _.keys(leaf_data).join(",");
     _.each(leaf_data, function(v, k) {
-      url += "&" + k + "_id=" + v.join(",");
+      query += "&" + k + "_id=" + v.join(",");
     });
 
     // Encode URI.
     if (encode) {
-      url = url.replace(/[@=&\?]/g, function(c) {
+      query = query.replace(/[@=&\?]/g, function(c) {
         var chars = {
           '&' : '%26',
           '=' : '%3D',
@@ -657,7 +658,7 @@ LSS.renderTree = function(data, algos) {
       });
     }
 
-    window.open(url);
+    window.open(base + query);
   }
 
   // View in cmtv event handler.
