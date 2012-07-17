@@ -189,9 +189,9 @@ LSS.expandTopHitPerRef = function(algos) {
 };
 
 //
-// Expand tree using original dataset.
+// Remove filters by expanding tree using original dataset.
 //
-LSS.expandTree = function(algos) {
+LSS.removeFilters = function(algos) {
 
   var self = this,
       algos = _.map(algos, function(a) { return a.toLowerCase(); }),
@@ -419,15 +419,16 @@ LSS.renderTree = function(data, algos) {
   var self = this,
       algos = _.map(algos, function(a) { return a.toLowerCase(); }),
       data,
+      results = "#search-results",
+      tools = "#tools",
       id = self.quorum_id,
-      margin = { top: 20, right: 0, bottom: 20, left: 45 },
-      width = 1280 - margin.right - margin.left, // default width
-      height = 800 - margin.top - margin.bottom, // default height
+      margin = { top: 20, right: 20, bottom: 20, left: 60 },
+      width = $(results).width() - margin.right - margin.left,
+      height = 800 - margin.top - margin.bottom,
+      node_distance = 240,
       i = 0,
       k,
       duration = 500,
-      results = "#search-results",
-      tools = "#tools",
       root,
       tree,
       diagonal,
@@ -435,9 +436,6 @@ LSS.renderTree = function(data, algos) {
       leaf_size = 12, // pixels per leaf node
       total_leaf_size = 0,
       leaf_data;
-
-  // Empty results before calling d3.
-  $(results).empty();
 
   // Gather data sets if data is null.
   if (_.isNull(data)) {
@@ -461,9 +459,15 @@ LSS.renderTree = function(data, algos) {
   // If the calculated total_leaf_size is > than the default height,
   // set height to the total_leaf_size to ensure each leaf node has
   // approximately 12x12 px of space.
+  //
+  // The width is adjusted in the update() below.
+  // See calculated_width.
   if (total_leaf_size > height) {
     height = total_leaf_size - margin.top - margin.bottom;
   }
+
+  // Empty results before calling d3.
+  $(results).empty();
 
   // Display tools
   $(tools).show();
@@ -510,8 +514,20 @@ LSS.renderTree = function(data, algos) {
     // Compute the new tree layout.
     var nodes = tree.nodes(root).reverse();
 
+    // Calculate the max depth of the tree.
+    var max_depth = d3.max(nodes, function(d) { return d.depth; });
+
+    // Calculate width using normalized node_distance.
+    var calculated_width = (max_depth * node_distance) + margin.right +
+      margin.left;
+
+    // Recalculate node_distance if it's greater than the width of the tree.
+    if (calculated_width > width) {
+      node_distance = (width / max_depth) - margin.right;
+    }
+
     // Normalize for fixed-depth.
-    nodes.forEach(function(d) { d.y = d.depth * 180; });
+    nodes.forEach(function(d) { d.y = d.depth * node_distance; });
 
     // Update the nodes…
     var node = vis.selectAll("g.node")
@@ -634,7 +650,7 @@ LSS.renderTree = function(data, algos) {
   // Export data set
   function exportDataSet(type, encode) {
     var base = self.exportUrls[type],
-        query;
+        query = "";
     encode = encode || false;
     leaf_data = {};
 
@@ -661,16 +677,12 @@ LSS.renderTree = function(data, algos) {
     window.open(base + query);
   }
 
-  // View in cmtv event handler.
+  // Export tree event handlers.
   // Hack to ensure only one event handler is bound.
   // TODO: Make this purdy.
   $('#cmtv').unbind('click').bind('click', function() {
     exportDataSet("cmtv", true);
   });
-
-  // View tab delimited results event handler.
-  // Hack to ensure only one event handler is bound.
-  // TODO: Make this purdy.
   $('#tab').unbind('click').bind('click', function() {
     exportDataSet("tab", false);
   });
@@ -691,11 +703,11 @@ LSS.renderMenu = function(algo) {
 
   algorithms.append(
     "<input type='checkbox' id='" + algo + "' value='" + algo + "'/>" +
-    "<label for='" + algo + "'>" + algo + "</label><br />"
+    "<label for='" + algo + "'>" + algo + "</label>"
   );
 
   // Format the checkboxes
-  $("input:checkbox", algorithms).button();
+  $(algorithms).buttonset();
 
   // Add the click event handler
   $("input:checkbox", algorithms).click(function() {
@@ -729,10 +741,29 @@ LSS.collectResults = function(id, data, algo) {
 // jQuery event handlers
 //
 $(function() {
-  $("#view").hide();
-  $("#tools").hide();
+  _.each(["#view", "#tools"], function(e) { $(e).hide(); });
   $("input:checkbox, button", "#results-menu").button();
 
+  // Filters menu.
+  _.each(["#filters", "#view-tree"], function(e) {
+    $(e).button({
+      icons: {
+        secondary : 'ui-icon-triangle-1-s'
+      }
+    })
+    .click(function() {
+      var menu = $(this).parent().next().show().position({
+        my : "left top",
+          at : "left bottom",
+          of : this
+      });
+      $(document).one('click', function() { menu.hide(); });
+      return false;
+    })
+    .parent().next().hide().menu();
+  });
+
+  // Gather checked algos.
   var checkedAlgos = function() {
     var algos = [];
     $("input:checkbox:checked", "#algorithms").each(function() {
@@ -751,13 +782,14 @@ $(function() {
     }
   });
 
-  // Expand Tree
-  $("#expand-tree").click(function() {
+  // Remove filters
+  $("#remove-filters").click(function() {
     var algos = checkedAlgos();
 
     if (!_.isEmpty(algos)) {
-      LSS.expandTree(algos);
+      LSS.removeFilters(algos);
     }
+    $("#evalue").val('');
   });
 
   // Top Hits

@@ -44,17 +44,15 @@ text.top-hit {
   color: white;
 }
 
-.selectable li {
-  margin: 3px;
-  padding: 0.4em;
-  font-size: 1.2em;
-}
-
 .selectable li:hover {
   cursor: pointer;
 }
 
-.ui-button {
-  margin: 4px;
-  padding: 0;
+.ui-menu {
+  position: absolute;
+  width: auto;
+}
+
+.ui-menu-item a {
+  font-weight: normal;
 }
