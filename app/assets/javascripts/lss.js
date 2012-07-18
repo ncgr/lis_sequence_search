@@ -34,6 +34,10 @@ LSS.trimData = function(data, algo) {
       len = data.length,
       i, d;
 
+  // Return null if data wasn't enqueued.
+  if (data[0].enqueued === false) {
+    return null;
+  }
   // Return data without result set.
   if (data[0].results === false) {
     return data;
@@ -730,10 +734,13 @@ LSS.collectResults = function(id, data, algo) {
   self.quorum_id = self.quorum_id || id;
 
   // Copy trimmed datasets.
+  // If the algorithm wasn't enqueued, trimData returns null.
   self.data[algo] = self.trimData(data, algo);
 
   // Render menu
-  self.renderMenu(algo);
+  if (!_.isNull(self.data[algo])) {
+    self.renderMenu(algo);
+  }
 
 };
 
