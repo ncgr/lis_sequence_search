@@ -9,6 +9,11 @@
 var LSS = LSS || {};
 
 //
+// Cache the datasets returned from Quorum per algorithm.
+//
+LSS.data = LSS.data || {};
+
+//
 // URLs used to view result sets.
 //
 LSS.exportUrls = {
@@ -20,9 +25,151 @@ LSS.exportUrls = {
 };
 
 //
-// Cache the datasets returned from Quorum per algorithm.
+// GBrowse URLs
 //
-LSS.data = LSS.data || {};
+LSS.gbrowseUrls = {
+  mt_jcvi: "http://gbrowse.jcvi.org/cgi-bin/gbrowse/medicago/?ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=Gene-Transcripts_all-Transcripts_Bud-Transcripts_Blade-Transcripts_Root-Transcripts_Flower-Transcripts_Seed-Transcripts_mtg-Gene_Models-mt_fgenesh-genemarkHMM-genscan-fgenesh-TC_poplar-TC_maize-TC_arabidopsis-TC_Lotus-TC_soybean-TC_cotton-TC_medicago-TC_rice-TC_sorghum;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+  mt_lis: "http://medtr.comparative-legumes.org/gb2/gbrowse/3.5.1/?ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+  mt_hapmap: "http://www.medicagohapmap.org/cgi-bin/gbrowse/mthapmap/?q=%ref%:%start%..%stop%;t=Genes+Transcript+ReadingFrame+Translation+SNP+SNP_HM005+CovU_HM005+SNP_HM006+CovU_HM006+SNP_HM029+CovU_HM029;c=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+  mt_affy: "http://mtgea.noble.org/v2/probeset.php?id=",
+  gm_soybase: "http://soybase.org/gb2/gbrowse/gmax1.01/?ref=%ref%;start=%start%;stop=%stop%;version=100;cache=on;drag_and_drop=on;show_tooltips=on;grid=on;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+  lj_kazusa: "http://gsv.kazusa.or.jp/cgi-bin/gbrowse/lotus/?ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;label=contig-phase3-phase1%%2C2-annotation-GMhmm-GenScan-blastn-tigrgi-blastx-marker;grid=on;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+  cc_lis: "http://cajca.comparative-legumes.org/gb2/gbrowse/1.0/?ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%"
+};
+
+//
+// Replace placeholders with correct values.
+//
+LSS.formatGbrowseUrl = function(data, url) {
+
+  var self = this,
+      hit,
+      chr,
+      area = 50000;
+
+  hit = _.last(data.hit_display_id.split(":"));
+  hit = hit.substring(hit.lastIndexOf('_') + 1, hit.length);
+
+  url = url.replace("%ref%", hit);
+  url = url.replace("%ref%", hit);
+  url = url.replace("%start%", data.hit_from);
+  url = url.replace("%stop%", data.hit_to);
+  url = url.replace("%query%", data.query);
+  url = url.replace("%hit_from%", data.hit_from);
+  url = url.replace("%hit_to%", data.hit_to);
+
+  return url;
+
+}
+
+//
+// Add Gm properties
+//
+LSS.addGm = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.gm_soybase,
+      urls = [];
+
+  urls.push({
+    "name": "Glycine max - Soybase",
+    "url": self.formatGbrowseUrl(data, url)
+  });
+
+  return urls;
+
+};
+
+//
+// Add Mt properties
+//
+LSS.addMt = function(data) {
+
+  var self = this,
+      urls = [];
+
+  urls.push({
+    "name": "Medicago truncatula - JCVI",
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.mt_jcvi)
+  });
+
+  urls.push({
+    "name": "Medicago truncatula - Hapmap",
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.mt_hapmap)
+  });
+
+  urls.push({
+    "name": "Medicago truncatula - LIS",
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.mt_lis)
+  });
+
+  return urls;
+
+};
+
+//
+// Add Lj properties
+//
+LSS.addLj = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.lj_kazusa,
+      urls = [];
+
+  urls.push({
+    "name": "Lotus japonicus - Kazusa",
+    "url": self.formatGbrowseUrl(data, url)
+  });
+
+  return urls;
+
+};
+
+//
+// Add Cc properties
+//
+LSS.addCc = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.cc_lis,
+      urls = [];
+
+  urls.push({
+    "name": "Cajanus cajan - LIS",
+    "url": self.formatGbrowseUrl(data, url)
+  });
+
+  return urls;
+
+};
+
+//
+// Add linkouts to GBrowse instances.
+//
+LSS.addGbrowseLinkOuts = function(data) {
+
+  var self = this,
+      hit,
+      links = [];
+
+  hit = _.first(data.hit_display_id.split(":"));
+
+  if (hit.search(/gm_genome_rel_1_01/) === 0) {
+    links.push(self.addGm(data));
+  }
+  if (hit.search(/mt_genome_3_5_1/) === 0) {
+    links.push(self.addMt(data));
+  }
+  if (hit.search(/lj_genome_2_5/) === 0) {
+    links.push(self.addLj(data));
+  }
+  if (hit.search(/cc_genome_1_0/) === 0) {
+    links.push(self.addCc(data));
+  }
+
+  return links;
+
+};
 
 //
 // Remove unwanted properties and add algo property to each object.
@@ -279,14 +426,13 @@ LSS.formatGroups = function(data) {
   // Group by hit_display_id.
   groups = _.groupBy(data, 'hit_display_id');
 
-  // Extend each object with name and size properties for d3.
+  // Extend each object with name a property for d3.
   // To avoid d3 tree node id property collisions, rename hit id
   // to quorum_hit_id.
   _.each(groups, function(v, k) {
     _.each(v, function(d) {
       _.extend(d, {
         "name": "Evalue: " + parseFloat(d.evalue).toPrecision(3),
-        "size": parseFloat(d.evalue).toPrecision(3),
         "quorum_hit_id": d.id
       });
     });
@@ -302,6 +448,27 @@ LSS.formatGroups = function(data) {
 };
 
 //
+// Format link outs.
+//
+LSS.formatLinkOuts = function(data) {
+
+  var self = this,
+      links = [];
+
+  links.push(data);
+
+  // Add the GBrowse linkouts to each hsp.
+  _.each(self.addGbrowseLinkOuts(data), function(link) {
+    _.each(link, function(l) {
+      links.push(l);
+    });
+  });
+
+  return links;
+
+};
+
+//
 // Format HSPs.
 //
 LSS.formatHsps = function(data) {
@@ -312,7 +479,7 @@ LSS.formatHsps = function(data) {
   _.each(data, function(d) {
     hsps.push({
       "name": "q:" + d.query_from + "-" + d.query_to + "::h:" + d.hit_from + "-" + d.hit_to,
-      "children": [d]
+      "children": self.formatLinkOuts(d)
     });
   });
 
@@ -555,25 +722,27 @@ LSS.renderTree = function(data, algos) {
       .style("fill-opacity", 1e-6)
       .attr("onclick", function(d) {
         var h;
-        if (d.children || d._children) {
-          h = "";
-        } else {
+        if (d.quorum_hit_id) {
           h = "QUORUM.viewDetailedReport(" +
             id + "," + d.quorum_hit_id + ",'" + d.query + "','" + d.algo +
           "')";
+        } else if (d.url) {
+          h = "window.open('" + d.url + "')";
+        } else {
+          h = "";
         }
         return h;
       })
       .attr("class", function(d) {
         var r;
-        if (d.children || d._children) {
-          r = "";
-        } else {
+        if (d.quorum_hit_id || d.url) {
           if (d.top_hit) {
             r = "top-hit pointer";
           } else {
             r = "pointer";
           }
+        } else {
+          r = "";
         }
         return r;
       });
@@ -669,10 +838,10 @@ LSS.renderTree = function(data, algos) {
     if (encode) {
       query = query.replace(/[@=&\?]/g, function(c) {
         var chars = {
-          '&' : '%26',
-          '=' : '%3D',
-          '?' : '%3F',
-          '@' : '%40'
+          '&': '%26',
+          '=': '%3D',
+          '?': '%3F',
+          '@': '%40'
         };
         return chars[c];
       });
@@ -760,9 +929,9 @@ $(function() {
     })
     .click(function() {
       var menu = $(this).parent().next().show().position({
-        my : "left top",
-          at : "left bottom",
-          of : this
+        my: "left top",
+        at: "left bottom",
+        of: this
       });
       $(document).one('click', function() { menu.hide(); });
       return false;
