@@ -6,7 +6,13 @@
 //
 // Author: Ken Seal
 //
+
 var LSS = LSS || {};
+
+//
+// Cache the datasets returned from Quorum per algorithm.
+//
+LSS.data = LSS.data || {};
 
 //
 // URLs used to view result sets.
@@ -18,11 +24,6 @@ LSS.exportUrls = {
     document.URL + "/get_quorum_search_results.gff%3F",
   tab: document.URL + "/get_quorum_search_results.txt?"
 };
-
-//
-// Cache the datasets returned from Quorum per algorithm.
-//
-LSS.data = LSS.data || {};
 
 //
 // Remove unwanted properties and add algo property to each object.
@@ -279,14 +280,13 @@ LSS.formatGroups = function(data) {
   // Group by hit_display_id.
   groups = _.groupBy(data, 'hit_display_id');
 
-  // Extend each object with name and size properties for d3.
+  // Extend each object with name a property for d3.
   // To avoid d3 tree node id property collisions, rename hit id
   // to quorum_hit_id.
   _.each(groups, function(v, k) {
     _.each(v, function(d) {
       _.extend(d, {
         "name": "Evalue: " + parseFloat(d.evalue).toPrecision(3),
-        "size": parseFloat(d.evalue).toPrecision(3),
         "quorum_hit_id": d.id
       });
     });
@@ -554,10 +554,8 @@ LSS.renderTree = function(data, algos) {
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
       .attr("onclick", function(d) {
-        var h;
-        if (d.children || d._children) {
-          h = "";
-        } else {
+        var h = "";
+        if (d.quorum_hit_id) {
           h = "QUORUM.viewDetailedReport(" +
             id + "," + d.quorum_hit_id + ",'" + d.query + "','" + d.algo +
           "')";
@@ -565,10 +563,8 @@ LSS.renderTree = function(data, algos) {
         return h;
       })
       .attr("class", function(d) {
-        var r;
-        if (d.children || d._children) {
-          r = "";
-        } else {
+        var r = "";
+        if (d.quorum_hit_id) {
           if (d.top_hit) {
             r = "top-hit pointer";
           } else {
@@ -669,10 +665,10 @@ LSS.renderTree = function(data, algos) {
     if (encode) {
       query = query.replace(/[@=&\?]/g, function(c) {
         var chars = {
-          '&' : '%26',
-          '=' : '%3D',
-          '?' : '%3F',
-          '@' : '%40'
+          '&': '%26',
+          '=': '%3D',
+          '?': '%3F',
+          '@': '%40'
         };
         return chars[c];
       });
@@ -760,9 +756,9 @@ $(function() {
     })
     .click(function() {
       var menu = $(this).parent().next().show().position({
-        my : "left top",
-          at : "left bottom",
-          of : this
+        my: "left top",
+        at: "left bottom",
+        of: this
       });
       $(document).one('click', function() { menu.hide(); });
       return false;
