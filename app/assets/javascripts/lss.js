@@ -809,14 +809,12 @@ LSS.renderTree = function(data, algos) {
           h = "QUORUM.viewDetailedReport(" +
             id + "," + d.quorum_hit_id + ",'" + d.query + "','" + d.algo +
           "')";
-        } else if (d.url) {
-          h = "window.open('" + d.url + "')";
         }
         return h;
       })
       .attr("class", function(d) {
         var r = "";
-        if (d.quorum_hit_id || d.url) {
+        if (d.quorum_hit_id) {
           if (d.top_hit) {
             r = "top-hit pointer";
           } else {
