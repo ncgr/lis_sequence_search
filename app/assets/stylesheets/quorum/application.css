@@ -200,6 +200,11 @@ form label {
 
 /*** End Form Styles ***/
 
+#example-sequences a {
+  padding: 4px;
+  font-size: 12px;
+}
+
 #quorum {
   padding: 0;
   margin: 20px 0 20px 0;

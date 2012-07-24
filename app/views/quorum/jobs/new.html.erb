@@ -1,5 +1,12 @@
 <div id="new">
   <h1>Quorum Search</h1>
+
+  <div id="example-sequences">
+    <a id="cdna">cDNA Example</a>
+    <a id="prot">Peptide Example</a>
+    <a id="mixed">cDNA and Peptide Example</a>
+  </div>
+
   <%= form_for @job, :html => {:id => "quorum_job"} do |f| %>
     <%= render "shared/error_messages", :target => @job %>
     <div>

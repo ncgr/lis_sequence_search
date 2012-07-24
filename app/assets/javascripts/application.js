@@ -13,5 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require lss
+//= require sequences
 //= require d3.v2
 //= require_tree .

@@ -13,6 +13,7 @@
     {{ var qstrand   = v.query_frame }}
     {{ var hstrand   = v.hit_frame }}
     {{ var hsp_group = v.hsp_group }}
+    {{ var linkouts  = LSS.formatLinkouts(v) }}
     <div id="{{= id }}">
       <p class="small">{{= QUORUM.displayHspLinks(id, hsp_group, data) }}</p>
       <p class="small">Hit Accession: {{= v.hit_display_id }}</p>
@@ -39,6 +40,14 @@
           <td>Hit To: {{= v.hit_to }}</td>
         </tr>
       </table>
+      <p class="small">
+        {{ if (!_.isEmpty(linkouts)) { }}
+          Linkouts:<br />
+          {{ _.each(linkouts, function(l) { }}
+            <a href="{{= l.url }}" target="_blank">{{= l.name }}</a><br />
+          {{ }); }}
+        {{ } }}
+      </p>
       <p class="small">
         <a id="download_sequence_{{= id }}"
           onclick="QUORUM.downloadSequence(<%= @jobs.id %>, {{= id }}, '{{= algo }}', this)">
