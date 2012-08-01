@@ -2,6 +2,8 @@
 
 Prototype of the new LIS Sequence Search system.
 
+See it in action: http://doc.comparative-legumes.org/quorum/jobs/new
+
 Dependencies:
 
 * Quorum (https://github.com/ncgr/quorum)
@@ -17,7 +19,7 @@ Provide novel visualization of Blast results using d3.js tree layout.
 
 === Contributors
 
-* Andrew Farmer
+* Andrew Farmer (https://github.com/adf-ncgr)
 
 == License
 
