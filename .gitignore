@@ -7,3 +7,4 @@
 /lss_quorum/log
 /lss_quorum/tmp
 config/database.yml
+config/quorum_settings.yml
