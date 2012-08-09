@@ -1,10 +1,10 @@
 GIT
   remote: https://github.com/ncgr/quorum.git
-  revision: 815b7d6654912de5cd16685b983d61c102d31d55
+  revision: 357d35157fc5027c25470bd962790841d7ec619c
   branch: data_export
   specs:
     quorum (0.3.3)
-      bio-blastxmlparser (~> 1.0.1)
+      bio-blastxmlparser (~> 1.1.0)
       jquery-rails
       net-ssh (~> 2.3.0)
       rails (~> 3.1)
@@ -14,12 +14,12 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    actionmailer (3.2.7)
-      actionpack (= 3.2.7)
+    actionmailer (3.2.8)
+      actionpack (= 3.2.8)
       mail (~> 2.4.4)
-    actionpack (3.2.7)
-      activemodel (= 3.2.7)
-      activesupport (= 3.2.7)
+    actionpack (3.2.8)
+      activemodel (= 3.2.8)
+      activesupport (= 3.2.8)
       builder (~> 3.0.0)
       erubis (~> 2.7.0)
       journey (~> 1.0.4)
@@ -27,22 +27,22 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.1.3)
-    activemodel (3.2.7)
-      activesupport (= 3.2.7)
+    activemodel (3.2.8)
+      activesupport (= 3.2.8)
       builder (~> 3.0.0)
-    activerecord (3.2.7)
-      activemodel (= 3.2.7)
-      activesupport (= 3.2.7)
+    activerecord (3.2.8)
+      activemodel (= 3.2.8)
+      activesupport (= 3.2.8)
       arel (~> 3.0.2)
       tzinfo (~> 0.3.29)
-    activeresource (3.2.7)
-      activemodel (= 3.2.7)
-      activesupport (= 3.2.7)
-    activesupport (3.2.7)
+    activeresource (3.2.8)
+      activemodel (= 3.2.8)
+      activesupport (= 3.2.8)
+    activesupport (3.2.8)
       i18n (~> 0.6)
       multi_json (~> 1.0)
     arel (3.0.2)
-    bio-blastxmlparser (1.0.1)
+    bio-blastxmlparser (1.1.0)
       bio-logger (>= 1.0.0)
       nokogiri (>= 1.5.0)
     bio-logger (1.0.1)
@@ -96,17 +96,17 @@ GEM
       rack
     rack-test (0.6.1)
       rack (>= 1.0)
-    rails (3.2.7)
-      actionmailer (= 3.2.7)
-      actionpack (= 3.2.7)
-      activerecord (= 3.2.7)
-      activeresource (= 3.2.7)
-      activesupport (= 3.2.7)
+    rails (3.2.8)
+      actionmailer (= 3.2.8)
+      actionpack (= 3.2.8)
+      activerecord (= 3.2.8)
+      activeresource (= 3.2.8)
+      activesupport (= 3.2.8)
       bundler (~> 1.0)
-      railties (= 3.2.7)
-    railties (3.2.7)
-      actionpack (= 3.2.7)
-      activesupport (= 3.2.7)
+      railties (= 3.2.8)
+    railties (3.2.8)
+      actionpack (= 3.2.8)
+      activesupport (= 3.2.8)
       rack-ssl (~> 1.3.2)
       rake (>= 0.8.7)
       rdoc (~> 3.4)
@@ -140,7 +140,7 @@ GEM
       hike (~> 1.2)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
-    therubyracer (0.10.1)
+    therubyracer (0.10.2)
       libv8 (~> 3.3.10)
     thin (1.4.1)
       daemons (>= 1.0.9)
@@ -152,7 +152,7 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     tzinfo (0.3.33)
-    uglifier (1.2.6)
+    uglifier (1.2.7)
       execjs (>= 0.3.0)
       multi_json (~> 1.3)
     vegas (0.1.11)
@@ -167,7 +167,7 @@ DEPENDENCIES
   jquery-rails
   mysql2
   quorum!
-  rails (= 3.2.7)
+  rails (= 3.2.8)
   sass-rails (~> 3.2.3)
   therubyracer
   thin
