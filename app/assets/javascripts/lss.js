@@ -537,7 +537,8 @@ LSS.formatGroups = function(data) {
     _.each(v, function(d) {
       _.extend(d, {
         "name": "Evalue: " + parseFloat(d.evalue).toPrecision(3),
-        "quorum_hit_id": d.id
+        "quorum_hit_id": d.id,
+        "size": 1
       });
     });
   });
@@ -635,7 +636,7 @@ LSS.formatData = function(data, algo) {
         "name": hit[0],
         "children": [{
           "name": hit[1],
-          "size": self.numberOfQueries(groups[key])
+          "children": self.formatQueries(groups[key])
         }]
       });
     } else {
@@ -643,7 +644,7 @@ LSS.formatData = function(data, algo) {
         if (v.name === hit[0]) {
           v.children.push({
             "name": hit[1],
-            "size": self.numberOfQueries(groups[key])
+            "children": self.formatQueries(groups[key])
           });
         }
       });
@@ -760,7 +761,23 @@ LSS.renderTree = function(data, algos) {
     .attr("transform", function(d) { return "translate(8," + d.dx * ky / 2 + ")"; })
     .attr("dy", ".35em")
     .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; })
-    .text(function(d) { return d.name === "" ? "unknown" : d.name; });
+    .text(function(d) { return d.name; })
+    .on("click", function(d) {
+      if (d.quorum_hit_id) {
+        return QUORUM.viewDetailedReport(id, d.quorum_hit_id, d.query, d.algo);
+      } else {
+        return click(d);
+      }
+    })
+    .attr("class", function(d) {
+      var r = "";
+      if (d.top_hit) {
+        r = "top-hit pointer";
+      } else {
+        r = "pointer";
+      }
+      return r;
+    });
 
   var click = function(d) {
     if (!d.children) {
@@ -810,7 +827,7 @@ LSS.renderTree = function(data, algos) {
     encode = encode || false;
     leaf_data = {};
 
-    gatherVisibleLeafNodeData(root);
+    gatherVisibleLeafNodeData(formatted);
 
     query += "algo=" + _.keys(leaf_data).join(",");
     _.each(leaf_data, function(v, k) {

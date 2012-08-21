@@ -5,7 +5,7 @@
   stroke-width: 1.5px;
 }
 
-.node text {
+.node text, .icicle-node text {
   font: 10px sans-serif;
 }
 
@@ -72,9 +72,5 @@ text.top-hit {
 .icicle rect.parent {
   cursor: pointer;
   fill: steelblue;
-}
-
-text {
-  pointer-events: none;
 }
 
