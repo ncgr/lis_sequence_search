@@ -56,3 +56,25 @@ text.top-hit {
 .ui-menu-item a {
   font-weight: normal;
 }
+
+.icicle {
+  clear: both;
+  margin: 20px;
+  padding: 0;
+}
+
+.icicle rect {
+  stroke: #eee;
+  fill: #aaa;
+  fill-opacity: .8;
+}
+
+.icicle rect.parent {
+  cursor: pointer;
+  fill: steelblue;
+}
+
+text {
+  pointer-events: none;
+}
+

@@ -589,6 +589,22 @@ LSS.formatQueries = function(data) {
 };
 
 //
+// Calculate number of hits to each query sequence.
+//
+LSS.numberOfQueries = function(data) {
+
+  var self = this,
+      total = 0;
+
+  _.each(data, function(v, k) {
+    total += v.length;
+  });
+
+  return total;
+
+};
+
+//
 // Format single data set.
 //
 LSS.formatData = function(data, algo) {
@@ -619,7 +635,7 @@ LSS.formatData = function(data, algo) {
         "name": hit[0],
         "children": [{
           "name": hit[1],
-          "children": self.formatQueries(groups[key])
+          "size": self.numberOfQueries(groups[key])
         }]
       });
     } else {
@@ -627,7 +643,7 @@ LSS.formatData = function(data, algo) {
         if (v.name === hit[0]) {
           v.children.push({
             "name": hit[1],
-            "children": self.formatQueries(groups[key])
+            "size": self.numberOfQueries(groups[key])
           });
         }
       });
@@ -681,12 +697,18 @@ LSS.renderTree = function(data, algos) {
       height = 800 - margin.top - margin.bottom,
       node_distance = 240,
       i = 0,
+      x = d3.scale.linear().range([0, width]),
+      y = d3.scale.linear().range([0, height]),
       k,
       duration = 500,
       root,
       tree,
+      partition,
       diagonal,
       vis,
+      g,
+      kx,
+      ky,
       leaf_size = 12, // pixels per leaf node
       total_leaf_size = 0,
       leaf_data;
@@ -696,192 +718,76 @@ LSS.renderTree = function(data, algos) {
     data = self.gatherCheckedData(algos);
   }
 
-  // Stuff data into a nested JSON.
-  formatted = self.formatResults(data, algos);
-
-  // Recursively calculate the total number of leaves in the tree.
-  function totalLeafSize(d) {
-    if (d.children) {
-      d.children.forEach(totalLeafSize);
-    } else {
-      total_leaf_size += leaf_size;
-    }
-  }
-
-  totalLeafSize(formatted);
-
-  // If the calculated total_leaf_size is > than the default height,
-  // set height to the total_leaf_size to ensure each leaf node has
-  // approximately 12x12 px of space.
-  //
-  // The width is adjusted in the update() below.
-  // See calculated_width.
-  if (total_leaf_size > height) {
-    height = total_leaf_size - margin.top - margin.bottom;
-  }
-
   // Empty results before calling d3.
   $(results).empty();
 
   // Display tools
   $(tools).show();
 
-  root = formatted;
-  root.x0 = height / 2;
-  root.y0 = 0;
+  // Stuff data into a nested JSON.
+  formatted = self.formatResults(data, algos);
 
-  tree = d3.layout.tree()
-    .size([height, width]);
+  vis = d3.select(results).append("div")
+    .attr("class", "icicle")
+    .style("width", width + "px")
+    .style("height", height + "px")
+    .append("svg:svg")
+    .attr("width", width)
+    .attr("height", height);
 
-  diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
+  partition = d3.layout.partition()
+    .value(function(d) { return d.size; });
 
-  vis = d3.select(results).append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  g = vis.selectAll("g")
+    .data(partition.nodes(formatted))
+    .enter().append("svg:g")
+    .attr("class", "icicle-node")
+    .attr("transform", function(d) {
+      return "translate(" + x(d.y) + "," + y(d.x) + ")";
+    })
+  .on("click", click);
 
-  // Toggle children.
-  function toggle(d) {
-    if (d.children) {
-      d._children = d.children;
-      d.children = null;
-    } else {
-      d.children = d._children;
-      d._children = null;
-    }
-  }
+  kx = width / formatted.dx;
+  ky = height / 1;
 
-  // Recursively toggle all nodes deeper than level 1.
-  // Call this function if you choose to collapse the tree.
-  function toggleAll(d) {
-    if (d.children) {
-      d.children.forEach(toggleAll);
-      toggle(d);
-    }
-  }
+  g.append("svg:rect")
+    .attr("width", formatted.dy * kx)
+    .attr("height", function(d) { return d.dx * ky; })
+    .attr("class", function(d) { return d.children ? "parent" : "child"; })
+    .on("click", function(d) { click(d); });
 
-  // Update the tree.
-  function update(source) {
+  g.append("svg:text")
+    .attr("transform", function(d) { return "translate(8," + d.dx * ky / 2 + ")"; })
+    .attr("dy", ".35em")
+    .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; })
+    .text(function(d) { return d.name === "" ? "unknown" : d.name; });
 
-    // Compute the new tree layout.
-    var nodes = tree.nodes(root).reverse();
-
-    // Calculate the max depth of the tree.
-    var max_depth = d3.max(nodes, function(d) { return d.depth; });
-
-    // Calculate width using normalized node_distance.
-    var calculated_width = (max_depth * node_distance) + margin.right +
-      margin.left;
-
-    // Recalculate node_distance if it's greater than the width of the tree.
-    if (calculated_width > width) {
-      node_distance = (width / max_depth) - margin.right;
+  var click = function(d) {
+    if (!d.children) {
+      return;
     }
 
-    // Normalize for fixed-depth.
-    nodes.forEach(function(d) { d.y = d.depth * node_distance; });
+    kx = (d.y ? width - 40 : width) / (1 - d.y);
+    ky = height / d.dx;
+    x.domain([d.y, 1]).range([d.y ? 40 : 0, width]);
+    y.domain([d.x, d.x + d.dx]);
 
-    // Update the nodes…
-    var node = vis.selectAll("g.node")
-      .data(nodes, function(d) { return d.id || (d.id = i += 1); });
+    var t = g.transition()
+      .duration(750)
+      .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
 
-    // Enter any new nodes at the parent's previous position.
-    var nodeEnter = node.enter().append("g")
-      .attr("class", "node")
-      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
-      .on("click", function(d) { toggle(d); update(d); });
+    t.select("rect")
+      .attr("width", d.dy * kx)
+      .attr("height", function(d) { return d.dx * ky; });
 
-    nodeEnter.append("circle")
-      .attr("r", 1e-6)
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
-    nodeEnter.append("text")
-      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
-      .attr("dy", ".35em")
-      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
-      .text(function(d) { return d.name; })
-      .style("fill-opacity", 1e-6)
-      .attr("onclick", function(d) {
-        var h = "";
-        if (d.quorum_hit_id) {
-          h = "QUORUM.viewDetailedReport(" +
-            id + "," + d.quorum_hit_id + ",'" + d.query + "','" + d.algo +
-          "')";
-        }
-        return h;
-      })
-      .attr("class", function(d) {
-        var r = "";
-        if (d.quorum_hit_id) {
-          if (d.top_hit) {
-            r = "top-hit pointer";
-          } else {
-            r = "pointer";
-          }
-        }
-        return r;
-      });
-
-    // Transition nodes to their new position.
-    var nodeUpdate = node.transition()
-      .duration(duration)
-      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
-
-    nodeUpdate.select("circle")
-      .attr("r", 4.5)
-      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
-
-    nodeUpdate.select("text")
-      .style("fill-opacity", 1);
-
-    // Transition exiting nodes to the parent's new position.
-    var nodeExit = node.exit().transition()
-      .duration(duration)
-      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
-      .remove();
-
-    nodeExit.select("circle")
-      .attr("r", 1e-6);
-
-    nodeExit.select("text")
-      .style("fill-opacity", 1e-6);
-
-    // Update the links…
-    var link = vis.selectAll("path.link")
-      .data(tree.links(nodes), function(d) { return d.target.id; });
-
-    // Enter any new links at the parent's previous position.
-    link.enter().insert("path", "g")
-      .attr("class", "link")
-      .attr("d", function(d) {
-        var o = { x: source.x0, y: source.y0 };
-        return diagonal({ source: o, target: o });
-      });
-
-    // Transition links to their new position.
-    link.transition()
-      .duration(duration)
-      .attr("d", diagonal);
-
-    // Transition exiting nodes to the parent's new position.
-    link.exit().transition()
-      .duration(duration)
-      .attr("d", function(d) {
-        var o = { x: source.x, y: source.y };
-        return diagonal({ source: o, target: o });
-      })
-      .remove();
-
-    // Stash the old positions for transition.
-    nodes.forEach(function(d) {
-      d.x0 = d.x;
-      d.y0 = d.y;
-    });
+    t.select("text")
+      .attr("transform", transform)
+      .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; });
   }
 
-  update(root);
+  var transform = function(d) {
+    return "translate(8," + d.dx * ky / 2 + ")";
+  }
 
   // Recursively gather visible node data.
   function gatherVisibleLeafNodeData(d) {
