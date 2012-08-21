@@ -803,14 +803,11 @@ LSS.renderTree = function(data, algos) {
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
       .text(function(d) { return d.name; })
       .style("fill-opacity", 1e-6)
-      .attr("onclick", function(d) {
-        var h = "";
+      .on("click", function(d) {
         if (d.quorum_hit_id) {
-          h = "QUORUM.viewDetailedReport(" +
-            id + "," + d.quorum_hit_id + ",'" + d.query + "','" + d.algo +
-          "')";
+          return QUORUM.viewDetailedReport(id, d.quorum_hit_id, d.query, d.algo);
         }
-        return h;
+        return;
       })
       .attr("class", function(d) {
         var r = "";
