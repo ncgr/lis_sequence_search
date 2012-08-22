@@ -530,9 +530,11 @@ LSS.formatGroups = function(data) {
   // Group by hit_display_id.
   groups = _.groupBy(data, 'hit_display_id');
 
-  // Extend each object with name a property for d3.
+  // Extend each object with name and size properties for d3.
   // To avoid d3 tree node id property collisions, rename hit id
   // to quorum_hit_id.
+  //
+  // Size will always be 1 since we are displaying each Hsp per hit.
   _.each(groups, function(v, k) {
     _.each(v, function(d) {
       _.extend(d, {
@@ -708,6 +710,7 @@ LSS.renderTree = function(data, algos) {
       diagonal,
       vis,
       g,
+      t,
       kx,
       ky,
       leaf_size = 12, // pixels per leaf node
@@ -728,6 +731,8 @@ LSS.renderTree = function(data, algos) {
   // Stuff data into a nested JSON.
   formatted = self.formatResults(data, algos);
 
+  root = formatted;
+
   vis = d3.select(results).append("div")
     .attr("class", "icicle")
     .style("width", width + "px")
@@ -746,7 +751,7 @@ LSS.renderTree = function(data, algos) {
     .attr("transform", function(d) {
       return "translate(" + x(d.y) + "," + y(d.x) + ")";
     })
-  .on("click", click);
+    .on("click", click);
 
   kx = width / formatted.dx;
   ky = height / 1;
@@ -779,17 +784,21 @@ LSS.renderTree = function(data, algos) {
       return r;
     });
 
-  var click = function(d) {
+  // Zoom in on the clicked node.
+  function click(d) {
     if (!d.children) {
       return;
     }
+
+    // Set root to the clicked node for exporting data.
+    root = d;
 
     kx = (d.y ? width - 40 : width) / (1 - d.y);
     ky = height / d.dx;
     x.domain([d.y, 1]).range([d.y ? 40 : 0, width]);
     y.domain([d.x, d.x + d.dx]);
 
-    var t = g.transition()
+    t = g.transition()
       .duration(750)
       .attr("transform", function(d) { return "translate(" + x(d.y) + "," + y(d.x) + ")"; });
 
@@ -802,7 +811,7 @@ LSS.renderTree = function(data, algos) {
       .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; });
   }
 
-  var transform = function(d) {
+  function transform(d) {
     return "translate(8," + d.dx * ky / 2 + ")";
   }
 
@@ -827,7 +836,7 @@ LSS.renderTree = function(data, algos) {
     encode = encode || false;
     leaf_data = {};
 
-    gatherVisibleLeafNodeData(formatted);
+    gatherVisibleLeafNodeData(root);
 
     query += "algo=" + _.keys(leaf_data).join(",");
     _.each(leaf_data, function(v, k) {
