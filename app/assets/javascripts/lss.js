@@ -357,7 +357,7 @@ LSS.expandTopHits = function(algos) {
   // Cache the result for further filtering.
   self.data[cached] = data;
 
-  self.renderTree(data, algos);
+  self.renderView(data, algos);
 
 };
 
@@ -394,7 +394,7 @@ LSS.expandTopHitPerRefSeq = function(algos) {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderTree(ref, algos);
+  self.renderView(ref, algos);
 
 };
 
@@ -439,7 +439,7 @@ LSS.expandTopHitPerRef = function(algos) {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderTree(ref, algos);
+  self.renderView(ref, algos);
 
 };
 
@@ -458,7 +458,7 @@ LSS.removeFilters = function(algos) {
   // Destroy any cached data.
   self.data[cached] = null;
 
-  self.renderTree(null, algos);
+  self.renderView(null, algos);
 
 };
 
@@ -494,7 +494,7 @@ LSS.evalueFilter = function(value, algos) {
 
   $(results).empty();
 
-  self.renderTree(tmp, algos);
+  self.renderView(tmp, algos);
 };
 
 //
@@ -700,21 +700,287 @@ LSS.renderTree = function(data, algos) {
       height = 800 - margin.top - margin.bottom,
       node_distance = 240,
       i = 0,
+      k,
+      duration = 500,
+      root,
+      tree,
+      diagonal,
+      vis,
+      leaf_size = 12, // pixels per leaf node
+      total_leaf_size = 0,
+      leaf_data;
+
+  // Gather data sets if data is null.
+  if (_.isNull(data)) {
+    data = self.gatherCheckedData(algos);
+  }
+
+  // Stuff data into a nested JSON.
+  formatted = self.formatResults(data, algos);
+
+  // Recursively calculate the total number of leaves in the tree.
+  function totalLeafSize(d) {
+    if (d.children) {
+      d.children.forEach(totalLeafSize);
+    } else {
+      total_leaf_size += leaf_size;
+    }
+  }
+
+  totalLeafSize(formatted);
+
+  // If the calculated total_leaf_size is > than the default height,
+  // set height to the total_leaf_size to ensure each leaf node has
+  // approximately 12x12 px of space.
+  //
+  // The width is adjusted in the update() below.
+  // See calculated_width.
+  if (total_leaf_size > height) {
+    height = total_leaf_size - margin.top - margin.bottom;
+  }
+
+  // Empty results before calling d3.
+  $(results).empty();
+
+  // Display tools
+  $(tools).show();
+
+  root = formatted;
+  root.x0 = height / 2;
+  root.y0 = 0;
+
+  tree = d3.layout.tree()
+    .size([height, width]);
+
+  diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+  vis = d3.select(results).append("svg")
+    .attr("width", width + margin.right + margin.left)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Toggle children.
+  function toggle(d) {
+    if (d.children) {
+      d._children = d.children;
+      d.children = null;
+    } else {
+      d.children = d._children;
+      d._children = null;
+    }
+  }
+
+  // Recursively toggle all nodes deeper than level 1.
+  // Call this function if you choose to collapse the tree.
+  function toggleAll(d) {
+    if (d.children) {
+      d.children.forEach(toggleAll);
+      toggle(d);
+    }
+  }
+
+  // Update the tree.
+  function update(source) {
+
+    // Compute the new tree layout.
+    var nodes = tree.nodes(root).reverse();
+
+    // Calculate the max depth of the tree.
+    var max_depth = d3.max(nodes, function(d) { return d.depth; });
+
+    // Calculate width using normalized node_distance.
+    var calculated_width = (max_depth * node_distance) + margin.right +
+      margin.left;
+
+    // Recalculate node_distance if it's greater than the width of the tree.
+    if (calculated_width > width) {
+      node_distance = (width / max_depth) - margin.right;
+    }
+
+    // Normalize for fixed-depth.
+    nodes.forEach(function(d) { d.y = d.depth * node_distance; });
+
+    // Update the nodes…
+    var node = vis.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = i += 1); });
+
+    // Enter any new nodes at the parent's previous position.
+    var nodeEnter = node.enter().append("g")
+      .attr("class", "node")
+      .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+      .on("click", function(d) { toggle(d); update(d); });
+
+    nodeEnter.append("circle")
+      .attr("r", 1e-6)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+    nodeEnter.append("text")
+      .attr("x", function(d) { return d.children || d._children ? -10 : 10; })
+      .attr("dy", ".35em")
+      .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+      .text(function(d) { return d.name; })
+      .style("fill-opacity", 1e-6)
+      .on("click", function(d) {
+        if (d.quorum_hit_id) {
+          return QUORUM.viewDetailedReport(id, d.quorum_hit_id, d.query, d.algo);
+        }
+        return;
+      })
+      .attr("class", function(d) {
+        var r = "";
+        if (d.quorum_hit_id) {
+          if (d.top_hit) {
+            r = "top-hit pointer";
+          } else {
+            r = "pointer";
+          }
+        }
+        return r;
+      });
+
+    // Transition nodes to their new position.
+    var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; });
+
+    nodeUpdate.select("circle")
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+    nodeUpdate.select("text")
+      .style("fill-opacity", 1);
+
+    // Transition exiting nodes to the parent's new position.
+    var nodeExit = node.exit().transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + source.y + "," + source.x + ")"; })
+      .remove();
+
+    nodeExit.select("circle")
+      .attr("r", 1e-6);
+
+    nodeExit.select("text")
+      .style("fill-opacity", 1e-6);
+
+    // Update the links…
+    var link = vis.selectAll("path.link")
+      .data(tree.links(nodes), function(d) { return d.target.id; });
+
+    // Enter any new links at the parent's previous position.
+    link.enter().insert("path", "g")
+      .attr("class", "link")
+      .attr("d", function(d) {
+        var o = { x: source.x0, y: source.y0 };
+        return diagonal({ source: o, target: o });
+      });
+
+    // Transition links to their new position.
+    link.transition()
+      .duration(duration)
+      .attr("d", diagonal);
+
+    // Transition exiting nodes to the parent's new position.
+    link.exit().transition()
+      .duration(duration)
+      .attr("d", function(d) {
+        var o = { x: source.x, y: source.y };
+        return diagonal({ source: o, target: o });
+      })
+      .remove();
+
+    // Stash the old positions for transition.
+    nodes.forEach(function(d) {
+      d.x0 = d.x;
+      d.y0 = d.y;
+    });
+  }
+
+  update(root);
+
+  // Recursively gather visible node data.
+  function gatherVisibleLeafNodeData(d) {
+    if (d.children) {
+      d.children.forEach(gatherVisibleLeafNodeData);
+    } else {
+      if (_.isArray(leaf_data[d.algo])) {
+        leaf_data[d.algo].push(d.id);
+      } else {
+        leaf_data[d.algo] = [];
+        leaf_data[d.algo].push(d.id);
+      }
+    }
+  }
+
+  // Export data set
+  function exportDataSet(type, encode) {
+    var base = self.exportUrls[type],
+        query = "";
+    encode = encode || false;
+    leaf_data = {};
+
+    gatherVisibleLeafNodeData(root);
+
+    query += "algo=" + _.keys(leaf_data).join(",");
+    _.each(leaf_data, function(v, k) {
+      query += "&" + k + "_id=" + v.join(",");
+    });
+
+    // Encode URI.
+    if (encode) {
+      query = query.replace(/[@=&\?]/g, function(c) {
+        var chars = {
+          '&': '%26',
+          '=': '%3D',
+          '?': '%3F',
+          '@': '%40'
+        };
+        return chars[c];
+      });
+    }
+
+    window.open(base + query);
+  }
+
+  // Export tree event handlers.
+  // Hack to ensure only one event handler is bound.
+  // TODO: Make this purdy.
+  $('#cmtv').unbind('click').bind('click', function() {
+    exportDataSet("cmtv", true);
+  });
+  $('#tab').unbind('click').bind('click', function() {
+    exportDataSet("tab", false);
+  });
+};
+
+//
+// Renders an interactive d3 partition view.
+//
+LSS.renderPartition = function(data, algos) {
+
+  var self = this,
+      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
+      data,
+      results = "#search-results",
+      tools = "#tools",
+      id = self.quorum_id,
+      margin = { top: 20, right: 20, bottom: 20, left: 60 },
+      width = $(results).width() - margin.right - margin.left,
+      height = 800 - margin.top - margin.bottom,
+      node_distance = 240,
+      i = 0,
       x = d3.scale.linear().range([0, width]),
       y = d3.scale.linear().range([0, height]),
       k,
       duration = 500,
       root,
-      tree,
       partition,
-      diagonal,
       vis,
       g,
       t,
       kx,
       ky,
-      leaf_size = 12, // pixels per leaf node
-      total_leaf_size = 0,
       leaf_data;
 
   // Gather data sets if data is null.
@@ -871,6 +1137,24 @@ LSS.renderTree = function(data, algos) {
 };
 
 //
+// Render view.
+//
+LSS.renderView = function(data, algos, view) {
+
+  var self = this;
+
+  self.currentView = self.currentView || self.renderPartition;
+
+  if (typeof view === "function") {
+    self.currentView = view;
+    return view.call(self, data, algos);
+  }
+
+  self.currentView.call(self, data, algos);
+
+};
+
+//
 // Render interactive menu.
 //
 LSS.renderMenu = function(algo) {
@@ -909,6 +1193,7 @@ LSS.collectResults = function(id, data, algo) {
 
   var self = this;
 
+  // Set Quorum Job id.
   self.quorum_id = self.quorum_id || id;
 
   // Copy trimmed datasets.
@@ -958,12 +1243,42 @@ $(function() {
     return algos;
   };
 
+  // Highlight the selected view.
+  var highlightView = function(el) {
+    var class_name = "ui-state-highlight";
+
+    $("#views li").each(function() {
+      $(this).removeClass(class_name);
+    });
+    $(el).addClass(class_name);
+  };
+
   // View
   $("#view").click(function() {
     var algos = checkedAlgos();
 
     if (!_.isEmpty(algos)) {
-      LSS.renderTree(null, algos);
+      LSS.renderView(null, algos, LSS.renderPartition);
+    }
+  });
+
+  // View as tree
+  $("#tree").click(function() {
+    var algos = checkedAlgos();
+
+    if (!_.isEmpty(algos)) {
+      LSS.renderView(null, algos, LSS.renderTree);
+      highlightView("#tree");
+    }
+  });
+
+  // View as partition
+  $("#partition").click(function() {
+    var algos = checkedAlgos();
+
+    if (!_.isEmpty(algos)) {
+      LSS.renderView(null, algos, LSS.renderPartition);
+      highlightView("#partition");
     }
   });
 
