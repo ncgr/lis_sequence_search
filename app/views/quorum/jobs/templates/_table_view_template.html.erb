@@ -1,0 +1,45 @@
+<%# Table View Template %>
+<script type="text/template" id="table-view">
+<table class="results">
+  <tr>
+    <th>query ID</th>
+    <th>subject ID</th>
+    <th>align length</th>
+    <th>% identity</th>
+    <th>E-value</th>
+    <th>bit score</th>
+    <th>subject description</th>
+    <th>alignment</th>
+    <th>GBrowse</th>
+  </tr>
+  {{ var i = 0, style = "" }}
+  {{ _.each(data, function(d) { }}
+  {{ i += 1 }}
+  <tr class="{{= i % 2 == 0 ? 'even' : 'odd' }}">
+    <td>{{= d.query }}</td>
+    <td>{{= _.last(d.hit_display_id.split(':')) }}</td>
+    <td>{{= d.align_len }}</td>
+    <td>{{= parseFloat(d.pct_identity).toPrecision(3) }}</td>
+    <td>{{= parseFloat(d.evalue).toPrecision(3) }}</td>
+    <td>{{= d.bit_score }}</td>
+    <td>{{= d.hit_def }}</td>
+    <td>
+      <a class="detailed_report"
+        onclick="QUORUM.viewDetailedReport(
+          {{= quorum_id }},
+          {{= d.quorum_hit_id }},
+          '{{= d.query }}',
+          '{{= d.algo }}')"
+      >view</a>
+    </td>
+    <td>
+      {{ _.each(LSS.formatLinkouts(d), function(l) { }}
+        <a class="detailed_report" href="{{= l.url }}" target="_blank">
+          {{= l.name }}
+        </a>&nbsp;
+      {{ }); }}
+    </td>
+  </tr>
+  {{ }); }}
+</table>
+</script>

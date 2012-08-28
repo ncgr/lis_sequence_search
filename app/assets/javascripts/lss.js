@@ -1,13 +1,45 @@
 //
 // LIS Sequence Search
 //
-// d3 interactive tree harvested from
-// http://mbostock.github.com/d3/talk/20111018/tree.html
+// Client side Blast result visualization library.
+//
+// Dependencies:
+//  Underscore.js
+//  d3.js
+//  jQuery
 //
 // Author: Ken Seal
 //
 
 var LSS = LSS || {};
+
+//
+// General purpose namespace method for LSS object.
+//
+// This method is nondestructive. If a namespace exists, it won't be
+// re-created.
+//
+LSS.namespace = function(ns) {
+
+  var self = this,
+      parts = ns.split('.'),
+      parent = LSS,
+      i;
+
+  if (parts[0] === "LSS") {
+    parts = parts.slice(1);
+  }
+
+  for (i = 0; i < parts.length; i += 1) {
+    if (typeof parent[parts[i]] === "undefined") {
+      parent[parts[i]] = {};
+    }
+    parent = parent[parts[i]];
+  }
+
+  return parent;
+
+};
 
 //
 // Cache the datasets returned from Quorum per algorithm.
@@ -64,6 +96,38 @@ LSS.gbrowseUrls = {
   cc_lis: "http://cajca.comparative-legumes.org/gb2/gbrowse/1.0/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%"
+};
+
+//
+// Gather checked algos.
+//
+LSS.checkedAlgos = function() {
+
+  var self = this,
+      algos = [];
+
+  $("input:checkbox:checked", "#algorithms").each(function() {
+    algos.push($(this).val());
+  });
+
+  return _.map(algos, function(a) { return a.toLowerCase() });
+
+};
+
+//
+// Highlight the selected view.
+//
+LSS.highlightView = function(el) {
+
+  var self = this,
+      class_name = "ui-state-highlight";
+
+  $("#views li").each(function() {
+    $(this).removeClass(class_name);
+  });
+
+  $(el).addClass(class_name);
+
 };
 
 //
@@ -276,6 +340,22 @@ LSS.formatLinkouts = function(data) {
 };
 
 //
+// Flatten a LSS object into an array of objects.
+//
+LSS.flattenData = function(data) {
+
+  var self = this,
+      results = [];
+
+  _.each(data, function(v, k) {
+    results.push(v);
+  });
+
+  return _.flatten(results);
+
+};
+
+//
 // Remove unwanted properties and add algo to each object.
 //
 LSS.trimData = function(data, algo) {
@@ -298,6 +378,10 @@ LSS.trimData = function(data, algo) {
   wanted = [
     "id",
     "evalue",
+    "bit_score",
+    "pct_identity",
+    "align_len",
+    "hit_def",
     "query",
     "hit_display_id",
     "query_from",
@@ -338,13 +422,17 @@ LSS.gatherCheckedData = function(algos) {
 //
 // Expand top hit per query sequence.
 //
-LSS.expandTopHits = function(algos) {
+LSS.expandTopHits = function() {
 
   var self = this,
-      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
-      cached = algos.join("-") + "-cached",
+      algos = self.checkedAlgos(),
+      cached = "cached",
       data = [],
       results = "#search-results";
+
+  if (_.isEmpty(algos)) {
+    return;
+  }
 
   $(results).empty();
 
@@ -357,22 +445,26 @@ LSS.expandTopHits = function(algos) {
   // Cache the result for further filtering.
   self.data[cached] = data;
 
-  self.renderTree(data, algos);
+  self.renderView(data);
 
 };
 
 //
 // Expand top hit per reference sequence.
 //
-LSS.expandTopHitPerRefSeq = function(algos) {
+LSS.expandTopHitPerRefSeq = function() {
 
   var self = this,
-      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
-      cached = algos.join("-") + "-cached",
+      algos = self.checkedAlgos(),
+      cached = "cached",
       results = "#search-results",
       found,
       tmp = [],
       ref = [];
+
+  if (_.isEmpty(algos)) {
+    return;
+  }
 
   $(results).empty();
 
@@ -394,22 +486,27 @@ LSS.expandTopHitPerRefSeq = function(algos) {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderTree(ref, algos);
+  self.renderView(ref);
 
 };
 
 //
 // Expand top hit per reference.
 //
-LSS.expandTopHitPerRef = function(algos) {
+LSS.expandTopHitPerRef = function() {
 
   var self = this,
-      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
-      cached = algos.join("-") + "-cached",
+      algos = self.checkedAlgos(),
+      cached = "cached",
       results = "#search-results",
       found,
       tmp = [],
       ref = [];
+
+  // Return if checkedAlgos is empty.
+  if (_.isEmpty(algos)) {
+    return;
+  }
 
   $(results).empty();
 
@@ -439,42 +536,55 @@ LSS.expandTopHitPerRef = function(algos) {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderTree(ref, algos);
+  self.renderView(ref);
 
 };
 
 //
 // Remove filters by expanding tree using original dataset.
 //
-LSS.removeFilters = function(algos) {
+LSS.removeFilters = function() {
 
   var self = this,
-      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
-      cached = algos.join("-") + "-cached",
+      algos = self.checkedAlgos(),
+      cached = "cached",
       results = "#search-results";
+
+  // Return if checkedAlgos is empty.
+  if (_.isEmpty(algos)) {
+    return;
+  }
 
   $(results).empty();
 
   // Destroy any cached data.
   self.data[cached] = null;
 
-  self.renderTree(null, algos);
+  // Destroy clicked node data.
+  self.clicked = null;
+
+  self.renderView(null);
 
 };
 
 //
 // Filter dataset on evalue.
 //
-LSS.evalueFilter = function(value, algos) {
+LSS.evalueFilter = function(value) {
 
   var self = this,
-      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
-      cached = algos.join("-") + "-cached",
+      algos = self.checkedAlgos(),
+      cached = "cached",
       data,
       tmp = [],
       i,
       value = value || "0.0",
       results = "#search-results";
+
+  // Return if checkedAlgos is empty.
+  if (_.isEmpty(algos)) {
+    return;
+  }
 
   // Perform the filter on the cached data if applicable.
   // Otherwise use the original data.
@@ -494,7 +604,11 @@ LSS.evalueFilter = function(value, algos) {
 
   $(results).empty();
 
-  self.renderTree(tmp, algos);
+  // Cache the result for further filtering.
+  self.data[cached] = tmp;
+
+  self.renderView(tmp);
+
 };
 
 //
@@ -570,6 +684,7 @@ LSS.formatHsps = function(data) {
   });
 
   return hsps;
+
 };
 
 //
@@ -685,13 +800,13 @@ LSS.formatResults = function(data, algos) {
 };
 
 //
-// Renders an interactive d3 tree.
+// Renders an interactive d3 partition view.
 //
-LSS.renderTree = function(data, algos) {
+LSS.renderPartition = function(data) {
 
   var self = this,
-      algos = _.map(algos, function(a) { return a.toLowerCase(); }),
-      data,
+      algos = self.checkedAlgos(),
+      cached = "cached",
       results = "#search-results",
       tools = "#tools",
       id = self.quorum_id,
@@ -705,22 +820,25 @@ LSS.renderTree = function(data, algos) {
       k,
       duration = 500,
       root,
-      tree,
       partition,
-      diagonal,
       vis,
       g,
       t,
       kx,
       ky,
-      leaf_size = 12, // pixels per leaf node
-      total_leaf_size = 0,
-      leaf_data;
+      leaf_data = {};
 
-  // Gather data sets if data is null.
+  // View the cached data if applicable. Otherwise use the original data.
   if (_.isNull(data)) {
-    data = self.gatherCheckedData(algos);
+    if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
+      data = self.gatherCheckedData(algos);
+    } else {
+      data = self.data[cached];
+    }
   }
+
+  // Preserve last clicked node or set to null.
+  self.clicked = self.clicked || null;
 
   // Empty results before calling d3.
   $(results).empty();
@@ -784,6 +902,12 @@ LSS.renderTree = function(data, algos) {
       return r;
     });
 
+  // Restore tree after alternate view.
+  if (!_.isNull(self.clicked)) {
+    click(self.clicked);
+    self.clicked = null;
+  }
+
   // Zoom in on the clicked node.
   function click(d) {
     if (!d.children) {
@@ -792,6 +916,10 @@ LSS.renderTree = function(data, algos) {
 
     // Set root to the clicked node for exporting data.
     root = d;
+
+    // Preserve clicked node to restore tree if user navigates from partition
+    // to table and back.
+    self.clicked = d;
 
     kx = (d.y ? width - 40 : width) / (1 - d.y);
     ky = height / d.dx;
@@ -821,10 +949,10 @@ LSS.renderTree = function(data, algos) {
       d.children.forEach(gatherVisibleLeafNodeData);
     } else {
       if (_.isArray(leaf_data[d.algo])) {
-        leaf_data[d.algo].push(d.id);
+        leaf_data[d.algo].push(d);
       } else {
         leaf_data[d.algo] = [];
-        leaf_data[d.algo].push(d.id);
+        leaf_data[d.algo].push(d);
       }
     }
   }
@@ -832,6 +960,7 @@ LSS.renderTree = function(data, algos) {
   // Export data set
   function exportDataSet(type, encode) {
     var base = self.exportUrls[type],
+        ids = [],
         query = "";
     encode = encode || false;
     leaf_data = {};
@@ -840,7 +969,10 @@ LSS.renderTree = function(data, algos) {
 
     query += "algo=" + _.keys(leaf_data).join(",");
     _.each(leaf_data, function(v, k) {
-      query += "&" + k + "_id=" + v.join(",");
+      _.each(v, function(d) {
+        ids.push(d.id);
+      });
+      query += "&" + k + "_id=" + ids.join(",");
     });
 
     // Encode URI.
@@ -868,6 +1000,116 @@ LSS.renderTree = function(data, algos) {
   $('#tab').unbind('click').bind('click', function() {
     exportDataSet("tab", false);
   });
+
+  $('#table').unbind('click').bind('click', function() {
+    gatherVisibleLeafNodeData(root);
+    self.renderView(self.flattenData(leaf_data), self.renderTable, "#table");
+  });
+};
+
+//
+// Render table view.
+//
+LSS.renderTable = function(data) {
+
+  var self = this,
+      algos = self.checkedAlgos(),
+      cached = "cached",
+      results = "#search-results",
+      template;
+
+  // View the cached data if applicable. Otherwise use the original data.
+  if (_.isNull(data)) {
+    if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
+      data = self.gatherCheckedData(algos);
+    } else {
+      data = self.data[cached];
+    }
+  }
+
+  data = self.flattenData(data);
+
+  template = _.template(
+    $("#table-view").html(), {
+      data: data,
+      quorum_id: self.quorum_id
+    }
+  );
+
+  $(results).html(template);
+
+  // Export data set
+  function exportDataSet(type, encode) {
+    var base = self.exportUrls[type],
+        ids = [],
+        groups,
+        query = "";
+
+    encode = encode || false;
+
+    // Group by 'algo' since the data in table view is a flat array.
+    groups = _.groupBy(data, 'algo');
+
+    query += "algo=" + _.keys(groups).join(",");
+    _.each(groups, function(v, k) {
+      _.each(v, function(d) {
+        ids.push(d.id);
+      });
+      query += "&" + k + "_id=" + ids.join(",");
+    });
+
+    // Encode URI.
+    if (encode) {
+      query = query.replace(/[@=&\?]/g, function(c) {
+        var chars = {
+          '&': '%26',
+          '=': '%3D',
+          '?': '%3F',
+          '@': '%40'
+        };
+        return chars[c];
+      });
+    }
+
+    window.open(base + query);
+  }
+
+  // Hack to ensure only one event handler is bound.
+  // TODO: Make this purdy.
+  $('#cmtv').unbind('click').bind('click', function() {
+    exportDataSet("cmtv", true);
+  });
+  $('#tab').unbind('click').bind('click', function() {
+    exportDataSet("tab", false);
+  });
+
+  $('#partition').unbind('click').bind('click', function() {
+    self.renderView(null, self.renderPartition, "#partition");
+  });
+};
+
+
+//
+// Render view.
+//
+LSS.renderView = function(data, view, highlight) {
+
+  var self = this,
+      args;
+
+  self.currentView = self.currentView || self.renderPartition;
+
+  if (highlight) {
+    self.highlightView(highlight);
+  }
+
+  if (typeof view === "function") {
+    self.currentView = view;
+    return view.call(self, data);
+  }
+
+  self.currentView.call(self, data);
+
 };
 
 //
@@ -909,6 +1151,7 @@ LSS.collectResults = function(id, data, algo) {
 
   var self = this;
 
+  // Set Quorum Job id.
   self.quorum_id = self.quorum_id || id;
 
   // Copy trimmed datasets.
@@ -948,70 +1191,46 @@ $(function() {
     .parent().next().hide().menu();
   });
 
-  // Gather checked algos.
-  var checkedAlgos = function() {
-    var algos = [];
-    $("input:checkbox:checked", "#algorithms").each(function() {
-      algos.push($(this).val());
-    });
-
-    return algos;
-  };
-
   // View
   $("#view").click(function() {
-    var algos = checkedAlgos();
+    LSS.renderView(null, LSS.renderPartition , "#partition");
+  });
 
-    if (!_.isEmpty(algos)) {
-      LSS.renderTree(null, algos);
-    }
+  // View as partition
+  $("#partition").click(function() {
+    LSS.renderView(null, LSS.renderPartition, "#partition");
+  });
+
+  // View as table
+  $("#table").click(function() {
+    LSS.renderView(null, LSS.renderTable, "#table");
   });
 
   // Remove filters
   $("#remove-filters").click(function() {
-    var algos = checkedAlgos();
-
-    if (!_.isEmpty(algos)) {
-      LSS.removeFilters(algos);
-    }
+    LSS.removeFilters();
     $("#evalue").val('');
   });
 
   // Top Hits
   $("#top-hits").click(function() {
-    var algos = checkedAlgos();
-
-    if (!_.isEmpty(algos)) {
-      LSS.expandTopHits(algos);
-    }
+    LSS.expandTopHits();
   });
 
   // Top Hits Per Reference Sequence
   $("#top-hits-per-ref-seq").click(function() {
-    var algos = checkedAlgos();
-
-    if (!_.isEmpty(algos)) {
-      LSS.expandTopHitPerRefSeq(algos);
-    }
+    LSS.expandTopHitPerRefSeq();
   });
 
   // Top Hits Per Reference
   $("#top-hits-per-ref").click(function() {
-    var algos = checkedAlgos();
-
-    if (!_.isEmpty(algos)) {
-      LSS.expandTopHitPerRef(algos);
-    }
+    LSS.expandTopHitPerRef();
   });
 
   // Evalue Filter
   $("#filter-evalue").click(function() {
     var val = $("#evalue").val();
-    var algos = checkedAlgos();
-
-    if (!_.isEmpty(algos)) {
-      LSS.evalueFilter(val, algos);
-    }
+    LSS.evalueFilter(val);
   });
 });
 

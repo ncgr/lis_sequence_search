@@ -4,7 +4,7 @@
   <div id="results" class="ui-widget ui-widget-content ui-corner-all">
     <div id="results-menu" class="ui-widget-header ui-corner-all">
       <span id="menu-loading">
-        <p>Loading... <%= image_tag "quorum/loading.gif" %></p>
+        <p>Searching... <%= image_tag "quorum/loading.gif" %></p>
       </span>
 
       <span id="algorithms"></span>
@@ -28,9 +28,11 @@
         <span>
           <button id='view-tree'>view as</button>
         </span>
-        <ul>
+        <ul id="views">
           <li id="cmtv"><a href="#">cmtv</a></li>
           <li id="tab"><a href="#">tab delimited</a></li>
+          <li id="partition" class="ui-state-highlight"><a href="#">partition</a></li>
+          <li id="table"><a href="#">table</a></li>
         </ul>
       </span>
     </div>
@@ -42,11 +44,12 @@
 <div id="quorum">
   <hr class="big" />
   <p>
-    Powered by <%= link_to "Quorum", "https://github.com/ncgr/quorum" %>
+    Powered by <%= link_to "Quorum v#{Quorum::VERSION}", "https://github.com/ncgr/quorum" %>
   </p>
 </div>
 
 <%= render :partial => "quorum/jobs/templates/blast_detailed_report_template" %>
+<%= render :partial => "quorum/jobs/templates/table_view_template" %>
 
 <script type="text/javascript">
   $(function() {

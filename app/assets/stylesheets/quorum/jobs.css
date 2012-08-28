@@ -56,6 +56,7 @@ table.report_details {
 th {
   white-space: normal;
   font-size: 14px;
+  border-bottom: solid 0.1em black;
 }
 
 th, td {
