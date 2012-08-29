@@ -361,6 +361,23 @@ LSS.flattenData = function(data) {
 };
 
 //
+// Convert LSS object with algo properties to an array of arrays.
+//
+//
+LSS.toArray = function(data) {
+
+  var self = this,
+      results = [];
+
+  _.each(data, function(v, k) {
+    results.push(v);
+  });
+
+  return results;
+
+};
+
+//
 // Flag top hit per sequence query by adding property "top_hit": true to each
 // object.
 //
@@ -917,7 +934,6 @@ LSS.renderPartition = function(data) {
   // Restore tree after alternate view.
   if (!_.isNull(self.clicked)) {
     click(self.clicked);
-    self.clicked = null;
   }
 
   // Zoom in on the clicked node.
@@ -1015,7 +1031,7 @@ LSS.renderPartition = function(data) {
 
   $('#table').unbind('click').bind('click', function() {
     gatherVisibleLeafNodeData(root);
-    self.renderView(self.flattenData(leaf_data), self.renderTable, "#table");
+    self.renderView(leaf_data, self.renderTable, "#table");
   });
 };
 
