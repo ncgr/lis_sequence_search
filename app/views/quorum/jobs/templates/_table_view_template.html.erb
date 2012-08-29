@@ -18,7 +18,7 @@
   {{ i += 1 }}
   <tr class="{{= i % 2 == 0 ? 'even' : 'odd' }}">
     <td>{{= d.query }}</td>
-    <td>{{= _.last(d.hit_display_id.split(':')) }}</td>
+    <td>{{= d.hit_id }}</td>
     <td>{{= d.align_len }}</td>
     <td>{{= parseFloat(d.pct_identity).toPrecision(3) }}</td>
     <td>{{= parseFloat(d.evalue).toPrecision(3) }}</td>
