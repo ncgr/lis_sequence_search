@@ -9,6 +9,7 @@
     <th>E-value</th>
     <th>bit score</th>
     <th>subject description</th>
+    <th>algorithm</th>
     <th>alignment</th>
     <th>GBrowse</th>
   </tr>
@@ -23,6 +24,7 @@
     <td>{{= parseFloat(d.evalue).toPrecision(3) }}</td>
     <td>{{= d.bit_score }}</td>
     <td>{{= d.hit_def }}</td>
+    <td>{{= d.algo }}</td>
     <td>
       <a class="detailed_report"
         onclick="QUORUM.viewDetailedReport(

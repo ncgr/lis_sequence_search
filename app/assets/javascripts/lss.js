@@ -42,7 +42,7 @@ LSS.namespace = function(ns) {
 };
 
 //
-// Cache the datasets returned from Quorum per algorithm.
+// Cache the datasets returned from Quorum.
 //
 LSS.data = LSS.data || {};
 
@@ -60,6 +60,8 @@ LSS.exportUrls = {
 
 //
 // GBrowse URLs
+//
+// Substitute placeholders %foo% with actual values before creating links.
 //
 LSS.gbrowseUrls = {
   mt_jcvi: "http://www.jcvi.org/cgi-bin/gb2/gbrowse/mtruncatula/?" +
@@ -99,7 +101,7 @@ LSS.gbrowseUrls = {
 };
 
 //
-// Gather checked algos.
+// Gather checked algos in the view.
 //
 LSS.checkedAlgos = function() {
 
@@ -115,7 +117,7 @@ LSS.checkedAlgos = function() {
 };
 
 //
-// Highlight the selected view.
+// Highlight the selected view (table, partition, etc.).
 //
 LSS.highlightView = function(el) {
 
@@ -212,7 +214,7 @@ LSS.formatGbrowseUrl = function(data, url, type) {
 }
 
 //
-// Add Gm properties
+// Add Gm url.
 //
 LSS.addGm = function(data) {
 
@@ -230,7 +232,7 @@ LSS.addGm = function(data) {
 };
 
 //
-// Add Mt properties
+// Add Mt urls.
 //
 LSS.addMt = function(data) {
 
@@ -257,7 +259,7 @@ LSS.addMt = function(data) {
 };
 
 //
-// Add Lj properties
+// Add Lj url.
 //
 LSS.addLj = function(data) {
 
@@ -275,7 +277,7 @@ LSS.addLj = function(data) {
 };
 
 //
-// Add Cc properties
+// Add Cc url.
 //
 LSS.addCc = function(data) {
 
@@ -321,7 +323,8 @@ LSS.addGbrowseLinkOuts = function(data) {
 };
 
 //
-// Format link outs.
+// Format link outs and return an array of objects containing url and name
+// properties.
 //
 LSS.formatLinkouts = function(data) {
 
@@ -342,6 +345,8 @@ LSS.formatLinkouts = function(data) {
 //
 // Flatten a LSS object into an array of objects.
 //
+// This method is useful for displaying objects in a table view.
+//
 LSS.flattenData = function(data) {
 
   var self = this,
@@ -356,14 +361,37 @@ LSS.flattenData = function(data) {
 };
 
 //
-// Remove unwanted properties and add algo to each object.
+// Flag top hit per sequence query by adding property "top_hit": true to each
+// object.
 //
-LSS.trimData = function(data, algo) {
+LSS.flagTopHitPerQuery = function(data) {
+
+  var self = this,
+      query;
+
+  // Quorum returns data in this oder.
+  _.each(data, function(d) {
+    if (query !== d.query) {
+      _.extend(d, { "top_hit": true });
+      query = d.query;
+    }
+  });
+
+  return data;
+
+};
+
+//
+// Removes unwanted properties and adds wanted properties each object.
+//
+LSS.prepData = function(data, algo) {
 
   var self = this,
       wanted,
       len = data.length,
-      i, d;
+      hit,
+      i,
+      d;
 
   // Return null if data wasn't enqueued.
   if (data[0].enqueued === false) {
@@ -396,10 +424,30 @@ LSS.trimData = function(data, algo) {
         delete data[i][d];
       }
     }
-    _.extend(data[i], { "algo": algo });
+
+    // Bust up hit_display_id into ref and hit_id preserving hit_display_id.
+    if (!_.isNull(data[i].hit_display_id)) {
+      hit = data[i].hit_display_id.split(":");
+      _.extend(data[i], {
+        "ref": hit[0],
+        "hit_id": hit[1]
+      });
+    }
+
+    // Extend each object with name and size properties for d3.
+    // To avoid d3 node id property collisions, rename hit id
+    // to quorum_hit_id.
+    //
+    // Size will always be 1 since we are displaying each Hsp per hit.
+    _.extend(data[i], {
+      "algo": algo,
+      "name": "Evalue: " + parseFloat(data[i].evalue).toPrecision(3),
+      "quorum_hit_id": data[i].id,
+      "size": 1
+    });
   }
 
-  return data;
+  return self.flagTopHitPerQuery(data);
 
 };
 
@@ -436,6 +484,7 @@ LSS.expandTopHits = function() {
 
   $(results).empty();
 
+  // Remove each object without a top_hit property.
   _.each(algos, function(a) {
     data.push(_.reject(self.data[a], function(d) {
       return _.isUndefined(d.top_hit);
@@ -612,26 +661,6 @@ LSS.evalueFilter = function(value) {
 };
 
 //
-// Flag top hit per sequence query by adding property
-// "top_hit": true to each object.
-//
-LSS.flagTopHitPerQuery = function(data) {
-
-  var self = this,
-      query;
-
-  _.each(data, function(d) {
-    if (query !== d.query) {
-      _.extend(d, { "top_hit": true });
-      query = d.query;
-    }
-  });
-
-  return data;
-
-};
-
-//
 // Format groups for d3 tree layout.
 //
 LSS.formatGroups = function(data) {
@@ -639,25 +668,8 @@ LSS.formatGroups = function(data) {
   var self = this,
       groups = {};
 
-  data = self.flagTopHitPerQuery(data);
-
   // Group by hit_display_id.
   groups = _.groupBy(data, 'hit_display_id');
-
-  // Extend each object with name and size properties for d3.
-  // To avoid d3 tree node id property collisions, rename hit id
-  // to quorum_hit_id.
-  //
-  // Size will always be 1 since we are displaying each Hsp per hit.
-  _.each(groups, function(v, k) {
-    _.each(v, function(d) {
-      _.extend(d, {
-        "name": "Evalue: " + parseFloat(d.evalue).toPrecision(3),
-        "quorum_hit_id": d.id,
-        "size": 1
-      });
-    });
-  });
 
   // Group each sub group by query.
   _.each(groups, function(v, k) {
@@ -1154,9 +1166,9 @@ LSS.collectResults = function(id, data, algo) {
   // Set Quorum Job id.
   self.quorum_id = self.quorum_id || id;
 
-  // Copy trimmed datasets.
-  // If the algorithm wasn't enqueued, trimData returns null.
-  self.data[algo] = self.trimData(data, algo);
+  // Copy datasets.
+  // If the algorithm wasn't enqueued, prepData returns null.
+  self.data[algo] = self.prepData(data, algo);
 
   // Render menu
   if (!_.isNull(self.data[algo])) {
