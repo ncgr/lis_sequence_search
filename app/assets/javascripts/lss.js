@@ -626,9 +626,6 @@ LSS.removeFilters = function() {
   // Destroy any cached data.
   self.data[cached] = null;
 
-  // Destroy clicked node data.
-  self.clicked = null;
-
   self.renderView(null);
 
 };
@@ -866,9 +863,6 @@ LSS.renderPartition = function(data) {
     }
   }
 
-  // Preserve last clicked node or set to null.
-  self.clicked = self.clicked || null;
-
   // Empty results before calling d3.
   $(results).empty();
 
@@ -931,11 +925,6 @@ LSS.renderPartition = function(data) {
       return r;
     });
 
-  // Restore tree after alternate view.
-  if (!_.isNull(self.clicked)) {
-    click(self.clicked);
-  }
-
   // Zoom in on the clicked node.
   function click(d) {
     if (!d.children) {
@@ -944,10 +933,6 @@ LSS.renderPartition = function(data) {
 
     // Set root to the clicked node for exporting data.
     root = d;
-
-    // Preserve clicked node to restore tree if user navigates from partition
-    // to table and back.
-    self.clicked = d;
 
     kx = (d.y ? width - 40 : width) / (1 - d.y);
     ky = height / d.dx;
@@ -1031,6 +1016,7 @@ LSS.renderPartition = function(data) {
 
   $('#table').unbind('click').bind('click', function() {
     gatherVisibleLeafNodeData(root);
+    self.data[cached] = self.toArray(leaf_data);
     self.renderView(leaf_data, self.renderTable, "#table");
   });
 };
