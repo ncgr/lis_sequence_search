@@ -1207,6 +1207,7 @@ $(function() {
 
   // View
   $("#view").click(function() {
+    LSS.data["cached"] = null;
     LSS.renderView(null, LSS.renderPartition , "#partition");
   });
 
