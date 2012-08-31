@@ -751,11 +751,14 @@ LSS.numberOfQueries = function(data) {
 //
 // Format single data set.
 //
-LSS.formatData = function(data, algo) {
+LSS.formatData = function(data) {
 
   var self = this,
+      algo,
       groups = {},
       formatted = {};
+
+  algo = data[0].algo;
 
   formatted = {
     "name": algo,
@@ -801,7 +804,7 @@ LSS.formatData = function(data, algo) {
 //
 // Format results into nested JSON.
 //
-LSS.formatResults = function(data, algos) {
+LSS.formatResults = function(data) {
 
   var self = this,
       formatted,
@@ -815,10 +818,10 @@ LSS.formatResults = function(data, algos) {
     };
 
     for (i = 0; i < data.length; i++) {
-      formatted.children.push(self.formatData(data[i], algos[i]));
+      formatted.children.push(self.formatData(data[i]));
     }
   } else {
-    formatted = self.formatData(data[0], algos[0]);
+    formatted = self.formatData(data[0]);
   }
 
   return formatted;
@@ -870,7 +873,7 @@ LSS.renderPartition = function(data) {
   $(tools).show();
 
   // Stuff data into a nested JSON.
-  formatted = self.formatResults(data, algos);
+  formatted = self.formatResults(data);
 
   root = formatted;
 
