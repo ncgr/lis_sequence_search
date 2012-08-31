@@ -31,7 +31,7 @@ LSS.namespace = function(ns) {
   }
 
   for (i = 0; i < parts.length; i += 1) {
-    if (typeof parent[parts[i]] === "undefined") {
+    if (_.isUndefined(parent[parts[i]])) {
       parent[parts[i]] = {};
     }
     parent = parent[parts[i]];
@@ -1022,6 +1022,39 @@ LSS.renderPartition = function(data) {
 };
 
 //
+// Sort objects by property.
+//
+LSS.sortable = function(prop, dataType) {
+
+  var self = this;
+
+  data = self.tableData;
+
+  self.sortDir = self.sortDir || "";
+
+  // Check the data and make sure the first object has the requested property.
+  if (_.isNull(data) || !_.has(_.first(data), prop)) {
+    return;
+  }
+
+  self.sortDir === "desc" ? self.sortDir = "asc" : self.sortDir = "desc";
+
+  data = _.sortBy(data, function(d) {
+    if (_.isFunction(dataType)) {
+      return dataType.call(null, d[prop]);
+    }
+    return d[prop];
+  });
+
+  if (self.sortDir === "asc") {
+    data = data.reverse();
+  }
+
+  self.renderView(data);
+
+};
+
+//
 // Render table view.
 //
 LSS.renderTable = function(data) {
@@ -1042,6 +1075,8 @@ LSS.renderTable = function(data) {
   }
 
   data = self.flattenData(data);
+
+  self.tableData = data;
 
   template = _.template(
     $("#table-view").html(), {
@@ -1117,7 +1152,7 @@ LSS.renderView = function(data, view, highlight) {
     self.highlightView(highlight);
   }
 
-  if (typeof view === "function") {
+  if (_.isFunction(view)) {
     self.currentView = view;
     return view.call(self, data);
   }
@@ -1248,4 +1283,3 @@ $(function() {
     LSS.evalueFilter(val);
   });
 });
-
