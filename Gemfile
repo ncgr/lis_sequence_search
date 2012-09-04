@@ -17,3 +17,7 @@ group :development do
   gem 'debugger'
   gem 'thin'
 end
+
+group :test do
+  gem 'jasmine'
+end
