@@ -11,6 +11,9 @@
 // Author: Ken Seal
 //
 
+// LSS
+//---------------------------------------------------------------------------//
+
 var LSS = LSS || {};
 
 //
@@ -45,6 +48,11 @@ LSS.namespace = function(ns) {
 // Cache the datasets returned from Quorum.
 //
 LSS.data = LSS.data || {};
+
+//
+// Store the visible leaf node data.
+//
+LSS.leaf_data = LSS.leaf_data || {};
 
 //
 // URLs used to view result sets.
@@ -577,14 +585,6 @@ LSS.expandTopHitPerRef = function() {
   $(results).empty();
 
   _.each(algos, function(a) {
-    // Add ref property to each object.
-    _.each(self.data[a], function(d) {
-      if (!_.isNull(d.hit_display_id)) {
-        hit = d.hit_display_id.split(":");
-        _.extend(d, { "ref": hit[0] });
-      }
-    });
-
     _.each(self.data[a], function(d) {
       if (!_.isNull(d.hit_display_id)) {
         found = _.find(tmp, function(t) {
@@ -751,14 +751,13 @@ LSS.numberOfQueries = function(data) {
 //
 // Format single data set.
 //
-LSS.formatData = function(data) {
+LSS.formatData = function(data, algo) {
 
   var self = this,
-      algo,
       groups = {},
-      formatted = {};
-
-  algo = data[0].algo;
+      formatted = {},
+      hit,
+      found;
 
   formatted = {
     "name": algo,
@@ -774,9 +773,9 @@ LSS.formatData = function(data) {
   keys = _.keys(groups);
 
   _.each(keys, function(key) {
-    var hit = key.split(":");
+    hit = key.split(":");
 
-    var found = _.find(formatted.children, function(c) { return c.name === hit[0]; });
+    found = _.find(formatted.children, function(c) { return c.name === hit[0]; });
     if (_.isUndefined(found)) {
       formatted.children.push({
         "name": hit[0],
@@ -804,13 +803,13 @@ LSS.formatData = function(data) {
 //
 // Format results into nested JSON.
 //
-LSS.formatResults = function(data) {
+LSS.formatResults = function(data, algos) {
 
   var self = this,
       formatted,
       i;
 
-  // If multiple data sets are selected, combine into a single tree.
+  // Combine if multiple data sets are selected.
   if (data.length > 1) {
     formatted = {
       "name": self.quorum_id,
@@ -818,15 +817,17 @@ LSS.formatResults = function(data) {
     };
 
     for (i = 0; i < data.length; i++) {
-      formatted.children.push(self.formatData(data[i]));
+      formatted.children.push(self.formatData(data[i], algos[i]));
     }
   } else {
-    formatted = self.formatData(data[0]);
+    formatted = self.formatData(data[0], algos[0]);
   }
 
   return formatted;
 
 };
+
+
 
 //
 // Renders an interactive d3 partition view.
@@ -854,8 +855,7 @@ LSS.renderPartition = function(data) {
       g,
       t,
       kx,
-      ky,
-      leaf_data = {};
+      ky;
 
   // View the cached data if applicable. Otherwise use the original data.
   if (_.isNull(data)) {
@@ -873,9 +873,13 @@ LSS.renderPartition = function(data) {
   $(tools).show();
 
   // Stuff data into a nested JSON.
-  formatted = self.formatResults(data);
+  formatted = self.formatResults(data, algos);
 
+  // Set root to formatted for partition view.
   root = formatted;
+
+  // Clear leaf_data
+  self.leaf_data = {};
 
   vis = d3.select(results).append("div")
     .attr("class", "icicle")
@@ -934,7 +938,8 @@ LSS.renderPartition = function(data) {
       return;
     }
 
-    // Set root to the clicked node for exporting data.
+    // Set root to the clicked node to ease exporting data and switching
+    // between views.
     root = d;
 
     kx = (d.y ? width - 40 : width) / (1 - d.y);
@@ -959,68 +964,20 @@ LSS.renderPartition = function(data) {
     return "translate(8," + d.dx * ky / 2 + ")";
   }
 
-  // Recursively gather visible node data.
-  function gatherVisibleLeafNodeData(d) {
-    if (d.children) {
-      d.children.forEach(gatherVisibleLeafNodeData);
-    } else {
-      if (_.isArray(leaf_data[d.algo])) {
-        leaf_data[d.algo].push(d);
-      } else {
-        leaf_data[d.algo] = [];
-        leaf_data[d.algo].push(d);
-      }
-    }
-  }
-
-  // Export data set
-  function exportDataSet(type, encode) {
-    var base = self.exportUrls[type],
-        ids = [],
-        query = "";
-    encode = encode || false;
-    leaf_data = {};
-
-    gatherVisibleLeafNodeData(root);
-
-    query += "algo=" + _.keys(leaf_data).join(",");
-    _.each(leaf_data, function(v, k) {
-      _.each(v, function(d) {
-        ids.push(d.id);
-      });
-      query += "&" + k + "_id=" + ids.join(",");
-    });
-
-    // Encode URI.
-    if (encode) {
-      query = query.replace(/[@=&\?]/g, function(c) {
-        var chars = {
-          '&': '%26',
-          '=': '%3D',
-          '?': '%3F',
-          '@': '%40'
-        };
-        return chars[c];
-      });
-    }
-
-    window.open(base + query);
-  }
-
   // Export tree event handlers.
   // Hack to ensure only one event handler is bound.
   // TODO: Make this purdy.
   $('#cmtv').unbind('click').bind('click', function() {
-    exportDataSet("cmtv", true);
+    exportDataSet(root, "cmtv", true);
   });
   $('#tab').unbind('click').bind('click', function() {
-    exportDataSet("tab", false);
+    exportDataSet(root, "tab", false);
   });
 
   $('#table').unbind('click').bind('click', function() {
     gatherVisibleLeafNodeData(root);
-    self.data[cached] = self.toArray(leaf_data);
-    self.renderView(leaf_data, self.renderTable, "#table");
+    self.data[cached] = self.toArray(self.leaf_data);
+    self.renderView(self.leaf_data, self.renderTable, "#table");
   });
 };
 
@@ -1066,7 +1023,8 @@ LSS.renderTable = function(data) {
       algos = self.checkedAlgos(),
       cached = "cached",
       results = "#search-results",
-      template;
+      template,
+      group;
 
   // View the cached data if applicable. Otherwise use the original data.
   if (_.isNull(data)) {
@@ -1077,8 +1035,10 @@ LSS.renderTable = function(data) {
     }
   }
 
+  // Flatten data before rendering table view.
   data = self.flattenData(data);
 
+  // Set table data for sorting.
   self.tableData = data;
 
   template = _.template(
@@ -1090,49 +1050,13 @@ LSS.renderTable = function(data) {
 
   $(results).html(template);
 
-  // Export data set
-  function exportDataSet(type, encode) {
-    var base = self.exportUrls[type],
-        ids = [],
-        groups,
-        query = "";
-
-    encode = encode || false;
-
-    // Group by 'algo' since the data in table view is a flat array.
-    groups = _.groupBy(data, 'algo');
-
-    query += "algo=" + _.keys(groups).join(",");
-    _.each(groups, function(v, k) {
-      _.each(v, function(d) {
-        ids.push(d.id);
-      });
-      query += "&" + k + "_id=" + ids.join(",");
-    });
-
-    // Encode URI.
-    if (encode) {
-      query = query.replace(/[@=&\?]/g, function(c) {
-        var chars = {
-          '&': '%26',
-          '=': '%3D',
-          '?': '%3F',
-          '@': '%40'
-        };
-        return chars[c];
-      });
-    }
-
-    window.open(base + query);
-  }
-
   // Hack to ensure only one event handler is bound.
   // TODO: Make this purdy.
   $('#cmtv').unbind('click').bind('click', function() {
-    exportDataSet("cmtv", true);
+    exportDataSet(data, "cmtv", true);
   });
   $('#tab').unbind('click').bind('click', function() {
-    exportDataSet("tab", false);
+    exportDataSet(data, "tab", false);
   });
 
   $('#partition').unbind('click').bind('click', function() {
@@ -1218,71 +1142,5 @@ LSS.collectResults = function(id, data, algo) {
 };
 
 //
-// jQuery event handlers
-//
-$(function() {
-  _.each(["#view", "#tools"], function(e) { $(e).hide(); });
-  $("input:checkbox, button", "#results-menu").button();
-
-  // Filters menu.
-  _.each(["#filters", "#view-tree"], function(e) {
-    $(e).button({
-      icons: {
-        secondary : 'ui-icon-triangle-1-s'
-      }
-    })
-    .click(function() {
-      var menu = $(this).parent().next().show().position({
-        my: "left top",
-        at: "left bottom",
-        of: this
-      });
-      $(document).one('click', function() { menu.hide(); });
-      return false;
-    })
-    .parent().next().hide().menu();
-  });
-
-  // View
-  $("#view").click(function() {
-    LSS.data["cached"] = null;
-    LSS.renderView(null, LSS.renderPartition , "#partition");
-  });
-
-  // View as partition
-  $("#partition").click(function() {
-    LSS.renderView(null, LSS.renderPartition, "#partition");
-  });
-
-  // View as table
-  $("#table").click(function() {
-    LSS.renderView(null, LSS.renderTable, "#table");
-  });
-
-  // Remove filters
-  $("#remove-filters").click(function() {
-    LSS.removeFilters();
-    $("#evalue").val('');
-  });
-
-  // Top Hits
-  $("#top-hits").click(function() {
-    LSS.expandTopHits();
-  });
-
-  // Top Hits Per Reference Sequence
-  $("#top-hits-per-ref-seq").click(function() {
-    LSS.expandTopHitPerRefSeq();
-  });
-
-  // Top Hits Per Reference
-  $("#top-hits-per-ref").click(function() {
-    LSS.expandTopHitPerRef();
-  });
-
-  // Evalue Filter
-  $("#filter-evalue").click(function() {
-    var val = $("#evalue").val();
-    LSS.evalueFilter(val);
-  });
-});
+// End LSS
+//---------------------------------------------------------------------------//
