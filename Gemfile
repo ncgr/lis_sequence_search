@@ -16,8 +16,10 @@ gem 'quorum', :git => 'https://github.com/ncgr/quorum.git', :branch => 'data_exp
 group :development do
   gem 'debugger'
   gem 'thin'
+  gem 'guard-jasmine-headless-webkit'
 end
 
-group :test do
-  gem 'jasmine'
+group :test, :development do
+  gem 'jasmine-rails'
+  gem 'jasmine-headless-webkit'
 end

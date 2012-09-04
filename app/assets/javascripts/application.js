@@ -12,9 +12,11 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require d3.v2
+//= require underscore
+//= require quorum/application
 //= require lss_data_export
 //= require lss
 //= require lss_events
 //= require sequences
-//= require d3.v2
 //= require_tree .
