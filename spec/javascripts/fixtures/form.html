@@ -1,0 +1,340 @@
+<div id="example-sequences">
+    <a id="cdna">cDNA Example</a>
+    <a id="prot">Peptide Example</a>
+    <a id="mixed">cDNA and Peptide Example</a>
+</div>
+<form id="quorum_job">
+
+    <div>
+        <textarea class="auto-hint" cols="40" id="job_sequence" name="job[sequence]" rows="20" title="Paste nucleic and amino acid FASTA sequence(s) here or upload a file below.">
+        </textarea>
+    </div>
+    <div>
+        <input id="job_sequence_file" name="job[sequence_file]" type="file" />
+    </div>
+
+
+    <p>
+    <strong>blastn</strong>
+    <input name="job[blastn_job_attributes][queue]" type="hidden" value="0" /><input id="job_blastn_job_attributes_queue" name="job[blastn_job_attributes][queue]" type="checkbox" value="1" />
+    </p>
+    <div id="blastn" class="toggle">
+        <table class="options">
+            <tr>
+                <td>
+                    <label>Database(s)</label>
+                </td>
+                <td>
+                    <input name="job[blastn_job_attributes][blast_dbs][]" type="hidden" value="" /><select id="job_blastn_job_attributes_blast_dbs" multiple="multiple" name="job[blastn_job_attributes][blast_dbs][]"><option value="gm_genome">Glycine max build 1.01</option>
+                        <option value="lj_genome">Lotus japonicus build 2.5</option>
+                        <option value="mt_genome">Medicago truncatula build 3.5.1</option>
+                        <option value="cc_genome">Cajanus cajan build 1.0</option>
+                        <option value="ca_transcripts">Cicer arietinum build Apr 2010</option></select>
+                </td>
+                <td>
+                    <label for="job_blastn_job_attributes_filter">DUST</label>
+                </td>
+                <td>
+                    <input name="job[blastn_job_attributes][filter]" type="hidden" value="0" /><input id="job_blastn_job_attributes_filter" name="job[blastn_job_attributes][filter]" type="checkbox" value="1" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastn_job_attributes_expectation">Expectation</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastn_job_attributes_expectation" name="job[blastn_job_attributes][expectation]" size="15" title="5e-20" type="text" />
+                </td>
+                <td>
+                    <label for="job_blastn_job_attributes_min_bit_score">Min bit score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastn_job_attributes_min_bit_score" name="job[blastn_job_attributes][min_bit_score]" size="15" title="0" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastn_job_attributes_max_score">Max score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastn_job_attributes_max_score" name="job[blastn_job_attributes][max_score]" size="15" title="25" type="text" />
+                </td>
+                <td>
+                    <label for="job_blastn_job_attributes_gapped_alignments">Gapped alignments</label>
+                </td>
+                <td>
+                    <select id="job_blastn_job_attributes_gapped_alignments" name="job[blastn_job_attributes][gapped_alignments]"><option value="false">No</option>
+                        <option value="true">Yes</option></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastn_job_attributes_gap_opening_extension">Gap opening extension</label>
+                </td>
+                <td>
+                    <select id="job_blastn_job_attributes_gap_opening_extension" name="job[blastn_job_attributes][gap_opening_extension]"><option value="">--Select--</option>
+                        <option value="32767,32767">32767, 32767</option>
+                        <option value="11,2">11, 2</option>
+                        <option value="10,2">10, 2</option>
+                        <option value="9,2">9, 2</option>
+                        <option value="8,2">8, 2</option>
+                        <option value="7,2">7, 2</option>
+                        <option value="6,2">6, 2</option>
+                        <option value="13,1">13, 1</option>
+                        <option value="12,1">12, 1</option>
+                        <option value="11,1">11, 1</option>
+                        <option value="10,1">10, 1</option>
+                        <option value="9,1">9, 1</option></select>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+
+
+    <p>
+    <strong>blastx</strong>
+    <input name="job[blastx_job_attributes][queue]" type="hidden" value="0" /><input id="job_blastx_job_attributes_queue" name="job[blastx_job_attributes][queue]" type="checkbox" value="1" />
+    </p>
+    <div id="blastx" class="toggle">
+        <table class="options">
+            <tr>
+                <td>
+                    <label>Database(s)</label>
+                </td>
+                <td>
+                    <input name="job[blastx_job_attributes][blast_dbs][]" type="hidden" value="" /><select id="job_blastx_job_attributes_blast_dbs" multiple="multiple" name="job[blastx_job_attributes][blast_dbs][]"><option value="gm_proteome">Glycine max proteome</option>
+                        <option value="lj_proteome">Lotus japonicus proteome</option>
+                        <option value="mt_proteome">Medicago truncatula proteome</option>
+                        <option value="cc_proteome">Cajanus cajan proteome</option>
+                        <option value="gene_families">Gene family consensus seqs</option></select>
+                </td>
+                <td>
+                    <label for="job_blastx_job_attributes_filter">SEG</label>
+                </td>
+                <td>
+                    <input name="job[blastx_job_attributes][filter]" type="hidden" value="0" /><input id="job_blastx_job_attributes_filter" name="job[blastx_job_attributes][filter]" type="checkbox" value="1" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastx_job_attributes_expectation">Expectation</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastx_job_attributes_expectation" name="job[blastx_job_attributes][expectation]" size="15" title="5e-20" type="text" />
+                </td>
+                <td>
+                    <label for="job_blastx_job_attributes_min_bit_score">Min bit score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastx_job_attributes_min_bit_score" name="job[blastx_job_attributes][min_bit_score]" size="15" title="0" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastx_job_attributes_max_score">Max score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastx_job_attributes_max_score" name="job[blastx_job_attributes][max_score]" size="15" title="25" type="text" />
+                </td>
+                <td>
+                    <label for="job_blastx_job_attributes_gapped_alignments">Gapped alignments</label>
+                </td>
+                <td>
+                    <select id="job_blastx_job_attributes_gapped_alignments" name="job[blastx_job_attributes][gapped_alignments]"><option value="false">No</option>
+                        <option value="true">Yes</option></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastx_job_attributes_gap_opening_extension">Gap opening extension</label>
+                </td>
+                <td>
+                    <select id="job_blastx_job_attributes_gap_opening_extension" name="job[blastx_job_attributes][gap_opening_extension]"><option value="">--Select--</option>
+                        <option value="32767,32767">32767, 32767</option>
+                        <option value="11,2">11, 2</option>
+                        <option value="10,2">10, 2</option>
+                        <option value="9,2">9, 2</option>
+                        <option value="8,2">8, 2</option>
+                        <option value="7,2">7, 2</option>
+                        <option value="6,2">6, 2</option>
+                        <option value="13,1">13, 1</option>
+                        <option value="12,1">12, 1</option>
+                        <option value="11,1">11, 1</option>
+                        <option value="10,1">10, 1</option>
+                        <option value="9,1">9, 1</option></select>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+
+
+    <p>
+    <strong>tblastn</strong>
+    <input name="job[tblastn_job_attributes][queue]" type="hidden" value="0" /><input id="job_tblastn_job_attributes_queue" name="job[tblastn_job_attributes][queue]" type="checkbox" value="1" />
+    </p>
+    <div id="tblastn" class="toggle">
+        <table class="options">
+            <tr>
+                <td>
+                    <label>Database(s)</label>
+                </td>
+                <td>
+                    <input name="job[tblastn_job_attributes][blast_dbs][]" type="hidden" value="" /><select id="job_tblastn_job_attributes_blast_dbs" multiple="multiple" name="job[tblastn_job_attributes][blast_dbs][]"><option value="gm_genome">Glycine max build 1.01</option>
+                        <option value="lj_genome">Lotus japonicus build 2.5</option>
+                        <option value="mt_genome">Medicago truncatula build 3.5.1</option>
+                        <option value="cc_genome">Cajanus cajan build 1.0</option>
+                        <option value="ca_transcripts">Cicer arietinum build Apr 2010</option></select>
+                </td>
+                <td>
+                    <label for="job_tblastn_job_attributes_filter">SEG</label>
+                </td>
+                <td>
+                    <input name="job[tblastn_job_attributes][filter]" type="hidden" value="0" /><input id="job_tblastn_job_attributes_filter" name="job[tblastn_job_attributes][filter]" type="checkbox" value="1" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_tblastn_job_attributes_expectation">Expectation</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_tblastn_job_attributes_expectation" name="job[tblastn_job_attributes][expectation]" size="15" title="5e-20" type="text" />
+                </td>
+                <td>
+                    <label for="job_tblastn_job_attributes_min_bit_score">Min bit score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_tblastn_job_attributes_min_bit_score" name="job[tblastn_job_attributes][min_bit_score]" size="15" title="0" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_tblastn_job_attributes_max_score">Max score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_tblastn_job_attributes_max_score" name="job[tblastn_job_attributes][max_score]" size="15" title="25" type="text" />
+                </td>
+                <td>
+                    <label for="job_tblastn_job_attributes_gapped_alignments">Gapped alignments</label>
+                </td>
+                <td>
+                    <select id="job_tblastn_job_attributes_gapped_alignments" name="job[tblastn_job_attributes][gapped_alignments]"><option value="false">No</option>
+                        <option value="true">Yes</option></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_tblastn_job_attributes_gap_opening_extension">Gap opening extension</label>
+                </td>
+                <td>
+                    <select id="job_tblastn_job_attributes_gap_opening_extension" name="job[tblastn_job_attributes][gap_opening_extension]"><option value="">--Select--</option>
+                        <option value="32767,32767">32767, 32767</option>
+                        <option value="11,2">11, 2</option>
+                        <option value="10,2">10, 2</option>
+                        <option value="9,2">9, 2</option>
+                        <option value="8,2">8, 2</option>
+                        <option value="7,2">7, 2</option>
+                        <option value="6,2">6, 2</option>
+                        <option value="13,1">13, 1</option>
+                        <option value="12,1">12, 1</option>
+                        <option value="11,1">11, 1</option>
+                        <option value="10,1">10, 1</option>
+                        <option value="9,1">9, 1</option></select>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+
+
+    <p>
+    <strong>blastp</strong>
+    <input name="job[blastp_job_attributes][queue]" type="hidden" value="0" /><input id="job_blastp_job_attributes_queue" name="job[blastp_job_attributes][queue]" type="checkbox" value="1" />
+    </p>
+    <div id="blastp" class="toggle">
+        <table class="options">
+            <tr>
+                <td>
+                    <label>Database(s)</label>
+                </td>
+                <td>
+                    <input name="job[blastp_job_attributes][blast_dbs][]" type="hidden" value="" /><select id="job_blastp_job_attributes_blast_dbs" multiple="multiple" name="job[blastp_job_attributes][blast_dbs][]"><option value="gm_proteome">Glycine max proteome</option>
+                        <option value="lj_proteome">Lotus japonicus proteome</option>
+                        <option value="mt_proteome">Medicago truncatula proteome</option>
+                        <option value="cc_proteome">Cajanus cajan proteome</option>
+                        <option value="gene_families">Gene family consensus seqs</option></select>
+                </td>
+                <td>
+                    <label for="job_blastp_job_attributes_filter">SEG</label>
+                </td>
+                <td>
+                    <input name="job[blastp_job_attributes][filter]" type="hidden" value="0" /><input id="job_blastp_job_attributes_filter" name="job[blastp_job_attributes][filter]" type="checkbox" value="1" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastp_job_attributes_expectation">Expectation</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastp_job_attributes_expectation" name="job[blastp_job_attributes][expectation]" size="15" title="5e-20" type="text" />
+                </td>
+                <td>
+                    <label for="job_blastp_job_attributes_min_bit_score">Min bit score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastp_job_attributes_min_bit_score" name="job[blastp_job_attributes][min_bit_score]" size="15" title="0" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastp_job_attributes_max_score">Max score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_blastp_job_attributes_max_score" name="job[blastp_job_attributes][max_score]" size="15" title="25" type="text" />
+                </td>
+                <td>
+                    <label for="job_blastp_job_attributes_gapped_alignments">Gapped alignments</label>
+                </td>
+                <td>
+                    <select id="job_blastp_job_attributes_gapped_alignments" name="job[blastp_job_attributes][gapped_alignments]"><option value="false">No</option>
+                        <option value="true">Yes</option></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_blastp_job_attributes_gap_opening_extension">Gap opening extension</label>
+                </td>
+                <td>
+                    <select id="job_blastp_job_attributes_gap_opening_extension" name="job[blastp_job_attributes][gap_opening_extension]"><option value="">--Select--</option>
+                        <option value="32767,32767">32767, 32767</option>
+                        <option value="11,2">11, 2</option>
+                        <option value="10,2">10, 2</option>
+                        <option value="9,2">9, 2</option>
+                        <option value="8,2">8, 2</option>
+                        <option value="7,2">7, 2</option>
+                        <option value="6,2">6, 2</option>
+                        <option value="13,1">13, 1</option>
+                        <option value="12,1">12, 1</option>
+                        <option value="11,1">11, 1</option>
+                        <option value="10,1">10, 1</option>
+                        <option value="9,1">9, 1</option></select>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div>
+        <input name="commit" type="submit" value="Submit" />&nbsp;&nbsp;
+        <input id="quorum_job_reset" name="reset" type="button" value="Reset" />
+    </div>
+</form>
