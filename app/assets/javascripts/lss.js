@@ -117,10 +117,10 @@ LSS.checkedAlgos = function() {
       algos = [];
 
   $("input:checkbox:checked", "#algorithms").each(function() {
-    algos.push($(this).val());
+    algos.push($(this).val().toLowerCase());
   });
 
-  return _.map(algos, function(a) { return a.toLowerCase() });
+  return algos;
 
 };
 
@@ -305,7 +305,7 @@ LSS.addCc = function(data) {
 //
 // Add linkouts to GBrowse instances.
 //
-LSS.addGbrowseLinkOuts = function(data) {
+LSS.addGbrowseLinkouts = function(data) {
 
   var self = this,
       hit,
@@ -340,7 +340,7 @@ LSS.formatLinkouts = function(data) {
       links = [];
 
   // Add the GBrowse linkouts to each hsp.
-  _.each(self.addGbrowseLinkOuts(data), function(link) {
+  _.each(self.addGbrowseLinkouts(data), function(link) {
     _.each(link, function(l) {
       links.push(l);
     });
@@ -388,6 +388,9 @@ LSS.toArray = function(data) {
 //
 // Flag top hit per sequence query by adding property "top_hit": true to each
 // object.
+//
+// Quorum returns results ordered by query, bit_score ascending so it's safe
+// to flag the first hit to each query as a top hit.
 //
 LSS.flagTopHitPerQuery = function(data) {
 
@@ -733,22 +736,6 @@ LSS.formatQueries = function(data) {
 };
 
 //
-// Calculate number of hits to each query sequence.
-//
-LSS.numberOfQueries = function(data) {
-
-  var self = this,
-      total = 0;
-
-  _.each(data, function(v, k) {
-    total += v.length;
-  });
-
-  return total;
-
-};
-
-//
 // Format single data set.
 //
 LSS.formatData = function(data, algo) {
@@ -801,7 +788,7 @@ LSS.formatData = function(data, algo) {
 };
 
 //
-// Format results into nested JSON.
+// Format results into nested objects reday for d3.js tree views.
 //
 LSS.formatResults = function(data, algos) {
 
@@ -843,12 +830,9 @@ LSS.renderPartition = function(data) {
       margin = { top: 20, right: 20, bottom: 20, left: 60 },
       width = $(results).width() - margin.right - margin.left,
       height = 800 - margin.top - margin.bottom,
-      node_distance = 240,
-      i = 0,
       x = d3.scale.linear().range([0, width]),
       y = d3.scale.linear().range([0, height]),
-      k,
-      duration = 500,
+      formatted,
       root,
       partition,
       vis,
@@ -1023,8 +1007,7 @@ LSS.renderTable = function(data) {
       algos = self.checkedAlgos(),
       cached = "cached",
       results = "#search-results",
-      template,
-      group;
+      template;
 
   // View the cached data if applicable. Otherwise use the original data.
   if (_.isNull(data)) {
