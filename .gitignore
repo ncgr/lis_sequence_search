@@ -9,4 +9,3 @@
 config/database.yml
 config/quorum_settings.yml
 .jhw-cache/
-.jasmine-headless-webkit
