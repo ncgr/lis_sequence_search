@@ -1,4 +1,4 @@
-= LIS Sequence Search
+= LIS Sequence Search {<img src="https://secure.travis-ci.org/ncgr/lis_sequence_search.png?branch=specs"alt="Build Status" />}[http://travis-ci.org/ncgr/lis_sequence_search]
 
 Prototype of the new LIS Sequence Search system.
 
