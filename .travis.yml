@@ -5,7 +5,6 @@ gemfile:
   - gemfiles/Gemfile.rails-3.2.x
 before_install:
   - sudo apt-get update
-  - sudo apt-get install ncbi-blast+ emboss
 before_script:
   - bundle install
 script: "jasmine-headless-webkit --use-server -c"
