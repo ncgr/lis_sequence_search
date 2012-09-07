@@ -169,23 +169,6 @@ SEQUENCES.addSequences = function(id) {
 
       mixed = cdna + "\n" + prot;
 
-  // Helper to clear form after click event.
-  function clearForm() {
-    $('textarea').val('');
-    $('input:text').val('');
-    $('input:file').val('');
-    $('input:checkbox').prop('checked', false);
-    $('select').val('');
-
-    $('.toggle').each(function() {
-      $(this).hide();
-    });
-
-    $('form :input.auto-hint').autoHint('addHints');
-  }
-
-  clearForm();
-
   if (id === "cdna") {
     sequence.removeClass("auto-hint").val(cdna);
 
@@ -200,7 +183,9 @@ SEQUENCES.addSequences = function(id) {
     blastx_db.each(function() {
       $(this).attr("selected", "selected");
     });
-  } else if (id === "prot") {
+  }
+
+  if (id === "prot") {
     sequence.removeClass("auto-hint").val(prot);
 
     tblastn.prop("checked", true);
@@ -214,7 +199,9 @@ SEQUENCES.addSequences = function(id) {
     blastp_db.each(function() {
       $(this).attr("selected", "selected");
     });
-  } else if (id === "mixed") {
+  }
+
+  if (id === "mixed") {
     sequence.removeClass("auto-hint").val(mixed);
 
     blastn.prop("checked", true);
@@ -245,8 +232,24 @@ SEQUENCES.addSequences = function(id) {
 
 $(function() {
 
+  // Helper to clear form after click event.
+  function clearForm() {
+    $('textarea').val('');
+    $('input:text').val('');
+    $('input:file').val('');
+    $('input:checkbox').prop('checked', false);
+    $('select').val('');
+
+    $('.toggle').each(function() {
+      $(this).hide();
+    });
+
+    $('form :input.auto-hint').autoHint('addHints');
+  }
+
   $("#example-sequences a").click(function() {
     var id = ($(this).attr("id"));
+    clearForm();
     SEQUENCES.addSequences(id);
   });
 

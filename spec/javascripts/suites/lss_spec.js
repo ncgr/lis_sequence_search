@@ -33,11 +33,15 @@ describe("LSS", function() {
   });
 
   describe("renderMenu", function() {
+    beforeEach(function() {
+      loadFixtures('results.html');
+    });
+    it("returns if algo is not set", function() {
+      LSS.renderMenu();
+      expect($("#algorithms")).toBeEmpty();
+    });
     it("renders LSS menu containing algorithm button(s)", function() {
-      _.each(['blastn','blastx'], function(a) {
-        LSS.renderMenu(a);
-      });
-
+      LSS.renderMenu('blastn');
       expect($("#algorithms")).not.toBeEmpty();
       expect($("#view")).not.toBeHidden();
     });

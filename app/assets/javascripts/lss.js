@@ -1077,11 +1077,15 @@ LSS.renderView = function(data, view, highlight) {
 LSS.renderMenu = function(algo) {
 
   var self = this,
-      algo = algo.toLowerCase(),
       view = $("#view"),
       loading = $("#menu-loading"),
       algorithms = $("#algorithms");
 
+  if (_.isUndefined(algo) || _.isNull(algo) || _.isEmpty(algo)) {
+    return;
+  }
+
+  algo = algo.toLowerCase(),
   loading.empty();
 
   algorithms.append(
