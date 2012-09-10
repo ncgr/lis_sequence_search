@@ -8,3 +8,4 @@
 /lss_quorum/tmp
 config/database.yml
 config/quorum_settings.yml
+.jhw-cache/

@@ -20,9 +20,9 @@
       <p class="small">Hit Description: {{= v.hit_def }}</p>
       <table class="report_details">
         <tr>
-          <td>E-value: {{= QUORUM.formatEvalue(v.evalue) }}</td>
+          <td>E-value: {{= parseFloat(v.evalue).toPrecision(3) }}</td>
           <td>Bit Score: {{= v.bit_score }}</td>
-          <td></td>
+          <td>Percent Identity: {{= parseFloat(v.pct_identity).toPrecision(3) }}</td>
         </tr>
         <tr>
           <td>Alignment Length: {{= v.align_len }}</td>

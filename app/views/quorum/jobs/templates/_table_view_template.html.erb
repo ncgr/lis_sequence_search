@@ -1,0 +1,53 @@
+<%# Table View Template %>
+<script type="text/template" id="table-view">
+<table class="results">
+  <tr>
+    <th><a onclick="LSS.sortable('query')">query ID</a></th>
+    <th><a onclick="LSS.sortable('hit_id')">subject ID</a></th>
+    <th><a onclick="LSS.sortable('align_len')">align length</a></th>
+    <th><a onclick="LSS.sortable('pct_identity')">% identity</a></th>
+    <th><a onclick="LSS.sortable('evalue', parseFloat)">E-value</a></th>
+    <th><a onclick="LSS.sortable('bit_score')">bit score</a></th>
+    <th><a onclick="LSS.sortable('hit_def')">subject description</a></th>
+    <th><a onclick="LSS.sortable('algo')">algorithm</a></th>
+    <th>alignment</th>
+    <th>GBrowse</th>
+  </tr>
+  {{ var i = 0, style = "", linkouts }}
+  {{ _.each(data, function(d) { }}
+  {{ i += 1 }}
+  <tr class="{{= i % 2 == 0 ? 'even' : 'odd' }}">
+    <td>{{= d.query }}</td>
+    <td>{{= d.hit_id }}</td>
+    <td>{{= d.align_len }}</td>
+    <td>{{= parseFloat(d.pct_identity).toPrecision(3) }}</td>
+    <td>{{= parseFloat(d.evalue).toPrecision(3) }}</td>
+    <td>{{= d.bit_score }}</td>
+    <td>{{= d.hit_def }}</td>
+    <td>{{= d.algo }}</td>
+    <td>
+      <a class="detailed_report"
+        onclick="QUORUM.viewDetailedReport(
+          {{= quorum_id }},
+          {{= d.quorum_hit_id }},
+          '{{= d.query }}',
+          '{{= d.algo }}')"
+      >view</a>
+    </td>
+    <td>
+      {{ linkouts = LSS.formatLinkouts(d) }}
+      {{ if (!_.isEmpty(linkouts)) { }}
+        {{ _.each(LSS.formatLinkouts(d), function(l) { }}
+          <a class="detailed_report" href="{{= l.url }}" target="_blank">
+            {{= l.name }}
+          </a>&nbsp;
+        {{ }); }}
+      {{ } else { }}
+        None
+      {{ } }}
+    </td>
+  </tr>
+  {{ }); }}
+</table>
+</script>
+
