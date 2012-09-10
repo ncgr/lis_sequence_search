@@ -6,8 +6,10 @@ gemfile:
 before_install:
   - sudo apt-get update
 before_script:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
   - bundle install
-script: "jasmine-headless-webkit --use-server -c"
+script: "bundle exec rake jasmine:headless"
 notifications:
   email:
     - "kas@ncgr.org"
