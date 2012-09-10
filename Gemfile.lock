@@ -214,7 +214,7 @@ DEPENDENCIES
   debugger
   guard-jasmine-headless-webkit
   jasmine
-  jasmine-headless-webkit (= 0.9.0.rc2)
+  jasmine-headless-webkit
   jasmine-rails
   jquery-rails
   mysql2

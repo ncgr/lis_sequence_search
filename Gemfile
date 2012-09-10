@@ -21,6 +21,6 @@ end
 group :test, :development do
   gem 'jasmine'
   gem 'jasmine-rails'
-  gem 'jasmine-headless-webkit', '0.9.0.rc2'
+  gem 'jasmine-headless-webkit'
   gem 'guard-jasmine-headless-webkit'
 end
