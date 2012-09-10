@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncgr/quorum.git
-  revision: 72006afe5cd64a93cc3dda60ef5c847dfbec5a46
+  revision: f88e12df6fc4970cd8dead750434cea504c9295f
   branch: data_export
   specs:
     quorum (0.4.0)
@@ -48,7 +48,7 @@ GEM
       nokogiri (>= 1.5.0)
     bio-logger (1.0.1)
       log4r (>= 1.1.9)
-    builder (3.0.2)
+    builder (3.0.3)
     childprocess (0.3.5)
       ffi (~> 1.0, >= 1.0.6)
     coffee-rails (3.2.2)
@@ -69,7 +69,7 @@ GEM
     debugger-ruby_core_source (1.1.3)
     diff-lcs (1.1.3)
     erubis (2.7.0)
-    eventmachine (0.12.10)
+    eventmachine (1.0.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
     ffi (1.1.5)
@@ -214,7 +214,7 @@ DEPENDENCIES
   debugger
   guard-jasmine-headless-webkit
   jasmine
-  jasmine-headless-webkit
+  jasmine-headless-webkit (~> 0.9.0.rc.2)
   jasmine-rails
   jquery-rails
   mysql2

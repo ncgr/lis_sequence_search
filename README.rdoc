@@ -11,7 +11,7 @@ Dependencies:
 
 == Description
 
-Provide novel visualization of Blast results using d3.js tree layout.
+Novel visualization of Blast results using d3.js.
 
 === Maintained By
 
