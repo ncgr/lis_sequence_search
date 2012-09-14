@@ -53,6 +53,6 @@
 
 <script type="text/javascript">
   $(function() {
-    QUORUM.pollResults(<%= @jobs.id %>, LSS.collectResults, LSS);
+    QUORUM.pollResults(LSS.collectResults, LSS);
   });
 </script>

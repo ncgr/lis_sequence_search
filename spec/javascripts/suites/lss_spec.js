@@ -18,15 +18,14 @@ describe("LSS", function() {
 
   describe("collectResults", function() {
     it("collects Quorum's results, preps data and renders menu", function() {
-      var id = 10,
-          algo = 'blastn';
+      var algo = 'blastn';
 
       spyOn(LSS, 'prepData');
       spyOn(LSS, 'renderMenu');
 
-      LSS.collectResults(id, data, algo);
+      LSS.collectResults(data, algo);
 
-      expect(LSS.quorum_id).toEqual(id);
+      expect(LSS.quorum_id).not.toBeEmpty();
       expect(LSS.prepData).toHaveBeenCalledWith(data, algo);
       expect(LSS.renderMenu).toHaveBeenCalledWith(algo);
     });

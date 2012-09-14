@@ -901,7 +901,7 @@ LSS.renderPartition = function(data) {
     .text(function(d) { return d.name; })
     .on("click", function(d) {
       if (d.quorum_hit_id) {
-        return QUORUM.viewDetailedReport(id, d.quorum_hit_id, d.query, d.algo);
+        return QUORUM.viewDetailedReport(d.quorum_hit_id, d.query, d.algo);
       } else {
         return click(d);
       }
@@ -1110,12 +1110,12 @@ LSS.renderMenu = function(algo) {
 //
 // Collects Quorum's results.
 //
-LSS.collectResults = function(id, data, algo) {
+LSS.collectResults = function(data, algo) {
 
   var self = this;
 
   // Set Quorum Job id.
-  self.quorum_id = self.quorum_id || id;
+  self.quorum_id = self.quorum_id || _.last(document.URL.split('/'));
 
   // Copy datasets.
   // If the algorithm wasn't enqueued, prepData returns null.
