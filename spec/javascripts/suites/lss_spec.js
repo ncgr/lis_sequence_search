@@ -377,6 +377,58 @@ describe("LSS", function() {
     });
   });
 
+  describe("setCurrentData", function() {
+    it("gathers checked data when cached data is undefined", function() {
+      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      spyOn(LSS, 'gatherCheckedData');
+      LSS.setCurrentData();
+      expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
+    });
+    it("gathers checked data when cached data is null", function() {
+      LSS.data['cached'] = null;
+      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      spyOn(LSS, 'gatherCheckedData');
+      LSS.setCurrentData();
+      expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
+    });
+    it("uses cached data if set", function() {
+      LSS.data['foo'] = 'bar';
+      LSS.data['cached'] = LSS.data['foo']; // Set cached data.
+      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      spyOn(LSS, 'gatherCheckedData');
+      var data = LSS.setCurrentData();
+      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
+      expect(data).toEqual(LSS.data['cached']);
+    });
+    afterEach(function() {
+      LSS.data = {};
+    });
+  });
+
+  describe("setData", function() {
+    it("uses passed data when set", function() {
+      var foo = {bar: "baz"};
+      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      spyOn(LSS, 'gatherCheckedData');
+      var data = LSS.setData(foo);
+      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
+      expect(data).toEqual(foo);
+    });
+    it("calls setCurrentData when passed data is undefined", function() {
+      spyOn(LSS, 'setCurrentData');
+      LSS.setData();
+      expect(LSS.setCurrentData).toHaveBeenCalled();
+    });
+    it("calls setCurrentData when passed data is null", function() {
+      spyOn(LSS, 'setCurrentData');
+      LSS.setData(null);
+      expect(LSS.setCurrentData).toHaveBeenCalled();
+    });
+    afterEach(function() {
+      LSS.data = {};
+    });
+  });
+
   describe("filters", function() {
     beforeEach(function() {
       LSS.data['foo'] = LSS.prepData(data, 'foo');
@@ -525,29 +577,9 @@ describe("LSS", function() {
     beforeEach(function() {
       LSS.data['foo'] = LSS.formatResults([LSS.prepData(data, 'foo')], ['foo']);
     });
-    it("gathers checked data when passed data is null", function() {
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
-      spyOn(LSS, 'gatherCheckedData');
-      spyOn(_, 'template');
-      LSS.renderTable(null);
-      expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
-      expect(_.template).toHaveBeenCalled();
-    });
-    it("uses cached data if set and passed data is null", function() {
-      LSS.data['cached'] = LSS.data['foo']; // Set cached data.
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
-      spyOn(LSS, 'gatherCheckedData');
-      spyOn(_, 'template');
-      LSS.renderTable(null);
-      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
-      expect(_.template).toHaveBeenCalled();
-    });
-    it("uses passed data when not null", function() {
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
-      spyOn(LSS, 'gatherCheckedData');
+    it("renders table template", function() {
       spyOn(_, 'template');
       LSS.renderTable(LSS.data['foo']);
-      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
       expect(_.template).toHaveBeenCalled();
     });
     afterEach(function() {
@@ -559,35 +591,17 @@ describe("LSS", function() {
   describe("renderPartition", function() {
     beforeEach(function() {
       LSS.data['foo'] = LSS.prepData(data, 'foo');
+      loadFixtures('results.html');
     });
-    it("gathers checked data when passed data is null", function() {
+    // TODO: Add specs that interact with the partition view.
+    it("renders partition view", function() {
+      spyOn(LSS, 'setData').andReturn(LSS.data);
       spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
-      spyOn(LSS, 'gatherCheckedData');
-      spyOn(LSS, 'formatResults').andReturn([]);
-      LSS.renderPartition(null);
-      expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
-      expect(LSS.formatResults).toHaveBeenCalled();
-    });
-    it("uses cached data if set and passed data is null", function() {
-      LSS.data['cached'] = LSS.data['foo']; // Set cached data.
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
-      spyOn(LSS, 'gatherCheckedData');
-      spyOn(LSS, 'formatResults').andReturn([]);
-      LSS.renderPartition(null);
-      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
-      expect(LSS.formatResults).toHaveBeenCalled();
-    });
-    it("uses passed data when not null", function() {
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
-      spyOn(LSS, 'gatherCheckedData');
-      spyOn(LSS, 'formatResults').andReturn([]);
       LSS.renderPartition(LSS.data['foo']);
-      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
-      expect(LSS.formatResults).toHaveBeenCalled();
+      expect($("#search-results")).toContainHtml('<div class="icicle" style="width: 934px; height: 760px; "><svg width="934" height="760"><g class="icicle-node" transform="translate(0,0)"><rect width="934" height="760" class="parent"></rect><text transform="translate(8,380)" dy=".35em" style="opacity: 1; " class="pointer">foo</text></g></svg></div>');
     });
     afterEach(function() {
       LSS.data = {};
-      LSS.tableData = {};
     });
   });
 });

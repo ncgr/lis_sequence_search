@@ -520,6 +520,45 @@ LSS.gatherCheckedData = function(algos) {
 };
 
 //
+// Helper to set cached data.
+//
+// If cached data is not set, use original.
+//
+LSS.setCurrentData = function() {
+
+  var self = this,
+      data,
+      cached = "cached",
+      algos = self.checkedAlgos();
+
+  if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
+    data = self.gatherCheckedData(algos);
+  } else {
+    data = self.data[cached];
+  }
+
+  return data;
+
+}
+
+//
+// Helper to set data.
+//
+// If data is defined, return. Otherwise check for cached data.
+//
+LSS.setData = function(data) {
+
+  var self = this;
+
+  if (_.isUndefined(data) || _.isNull(data)) {
+    data = self.setCurrentData();
+  }
+
+  return data;
+
+};
+
+//
 // Expand top hit per query sequence.
 //
 LSS.expandTopHits = function() {
@@ -678,11 +717,7 @@ LSS.evalueFilter = function(value) {
 
   // Perform the filter on the cached data if applicable.
   // Otherwise use the original data.
-  if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
-    data = self.gatherCheckedData(algos);
-  } else {
-    data = self.data[cached];
-  }
+  data = self.setCurrentData();
 
   for (i = 0; i < algos.length; i++) {
     tmp.push(_.reject(data[i], function(d) {
@@ -865,14 +900,7 @@ LSS.renderPartition = function(data) {
       kx,
       ky;
 
-  // View the cached data if applicable. Otherwise use the original data.
-  if (_.isNull(data)) {
-    if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
-      data = self.gatherCheckedData(algos);
-    } else {
-      data = self.data[cached];
-    }
-  }
+  data = self.setData(data);
 
   // Empty results before calling d3.
   $(results).empty();
@@ -1028,19 +1056,10 @@ LSS.sortable = function(prop, dataType) {
 LSS.renderTable = function(data) {
 
   var self = this,
-      algos = self.checkedAlgos(),
-      cached = "cached",
       results = "#search-results",
       template;
 
-  // View the cached data if applicable. Otherwise use the original data.
-  if (_.isNull(data)) {
-    if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
-      data = self.gatherCheckedData(algos);
-    } else {
-      data = self.data[cached];
-    }
-  }
+  data = self.setData(data);
 
   // Flatten data before rendering table view.
   data = self.flattenData(data);
@@ -1080,6 +1099,7 @@ LSS.renderView = function(data, view, highlight) {
   var self = this,
       args;
 
+  // Set default view to partition if current view is not set.
   self.currentView = self.currentView || self.renderPartition;
 
   if (highlight) {
