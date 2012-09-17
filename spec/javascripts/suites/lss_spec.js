@@ -101,7 +101,7 @@ describe("LSS", function() {
         "hit_from",
         "hit_to",
         "ref",
-        "hit_id",
+        "ref_id",
         "algo",
         "name",
         "quorum_hit_id",
@@ -277,6 +277,20 @@ describe("LSS", function() {
     });
   });
 
+  describe("addGf", function() {
+    it("formats a url for Gf LIS", function() {
+      spyOn(LSS, 'formatGbrowseUrl');
+      var gf = {ref: "genefam_20120817_protein", ref_id: 12345};
+      var url = LSS.addGf(gf);
+      expect(url[0].name).toEqual("Gene family consensus - LIS");
+      expect(LSS.formatGbrowseUrl).toHaveBeenCalledWith(
+        gf,
+        LSS.gbrowseUrls.gf_lis,
+        "gene_family-lis"
+      );
+    });
+  });
+
   describe("formatGbrowseUrl", function() {
 
     describe("formats start and stop minding viewing interval", function() {
@@ -331,6 +345,16 @@ describe("LSS", function() {
     it("formats gbrowse url for kazusa", function() {
       var url = LSS.formatGbrowseUrl(data[1], LSS.gbrowseUrls.lj_kazusa);
       expect(url).toEqual('http://gsv.kazusa.or.jp/cgi-bin/gbrowse/lotus/?ref=gm02;start=2934784;stop=3034942;width=1024;version=100;label=contig-phase3-phase1%%2C2-annotation-GMhmm-GenScan-blastn-tigrgi-blastx-marker;grid=on;add=gm02+LIS+LIS_Query_TOG894063+2984942..2984784');
+    });
+    it("formats gbrowse url for gene_family-lis", function() {
+      var gf = {
+        hit_display_id: "genefam_20120817_protein:12345",
+        ref: "genefam_20120817_protein",
+        ref_id: 12345
+      };
+      var url = LSS.formatGbrowseUrl(gf, LSS.gbrowseUrls.gf_lis, "gene_family-lis");
+      expect(url).not.toMatch('%');
+      expect(url).toEqual('http://leggle.comparative-legumes.org/gene_families/name=' + gf.ref_id);
     });
   });
 
@@ -466,7 +490,7 @@ describe("LSS", function() {
     });
     it("sorts data by property using _.sortBy()", function() {
       spyOn(LSS, 'renderView');
-      LSS.sortable('hit_id');
+      LSS.sortable('ref_id');
       expect(LSS.renderView).toHaveBeenCalled();
       expect(LSS.sortDir).toEqual('desc');
     });

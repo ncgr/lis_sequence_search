@@ -105,7 +105,9 @@ LSS.gbrowseUrls = {
 
   cc_lis: "http://cajca.comparative-legumes.org/gb2/gbrowse/1.0/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
-    "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%"
+    "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+
+  gf_lis: "http://leggle.comparative-legumes.org/gene_families/name=%ref_id%"
 };
 
 //
@@ -216,6 +218,7 @@ LSS.formatGbrowseUrl = function(data, url, type) {
   url = url.replace(/%query%/, data.query);
   url = url.replace(/%hit_from%/, data.hit_from);
   url = url.replace(/%hit_to%/, data.hit_to);
+  url = url.replace(/%ref_id%/, data.ref_id);
 
   return url;
 
@@ -303,6 +306,24 @@ LSS.addCc = function(data) {
 };
 
 //
+// Add Gf (gene family) url.
+//
+LSS.addGf = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.gf_lis,
+      urls = [];
+
+  urls.push({
+    "name": "Gene family consensus - LIS",
+    "url": self.formatGbrowseUrl(data, url, "gene_family-lis")
+  });
+
+  return urls;
+
+};
+
+//
 // Add linkouts to GBrowse instances.
 //
 LSS.addGbrowseLinkouts = function(data) {
@@ -311,7 +332,7 @@ LSS.addGbrowseLinkouts = function(data) {
       hit,
       links = [];
 
-  hit = _.first(data.hit_display_id.split(":"));
+  hit = _.first(data.hit_display_id.split(':'));
 
   if (hit.search(/gm_genome_rel_1_01/) === 0) {
     links.push(self.addGm(data));
@@ -324,6 +345,9 @@ LSS.addGbrowseLinkouts = function(data) {
   }
   if (hit.search(/cc_genome_1_0/) === 0) {
     links.push(self.addCc(data));
+  }
+  if (hit.search(/genefam_20120817_protein/) === 0) {
+    links.push(self.addGf(data));
   }
 
   return links;
@@ -453,12 +477,12 @@ LSS.prepData = function(data, algo) {
       }
     }
 
-    // Bust up hit_display_id into ref and hit_id preserving hit_display_id.
+    // Bust up hit_display_id into ref and ref_id preserving hit_display_id.
     if (!_.isNull(data[i].hit_display_id)) {
       hit = data[i].hit_display_id.split(":");
       _.extend(data[i], {
         "ref": hit[0],
-        "hit_id": hit[1]
+        "ref_id": hit[1]
       });
     }
 
@@ -1064,7 +1088,6 @@ LSS.renderView = function(data, view, highlight) {
 
   if (_.isFunction(view)) {
     self.currentView = view;
-    return view.call(self, data);
   }
 
   self.currentView.call(self, data);
