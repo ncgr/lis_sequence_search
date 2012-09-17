@@ -28,7 +28,7 @@ $(function() {
   // View
   $("#view").click(function() {
     LSS.data["cached"] = null;
-    LSS.renderView(null, LSS.renderPartition , "#partition");
+    LSS.renderView(null, null, "#partition");
   });
 
   // View as partition
