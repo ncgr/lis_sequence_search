@@ -16,6 +16,7 @@
 //= require d3.v2
 //= require underscore
 //= require lss
+//= require lss_urls
 //= require lss_data_export
 //= require lss_events
 //= require sequences

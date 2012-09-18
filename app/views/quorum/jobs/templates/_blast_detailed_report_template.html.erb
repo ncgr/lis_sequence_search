@@ -3,8 +3,6 @@
   <h3>Query Accession {{= query }}</h3>
   {{ var linkouts }}
   {{ _.each(data, function(v) { }}
-    {{ var hit = v.hit_display_id.split(":"); }}
-    {{ _.extend(v, { "ref": hit[0], "ref_id": hit[1] }); }}
     <div id="{{= v.id }}">
       <p class="small">{{= QUORUM.displayHspLinks(v.id, v.hsp_group, data) }}</p>
       <p class="small">Hit Accession: {{= v.hit_display_id }}</p>
