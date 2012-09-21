@@ -2,10 +2,7 @@
 /db/*.rdb
 /log/*.log
 /tmp
-/lss_quorum/blastdb
-/lss_quorum/gff3
-/lss_quorum/log
-/lss_quorum/tmp
+/lss_quorum
 config/database.yml
 config/quorum_settings.yml
 .jhw-cache/

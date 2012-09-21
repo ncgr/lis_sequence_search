@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120910183118) do
+ActiveRecord::Schema.define(:version => 20120921200012) do
 
   create_table "quorum_blastn_job_reports", :force => true do |t|
     t.string   "query"
@@ -44,11 +44,12 @@ ActiveRecord::Schema.define(:version => 20120910183118) do
     t.string   "hit_display_id"
     t.float    "pct_identity"
     t.integer  "gaps"
+    t.integer  "mismatch"
   end
 
   create_table "quorum_blastn_jobs", :force => true do |t|
     t.string   "expectation"
-    t.integer  "max_score"
+    t.integer  "max_target_seqs"
     t.integer  "min_bit_score"
     t.boolean  "filter"
     t.boolean  "gapped_alignments"
@@ -92,11 +93,12 @@ ActiveRecord::Schema.define(:version => 20120910183118) do
     t.string   "hit_display_id"
     t.float    "pct_identity"
     t.integer  "gaps"
+    t.integer  "mismatch"
   end
 
   create_table "quorum_blastp_jobs", :force => true do |t|
     t.string   "expectation"
-    t.integer  "max_score"
+    t.integer  "max_target_seqs"
     t.integer  "min_bit_score"
     t.boolean  "filter"
     t.boolean  "gapped_alignments"
@@ -140,11 +142,12 @@ ActiveRecord::Schema.define(:version => 20120910183118) do
     t.string   "hit_display_id"
     t.float    "pct_identity"
     t.integer  "gaps"
+    t.integer  "mismatch"
   end
 
   create_table "quorum_blastx_jobs", :force => true do |t|
     t.string   "expectation"
-    t.integer  "max_score"
+    t.integer  "max_target_seqs"
     t.integer  "min_bit_score"
     t.boolean  "filter"
     t.boolean  "gapped_alignments"
@@ -197,11 +200,12 @@ ActiveRecord::Schema.define(:version => 20120910183118) do
     t.string   "hit_display_id"
     t.float    "pct_identity"
     t.integer  "gaps"
+    t.integer  "mismatch"
   end
 
   create_table "quorum_tblastn_jobs", :force => true do |t|
     t.string   "expectation"
-    t.integer  "max_score"
+    t.integer  "max_target_seqs"
     t.integer  "min_bit_score"
     t.boolean  "filter"
     t.boolean  "gapped_alignments"
