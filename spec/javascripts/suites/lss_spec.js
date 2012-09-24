@@ -155,18 +155,25 @@ describe("LSS", function() {
 
       expect(formatted.name).toEqual('foo');
       expect(_.isArray(formatted.children)).toBeTruthy();
-      expect(formatted.children[0].name).toEqual('lj_genome_2_5');
-      expect(formatted.children[0].children[0].name).toEqual('lj_chr2');
-      expect(formatted.children[0].children[0].children[0].name).toEqual('TOG894063');
-      expect(formatted.children[0].children[0].children[0].children[0].name).toEqual('q:299-684::h:22469244-22468859');
+      expect(formatted.children[0].name).toEqual('lotja_genome_2_5');
+      expect(formatted.children[0].children[0].name).toEqual('Chr2');
+      expect(formatted.children[0].children[0].children[0].name)
+        .toEqual('TOG894063');
+      expect(formatted.children[0].children[0].children[0].children[0].name)
+        .toEqual('q:299-684::h:22469244-22468859');
     });
   });
 
   describe("formatGroups", function() {
     it("groups data by hit_display_id and each sub group by query for formatData", function() {
       var groups = LSS.formatGroups(LSS.prepData(data, 'foo'));
-      expect(_.keys(groups)).toEqual(['lj_genome_2_5:lj_chr2','gm_genome_rel_1_01:gm02','mt_genome_3_5_1:mt_3_5_1_chr5','cc_genome_1_0:CcLG06']);
-      expect(_.keys(groups['lj_genome_2_5:lj_chr2'])).toEqual(['TOG894063']);
+      expect(_.keys(groups)).toEqual([
+        'lotja_genome_2_5:Chr2',
+        'glyma_genome_rel_1_01:Gm02',
+        'medtr_genome_Mt3.5.2:chr5',
+        'cajca_genome_1.0:CcLG06'
+      ]);
+      expect(_.keys(groups['lotja_genome_2_5:Chr2'])).toEqual(['TOG894063']);
     });
   });
 
@@ -410,7 +417,12 @@ describe("LSS", function() {
       spyOn(LSS, 'setData').andReturn(LSS.data);
       spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
       LSS.renderPartition(LSS.data['foo']);
-      expect($("#search-results")).toContainHtml('<div class="icicle" style="width: 934px; height: 760px; "><svg width="934" height="760"><g class="icicle-node" transform="translate(0,0)"><rect width="934" height="760" class="parent"></rect><text transform="translate(8,380)" dy=".35em" style="opacity: 1; " class="pointer">foo</text></g></svg></div>');
+      expect($("#search-results")).toContainHtml(
+        '<div class="icicle" style="width: 934px; height: 760px; ">' +
+        '<svg width="934" height="760"><g class="icicle-node" transform=' +
+        '"translate(0,0)"><rect width="934" height="760" class="parent">' +
+        '</rect><text transform="translate(8,380)" dy=".35em" style=' +
+        '"opacity: 1; " class="pointer">foo</text></g></svg></div>');
     });
     afterEach(function() {
       LSS.data = {};

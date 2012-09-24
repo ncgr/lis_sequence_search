@@ -22,7 +22,7 @@ LSS.exportUrls = {
 // Substitute placeholders %foo% with actual values before creating links.
 //
 LSS.gbrowseUrls = {
-  mt_jcvi: "http://www.jcvi.org/cgi-bin/gb2/gbrowse/mtruncatula/?" +
+  medtr_jcvi: "http://www.jcvi.org/cgi-bin/gb2/gbrowse/mtruncatula/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;i" +
     "cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=Gene-" +
     "Transcripts_all-Transcripts_Bud-Transcripts_Blade-Transcripts_Root-" +
@@ -31,33 +31,37 @@ LSS.gbrowseUrls = {
     "arabidopsis-TC_Lotus-TC_soybean-TC_cotton-TC_medicago-TC_rice-" +
     "TC_sorghum;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  mt_lis: "http://medtr.comparative-legumes.org/gb2/gbrowse/3.5.1/?" +
+  medtr_lis: "http://medtr.comparative-legumes.org/gb2/gbrowse/3.5.1/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  mt_hapmap: "http://www.medicagohapmap.org/cgi-bin/gbrowse/mthapmap/?" +
+  medtr_hapmap: "http://www.medicagohapmap.org/cgi-bin/gbrowse/mthapmap/?" +
     "q=%ref%:%start%..%stop%;t=Genes+Transcript+ReadingFrame+Translation+" +
     "SNP+SNP_HM005+CovU_HM005+SNP_HM006+CovU_HM006+SNP_HM029+CovU_HM029;c=1;" +
     "add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  mt_affy: "http://mtgea.noble.org/v2/probeset.php?id=",
+  medtr_affy: "http://mtgea.noble.org/v2/probeset.php?id=",
 
-  gm_soybase: "http://soybase.org/gb2/gbrowse/gmax1.01/?" +
+  glyma_soybase: "http://soybase.org/gb2/gbrowse/gmax1.01/?" +
     "ref=%ref%;start=%start%;stop=%stop%;version=100;cache=on;" +
     "drag_and_drop=on;show_tooltips=on;grid=on;add=%ref%+LIS+" +
     "LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  lj_kazusa: "http://gsv.kazusa.or.jp/cgi-bin/gbrowse/lotus/?" +
+  lotja_kazusa: "http://gsv.kazusa.or.jp/cgi-bin/gbrowse/lotus/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;" +
     "label=contig-phase3-phase1%%2C2-annotation-GMhmm-GenScan-blastn-tigrgi-" +
     "blastx-marker;grid=on;add=%ref%+LIS+LIS_Query_%query%+" +
     "%hit_from%..%hit_to%",
 
-  cc_lis: "http://cajca.comparative-legumes.org/gb2/gbrowse/1.0/?" +
+  cajca_lis: "http://cajca.comparative-legumes.org/gb2/gbrowse/1.0/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  gf_lis: "http://leggle.comparative-legumes.org/gene_families/name=%ref_id%"
+  genfam_lis: "http://leggle.comparative-legumes.org/gene_families/name=" +
+    "%ref_id%",
+
+  phavu_phytozome: "http://www.phytozome.net/cgi-bin/gbrowse/commonbean_er/?" +
+    "name=%ref%%3A%hit_from%..%hit_to%"
 };
 
 //
@@ -70,14 +74,20 @@ LSS.formatGbrowseUrl = function(data, url, type) {
       chr,
       area = 50000,
       hit_from,
-      hit_to;
+      hit_to,
+      ref_id,
+      proteome_genemodel = false;
+
+  ref_id = data.ref_id;
 
   //
-  // Hit to a proteome.
+  // Hit to a proteome or genemodel.
   //
 
-  if (data.ref.search(/proteome/) >= 0) {
-    return url.slice(0, url.lastIndexOf('?') + 1) + 'name=' + data.ref_id;
+  if (data.ref.search(/proteome/) >= 0 || data.ref.search(/genemodel/) >= 0) {
+    // Remove the query string and add name=ref_id.
+    url = url.slice(0, url.lastIndexOf('?') + 1) + 'name=%ref_id%';
+    proteome_genemodel = true;
   }
 
   //
@@ -114,6 +124,11 @@ LSS.formatGbrowseUrl = function(data, url, type) {
         hit = "Cc" + hit.substring(4);
       }
       break;
+    case "kazusa":
+      if (proteome_genemodel) {
+        ref_id = "CDS:" + ref_id;
+      }
+      break;
     default:
       break;
   }
@@ -145,19 +160,19 @@ LSS.formatGbrowseUrl = function(data, url, type) {
   url = url.replace(/%query%/, data.query);
   url = url.replace(/%hit_from%/, data.hit_from);
   url = url.replace(/%hit_to%/, data.hit_to);
-  url = url.replace(/%ref_id%/, data.ref_id);
+  url = url.replace(/%ref_id%/, ref_id);
 
   return url;
 
 }
 
 //
-// Add Gm url.
+// Add Glyma url.
 //
-LSS.addGm = function(data) {
+LSS.addGlyma = function(data) {
 
   var self = this,
-      url = self.gbrowseUrls.gm_soybase,
+      url = self.gbrowseUrls.glyma_soybase,
       urls = [];
 
   urls.push({
@@ -170,26 +185,26 @@ LSS.addGm = function(data) {
 };
 
 //
-// Add Mt urls.
+// Add Medtr urls.
 //
-LSS.addMt = function(data) {
+LSS.addMedtr = function(data) {
 
   var self = this,
       urls = [];
 
   urls.push({
     "name": "Medicago truncatula - JCVI",
-    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.mt_jcvi, "jcvi")
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.medtr_jcvi, "jcvi")
   });
 
   urls.push({
     "name": "Medicago truncatula - Hapmap",
-    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.mt_hapmap, "hapmap")
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.medtr_hapmap, "hapmap")
   });
 
   urls.push({
     "name": "Medicago truncatula - LIS",
-    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.mt_lis, "medtr-lis")
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.medtr_lis, "medtr-lis")
   });
 
   return urls;
@@ -197,17 +212,17 @@ LSS.addMt = function(data) {
 };
 
 //
-// Add Lj url.
+// Add Lotja url.
 //
-LSS.addLj = function(data) {
+LSS.addLotja = function(data) {
 
   var self = this,
-      url = self.gbrowseUrls.lj_kazusa,
+      url = self.gbrowseUrls.lotja_kazusa,
       urls = [];
 
   urls.push({
     "name": "Lotus japonicus - Kazusa",
-    "url": self.formatGbrowseUrl(data, url)
+    "url": self.formatGbrowseUrl(data, url, "kazusa")
   });
 
   return urls;
@@ -215,12 +230,12 @@ LSS.addLj = function(data) {
 };
 
 //
-// Add Cc url.
+// Add Cajca url.
 //
-LSS.addCc = function(data) {
+LSS.addCajca = function(data) {
 
   var self = this,
-      url = self.gbrowseUrls.cc_lis,
+      url = self.gbrowseUrls.cajca_lis,
       urls = [];
 
   urls.push({
@@ -233,12 +248,12 @@ LSS.addCc = function(data) {
 };
 
 //
-// Add Gf (gene family) url.
+// Add Genfam (gene family) url.
 //
-LSS.addGf = function(data) {
+LSS.addGenfam = function(data) {
 
   var self = this,
-      url = self.gbrowseUrls.gf_lis,
+      url = self.gbrowseUrls.genfam_lis,
       urls = [];
 
   urls.push({
@@ -251,6 +266,25 @@ LSS.addGf = function(data) {
 };
 
 //
+// Add Phavu url.
+//
+LSS.addPhavu = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.phavu_phytozome,
+      urls = [];
+
+  urls.push({
+    "name": "Phaseolus vulgaris - Phytozome",
+    "url": self.formatGbrowseUrl(data, url)
+  });
+
+  return urls;
+
+};
+
+
+//
 // Add linkouts to GBrowse instances.
 //
 LSS.addGbrowseLinkouts = function(data) {
@@ -261,20 +295,23 @@ LSS.addGbrowseLinkouts = function(data) {
 
   hit = data.ref;
 
-  if (hit.search(/gm_/) === 0) {
-    links.push(self.addGm(data));
+  if (hit.search(/glyma_/) === 0) {
+    links.push(self.addGlyma(data));
   }
-  if (hit.search(/mt_/) === 0) {
-    links.push(self.addMt(data));
+  if (hit.search(/medtr_/) === 0) {
+    links.push(self.addMedtr(data));
   }
-  if (hit.search(/lj_/) === 0) {
-    links.push(self.addLj(data));
+  if (hit.search(/lotja_/) === 0) {
+    links.push(self.addLotja(data));
   }
-  if (hit.search(/cc_/) === 0) {
-    links.push(self.addCc(data));
+  if (hit.search(/cajca_/) === 0) {
+    links.push(self.addCajca(data));
+  }
+  if (hit.search(/phavu_/) === 0) {
+    links.push(self.addPhavu(data));
   }
   if (hit.search(/genefam/) === 0) {
-    links.push(self.addGf(data));
+    links.push(self.addGenfam(data));
   }
 
   return links;
