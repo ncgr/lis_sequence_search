@@ -350,29 +350,29 @@ describe("LSS", function() {
     });
     it("returns if data is null", function() {
       LSS.tableData = null;
-      spyOn(LSS, 'renderView');
+      spyOn(LSS, 'renderTable');
       LSS.sortable('query');
-      expect(LSS.renderView).not.toHaveBeenCalled();
+      expect(LSS.renderTable).not.toHaveBeenCalled();
     });
     it("returns if data doesn't have property", function() {
-      spyOn(LSS, 'renderView');
+      spyOn(LSS, 'renderTable');
       LSS.sortable('unknown');
-      expect(LSS.renderView).not.toHaveBeenCalled();
+      expect(LSS.renderTable).not.toHaveBeenCalled();
     });
     it("sorts data by property using _.sortBy()", function() {
-      spyOn(LSS, 'renderView');
+      spyOn(LSS, 'renderTable');
       LSS.sortable('ref_id');
-      expect(LSS.renderView).toHaveBeenCalled();
+      expect(LSS.renderTable).toHaveBeenCalled();
       expect(LSS.sortDir).toEqual('desc');
     });
     it("sorts data by property using _.sortBy() with pased dataType", function() {
       // Spy on top level function parseFloat();
       var parseFloat = jasmine.createSpy();
-      spyOn(LSS, 'renderView');
+      spyOn(LSS, 'renderTable');
       LSS.sortable('evalue', parseFloat);
       expect(parseFloat).toHaveBeenCalled();
       expect(parseFloat.callCount).toEqual(4);
-      expect(LSS.renderView).toHaveBeenCalled();
+      expect(LSS.renderTable).toHaveBeenCalled();
       expect(LSS.sortDir).toEqual('asc');
     })
     afterEach(function() {

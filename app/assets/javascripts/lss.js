@@ -658,13 +658,7 @@ LSS.renderPartition = function(data) {
     .attr("dy", ".35em")
     .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; })
     .text(function(d) { return d.name; })
-    .on("click", function(d) {
-      if (d.quorum_hit_id) {
-        return QUORUM.viewDetailedReport(d.quorum_hit_id, d.query, d.algo);
-      } else {
-        return click(d);
-      }
-    })
+    .on("click", function(d) { return click(d); })
     .attr("class", function(d) {
       var r = "";
       if (d.top_hit) {
@@ -675,9 +669,15 @@ LSS.renderPartition = function(data) {
       return r;
     });
 
+  // Render the table view below the partition.
+  self.renderTable(data);
+
   // Zoom in on the clicked node.
   function click(d) {
     if (!d.children) {
+      if (d.quorum_hit_id) {
+        return QUORUM.viewDetailedReport(d.quorum_hit_id, d.query, d.algo);
+      }
       return;
     }
 
@@ -701,7 +701,15 @@ LSS.renderPartition = function(data) {
     t.select("text")
       .attr("transform", transform)
       .style("opacity", function(d) { return d.dx * ky > 12 ? 1 : 0; });
-  }
+
+    // Clear leaf data on each call.
+    self.leaf_data = {};
+
+    // Render table with leaf node data.
+    gatherVisibleLeafNodeData(root);
+    self.data[cached] = self.toArray(self.leaf_data);
+    self.renderTable(self.leaf_data);
+   }
 
   function transform(d) {
     return "translate(8," + d.dx * ky / 2 + ")";
@@ -717,11 +725,6 @@ LSS.renderPartition = function(data) {
     exportDataSet(root, "tab", false);
   });
 
-  $('#table').unbind('click').bind('click', function() {
-    gatherVisibleLeafNodeData(root);
-    self.data[cached] = self.toArray(self.leaf_data);
-    self.renderView(self.leaf_data, self.renderTable, "#table");
-  });
 };
 
 //
@@ -753,7 +756,7 @@ LSS.sortable = function(prop, dataType) {
     data = data.reverse();
   }
 
-  self.renderView(data);
+  self.renderTable(data);
 
 };
 
@@ -781,20 +784,9 @@ LSS.renderTable = function(data) {
     }
   );
 
-  $(results).html(template);
+  $("table.results").empty();
+  $(results).append(template);
 
-  // Hack to ensure only one event handler is bound.
-  // TODO: Make this purdy.
-  $('#cmtv').unbind('click').bind('click', function() {
-    exportDataSet(data, "cmtv", true);
-  });
-  $('#tab').unbind('click').bind('click', function() {
-    exportDataSet(data, "tab", false);
-  });
-
-  $('#partition').unbind('click').bind('click', function() {
-    self.renderView(null, self.renderPartition, "#partition");
-  });
 };
 
 
