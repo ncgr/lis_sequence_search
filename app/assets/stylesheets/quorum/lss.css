@@ -1,3 +1,16 @@
+#results {
+  width: 100%;
+  margin: 0 auto;
+}
+
+#results-menu {
+  padding: 15px 5px;
+}
+
+.fixed {
+  position: fixed;
+}
+
 .node circle {
   cursor: pointer;
   fill: #fff;

@@ -52,5 +52,27 @@
 <script type="text/javascript">
   $(function() {
     QUORUM.pollResults(LSS.collectResults, LSS);
+
+    // Width and height for menu.
+    var resultsWidth = $('#results').outerWidth(),
+        aboveHeight = $('#results-menu').outerHeight();
+
+    // Update the width on click.
+    $('#view').click(function() {
+      var scrollBar = 12;
+      resultsWidth = $('#results').outerWidth() - scrollBar;
+    });
+
+    // Enable fixed position menu.
+    $(window).scroll(function() {
+      if ($(window).scrollTop() > aboveHeight){
+        $('#results-menu').addClass('fixed').css('top','0')
+        .css('width',resultsWidth + 'px');
+      } else {
+        $('#results-menu').removeClass('fixed')
+        .css('width','100%');
+      }
+    });
+
   });
 </script>
