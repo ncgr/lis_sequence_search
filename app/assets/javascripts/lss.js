@@ -669,7 +669,7 @@ LSS.renderPartition = function(data) {
       return r;
     });
 
-  // Render the table view below the partition.
+  // Render the table view along with the partition.
   self.renderTable(data);
 
   // Zoom in on the clicked node.
@@ -706,13 +706,17 @@ LSS.renderPartition = function(data) {
     self.leaf_data = {};
 
     // Render table with leaf node data.
-    gatherVisibleLeafNodeData(root);
-    self.data[cached] = self.toArray(self.leaf_data);
-    self.renderTable(self.leaf_data);
+    updateTableData();
    }
 
   function transform(d) {
     return "translate(8," + d.dx * ky / 2 + ")";
+  }
+
+  function updateTableData() {
+    gatherVisibleLeafNodeData(root);
+    self.data[cached] = self.toArray(self.leaf_data);
+    self.renderTable(self.leaf_data);
   }
 
   // Export tree event handlers.
@@ -784,7 +788,10 @@ LSS.renderTable = function(data) {
     }
   );
 
+  // Clear existing table.
   $("table.results").empty();
+
+  // Append table view to partition.
   $(results).append(template);
 
 };
