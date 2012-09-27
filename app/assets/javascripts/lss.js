@@ -275,14 +275,11 @@ LSS.expandTopHits = function() {
   var self = this,
       algos = self.checkedAlgos(),
       cached = "cached",
-      data = [],
-      results = "#search-results";
+      data = [];
 
   if (_.isEmpty(algos)) {
     return;
   }
-
-  $(results).empty();
 
   // Remove each object without a top_hit property.
   _.each(algos, function(a) {
@@ -306,7 +303,6 @@ LSS.expandTopHitPerRefSeq = function() {
   var self = this,
       algos = self.checkedAlgos(),
       cached = "cached",
-      results = "#search-results",
       found,
       tmp = [],
       ref = [];
@@ -314,8 +310,6 @@ LSS.expandTopHitPerRefSeq = function() {
   if (_.isEmpty(algos)) {
     return;
   }
-
-  $(results).empty();
 
   _.each(algos, function(a) {
     _.each(self.data[a], function(d) {
@@ -347,7 +341,6 @@ LSS.expandTopHitPerRef = function() {
   var self = this,
       algos = self.checkedAlgos(),
       cached = "cached",
-      results = "#search-results",
       found,
       tmp = [],
       ref = [];
@@ -356,8 +349,6 @@ LSS.expandTopHitPerRef = function() {
   if (_.isEmpty(algos)) {
     return;
   }
-
-  $(results).empty();
 
   _.each(algos, function(a) {
     _.each(self.data[a], function(d) {
@@ -388,15 +379,12 @@ LSS.removeFilters = function() {
 
   var self = this,
       algos = self.checkedAlgos(),
-      cached = "cached",
-      results = "#search-results";
+      cached = "cached";
 
   // Return if checkedAlgos is empty.
   if (_.isEmpty(algos)) {
     return;
   }
-
-  $(results).empty();
 
   // Destroy any cached data.
   self.data[cached] = null;
@@ -416,8 +404,7 @@ LSS.evalueFilter = function(value) {
       data,
       tmp = [],
       i,
-      value = value || "0.0",
-      results = "#search-results";
+      value = value || "0.0";
 
   // Return if checkedAlgos is empty.
   if (_.isEmpty(algos)) {
@@ -435,8 +422,6 @@ LSS.evalueFilter = function(value) {
       }
     }));
   }
-
-  $(results).empty();
 
   // Cache the result for further filtering.
   self.data[cached] = tmp;
@@ -625,7 +610,7 @@ LSS.renderPartition = function(data) {
   self.leaf_data = {};
 
   vis = d3.select(results).append("div")
-    .attr("class", "icicle")
+    .attr("class", "partition")
     .style("width", width + "px")
     .style("height", height + "px")
     .append("svg:svg")
@@ -638,7 +623,7 @@ LSS.renderPartition = function(data) {
   g = vis.selectAll("g")
     .data(partition.nodes(formatted))
     .enter().append("svg:g")
-    .attr("class", "icicle-node")
+    .attr("class", "partition-node")
     .attr("transform", function(d) {
       return "translate(" + x(d.y) + "," + y(d.x) + ")";
     })

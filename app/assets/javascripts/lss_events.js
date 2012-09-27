@@ -33,16 +33,6 @@ $(function() {
     LSS.renderView();
   });
 
-  // View as partition
-  $("#partition").click(function() {
-    LSS.renderView(null, LSS.renderPartition, "#partition");
-  });
-
-  // View as table
-  $("#table").click(function() {
-    LSS.renderView(null, LSS.renderTable, "#table");
-  });
-
   // Remove filters
   $("#remove-filters").click(function() {
     LSS.removeFilters();

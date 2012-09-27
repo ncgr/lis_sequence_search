@@ -418,8 +418,8 @@ describe("LSS", function() {
       spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
       LSS.renderPartition(LSS.data['foo']);
       expect($("#search-results")).toContainHtml(
-        '<div class="icicle" style="width: 934px; height: 760px; ">' +
-        '<svg width="934" height="760"><g class="icicle-node" transform=' +
+        '<div class="partition" style="width: 934px; height: 760px; ">' +
+        '<svg width="934" height="760"><g class="partition-node" transform=' +
         '"translate(0,0)"><rect width="934" height="760" class="parent">' +
         '</rect><text transform="translate(8,380)" dy=".35em" style=' +
         '"opacity: 1; " class="pointer">foo</text></g></svg></div>');

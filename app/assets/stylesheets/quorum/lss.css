@@ -18,7 +18,7 @@
   stroke-width: 1.5px;
 }
 
-.node text, .icicle-node text {
+.node text, .partition-node text {
   font: 10px sans-serif;
 }
 
@@ -70,20 +70,23 @@ text.top-hit {
   font-weight: normal;
 }
 
-.icicle {
+.partition {
   clear: both;
   margin: 20px;
   padding: 0;
 }
 
-.icicle rect {
+.partition rect {
   stroke: #eee;
   fill: #aaa;
   fill-opacity: .8;
 }
 
-.icicle rect.parent {
+.partition rect.parent {
   cursor: pointer;
   fill: steelblue;
 }
 
+table.results tr th {
+  background: #fff;
+}
