@@ -13,7 +13,7 @@
 
 #results {
   background-color: #fff;
-  margin: 0;
+  margin: 0 auto;
   padding: 0;
   overflow: hidden;
   width: 100%;
@@ -31,6 +31,14 @@
   width: 100%;
 }
 
+#partition, #table {
+  width: 100%;
+}
+
+#table {
+  overflow: auto;
+}
+
 /*** Table Styles ***/
 table.options {
   margin: 0 0 15px 10px;
@@ -44,6 +52,10 @@ table.results {
   border: 0;
   width: 100%;
   border-collapse: collapse;
+}
+
+table.results tr th {
+  background: #fff;
 }
 
 table.report_details {
@@ -70,8 +82,8 @@ th a, a:hover {
 }
 
 td {
-  white-space: normal;
   font-size: 12px;
+  white-space: normal;
 }
 
 td a.detailed_report, td a.detailed_report a:hover {

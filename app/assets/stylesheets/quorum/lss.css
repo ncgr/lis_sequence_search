@@ -1,12 +1,3 @@
-#results {
-  width: 100%;
-  margin: 0 auto;
-}
-
-#results-menu {
-  padding: 15px 5px;
-}
-
 .fixed {
   position: fixed;
 }
@@ -85,8 +76,4 @@ text.top-hit {
 .partition rect.parent {
   cursor: pointer;
   fill: steelblue;
-}
-
-table.results tr th {
-  background: #fff;
 }

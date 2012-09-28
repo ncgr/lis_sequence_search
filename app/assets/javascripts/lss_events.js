@@ -9,7 +9,7 @@ $(function() {
   $("input:checkbox, button", "#results-menu").button();
 
   // Filters menu.
-  _.each(["#filters", "#view-tree"], function(e) {
+  _.each(["#filters", "#view-as"], function(e) {
     $(e).button({
       icons: {
         secondary : 'ui-icon-triangle-1-s'
@@ -20,7 +20,7 @@ $(function() {
         my: "left top",
         at: "left bottom",
         of: this
-      });
+      }).css('z-index', 10000);
       $(document).one('click', function() { menu.hide(); });
       return false;
     })
@@ -58,6 +58,28 @@ $(function() {
   $("#filter-evalue").click(function() {
     var val = $("#evalue").val();
     LSS.evalueFilter(val);
+  });
+
+  // Width and height for menu.
+  var resultsWidth = $('#results').outerWidth(),
+      aboveHeight = $('#results-menu').outerHeight();
+
+  // Update the width on click.
+  $('#view').click(function() {
+    var scrollBar = 12;
+    resultsWidth = $('#results').outerWidth() - scrollBar;
+  });
+
+  // Enable fixed position menu.
+  $(window).scroll(function() {
+    if ($(window).scrollTop() > aboveHeight) {
+      $('#results-menu').addClass('fixed').css('top','0')
+        .css('width',resultsWidth + 'px')
+        .css('z-index', 1000);
+    } else {
+      $('#results-menu').removeClass('fixed')
+        .css('width','100%');
+    }
   });
 });
 

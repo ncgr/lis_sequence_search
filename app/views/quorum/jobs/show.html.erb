@@ -26,7 +26,7 @@
         <button id="filter-evalue">filter</button>
 
         <span>
-          <button id='view-tree'>view as</button>
+          <button id='view-as'>view as</button>
         </span>
         <ul id="views">
           <li id="cmtv"><a href="#">cmtv</a></li>
@@ -34,7 +34,14 @@
         </ul>
       </span>
     </div>
-    <div id="search-results"></div>
+    <div id="search-results">
+      <div id="partition">
+        <div id="partition-results"></div>
+      </div>
+      <div id="table">
+        <div id="table-results"></div>
+      </div>
+    </div>
   </div>
 
   <div id="detailed_report_dialog" title="Report Details"></div>
@@ -52,26 +59,5 @@
 <script type="text/javascript">
   $(function() {
     QUORUM.pollResults(LSS.collectResults, LSS);
-
-    // Width and height for menu.
-    var resultsWidth = $('#results').outerWidth(),
-        aboveHeight = $('#results-menu').outerHeight();
-
-    // Update the width on click.
-    $('#view').click(function() {
-      var scrollBar = 12;
-      resultsWidth = $('#results').outerWidth() - scrollBar;
-    });
-
-    // Enable fixed position menu.
-    $(window).scroll(function() {
-      if ($(window).scrollTop() > aboveHeight){
-        $('#results-menu').addClass('fixed').css('top','0')
-        .css('width',resultsWidth + 'px');
-      } else {
-        $('#results-menu').removeClass('fixed')
-        .css('width','100%');
-      }
-    });
   });
 </script>

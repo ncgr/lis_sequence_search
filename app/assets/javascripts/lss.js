@@ -575,12 +575,12 @@ LSS.renderPartition = function(data) {
   var self = this,
       algos = self.checkedAlgos(),
       cached = "cached",
-      results = "#search-results",
+      results = "#partition-results",
       tools = "#tools",
       id = self.quorum_id,
       margin = { top: 20, right: 20, bottom: 20, left: 60 },
       width = $(results).width() - margin.right - margin.left,
-      height = 800 - margin.top - margin.bottom,
+      height = (window.innerHeight * 0.6) - margin.top - margin.bottom,
       x = d3.scale.linear().range([0, width]),
       y = d3.scale.linear().range([0, height]),
       formatted,
@@ -594,7 +594,7 @@ LSS.renderPartition = function(data) {
 
   data = self.setData(data);
 
-  // Empty results before calling d3.
+  // Clear existing partition.
   $(results).empty();
 
   // Display tools
@@ -755,7 +755,7 @@ LSS.sortable = function(prop, dataType) {
 LSS.renderTable = function(data) {
 
   var self = this,
-      results = "#search-results",
+      results = "#table-results",
       template;
 
   data = self.setData(data);
@@ -774,10 +774,11 @@ LSS.renderTable = function(data) {
   );
 
   // Clear existing table.
-  $("table.results").empty();
+  $(results).empty();
 
   // Append table view to partition.
-  $(results).append(template);
+  $(results).html(template)
+    .css('height', (window.innerHeight * 0.4));
 
 };
 
