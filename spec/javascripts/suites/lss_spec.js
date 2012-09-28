@@ -416,13 +416,9 @@ describe("LSS", function() {
     it("renders partition view", function() {
       spyOn(LSS, 'setData').andReturn(LSS.data);
       spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      spyOn(window, 'innerHeight');
       LSS.renderPartition(LSS.data['foo']);
-      expect($("#search-results")).toContainHtml(
-        '<div class="partition" style="width: 934px; height: 760px; ">' +
-        '<svg width="934" height="760"><g class="partition-node" transform=' +
-        '"translate(0,0)"><rect width="934" height="760" class="parent">' +
-        '</rect><text transform="translate(8,380)" dy=".35em" style=' +
-        '"opacity: 1; " class="pointer">foo</text></g></svg></div>');
+      expect($("#partition-results")).toContainHtml('</g></svg></div>');
     });
     afterEach(function() {
       LSS.data = {};
