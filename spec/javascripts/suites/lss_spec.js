@@ -17,7 +17,7 @@ describe("LSS", function() {
   });
 
   describe("collectResults", function() {
-    it("collects Quorum's results, preps data and renders menu", function() {
+    it("collects Quorum's results and preps data", function() {
       var algo = 'blastn';
 
       spyOn(LSS, 'prepData');
@@ -27,7 +27,21 @@ describe("LSS", function() {
 
       expect(LSS.quorum_id).not.toBeEmpty();
       expect(LSS.prepData).toHaveBeenCalledWith(data, algo);
-      expect(LSS.renderMenu).toHaveBeenCalledWith(algo);
+      expect(LSS.renderMenu).not.toHaveBeenCalled();
+    });
+    it("calls renderMenu when all algorithms have returned", function() {
+      var algo = 'blastn';
+
+      LSS.data = {a:1,b:2,c:3};
+
+      spyOn(LSS, 'prepData');
+      spyOn(LSS, 'renderMenu');
+
+      LSS.collectResults(data, algo);
+
+      expect(LSS.quorum_id).not.toBeEmpty();
+      expect(LSS.prepData).toHaveBeenCalledWith(data, algo);
+      expect(LSS.renderMenu).toHaveBeenCalled();
     });
   });
 
@@ -35,14 +49,11 @@ describe("LSS", function() {
     beforeEach(function() {
       loadFixtures('results.html');
     });
-    it("returns if algo is not set", function() {
-      LSS.renderMenu();
-      expect($("#algorithms")).toBeEmpty();
-    });
-    it("renders LSS menu containing algorithm button(s)", function() {
+    it("renders LSS menu", function() {
+      spyOn(LSS, 'renderView');
       LSS.renderMenu('blastn');
-      expect($("#algorithms")).not.toBeEmpty();
-      expect($("#view")).not.toBeHidden();
+      expect(LSS.renderView).toHaveBeenCalled();
+      expect($("#tools")).not.toBeEmpty();
     });
   });
 
@@ -197,15 +208,15 @@ describe("LSS", function() {
   });
 
   describe("setCurrentData", function() {
-    it("gathers checked data when cached data is undefined", function() {
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+    it("gathers data when cached data is undefined", function() {
+      LSS.algos = ['foo'];
       spyOn(LSS, 'gatherCheckedData');
       LSS.setCurrentData();
       expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
     });
-    it("gathers checked data when cached data is null", function() {
+    it("gathers data when cached data is null", function() {
       LSS.data['cached'] = null;
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      LSS.algos = ['foo'];
       spyOn(LSS, 'gatherCheckedData');
       LSS.setCurrentData();
       expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
@@ -213,7 +224,7 @@ describe("LSS", function() {
     it("uses cached data if set", function() {
       LSS.data['foo'] = 'bar';
       LSS.data['cached'] = LSS.data['foo']; // Set cached data.
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      LSS.algos = ['foo'];
       spyOn(LSS, 'gatherCheckedData');
       var data = LSS.setCurrentData();
       expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
@@ -221,13 +232,14 @@ describe("LSS", function() {
     });
     afterEach(function() {
       LSS.data = {};
+      LSS.algos = [];
     });
   });
 
   describe("setData", function() {
     it("uses passed data when set", function() {
       var foo = {bar: "baz"};
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+      LSS.algos = ['foo'];
       spyOn(LSS, 'gatherCheckedData');
       var data = LSS.setData(foo);
       expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
@@ -245,6 +257,7 @@ describe("LSS", function() {
     });
     afterEach(function() {
       LSS.data = {};
+      LSS.algos = [];
     });
   });
 
@@ -254,13 +267,13 @@ describe("LSS", function() {
     });
     describe("expandTopHits", function() {
       it("returns when checkedAlgos is empty", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn([]);
+        LSS.algos = [];
         spyOn(LSS, 'renderView');
         LSS.expandTopHits();
         expect(LSS.renderView).not.toHaveBeenCalled();
       });
       it("returns objects where top_hit equals true", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+        LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.expandTopHits();
         expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
@@ -270,13 +283,13 @@ describe("LSS", function() {
 
     describe("expandTopHitPerRefSeq", function() {
       it("returns when checkedAlgos is empty", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn([]);
+        LSS.algos = [];
         spyOn(LSS, 'renderView');
         LSS.expandTopHitPerRefSeq();
         expect(LSS.renderView).not.toHaveBeenCalled();
       });
       it("returns objects containing top hit per reference sequence", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+        LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.expandTopHitPerRefSeq();
         expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
@@ -286,13 +299,13 @@ describe("LSS", function() {
 
     describe("expandTopHitPerRef", function() {
       it("returns when checkedAlgos is empty", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn([]);
+        LSS.algos = [];
         spyOn(LSS, 'renderView');
         LSS.expandTopHitPerRef();
         expect(LSS.renderView).not.toHaveBeenCalled();
       });
       it("returns objects containing top hit per reference", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+        LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.expandTopHitPerRef();
         expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
@@ -302,13 +315,13 @@ describe("LSS", function() {
 
     describe("removeFilters", function() {
       it("returns when checkedAlgos is empty", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn([]);
+        LSS.algos = [];
         spyOn(LSS, 'renderView');
         LSS.removeFilters();
         expect(LSS.renderView).not.toHaveBeenCalled();
       });
       it("clears cached data and renders current view with original data set", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+        LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.data['cached'] = LSS.data['foo'];
         LSS.removeFilters();
@@ -319,20 +332,20 @@ describe("LSS", function() {
 
     describe("evalueFilter", function() {
       it("returns when checkedAlgos is empty", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn([]);
+        LSS.algos = [];
         spyOn(LSS, 'renderView');
         LSS.evalueFilter();
         expect(LSS.renderView).not.toHaveBeenCalled();
       });
       it("returns objects containing evalues > 0.0", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+        LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.evalueFilter("0.0");
         expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
         expect(LSS.data['cached'][0].length).toEqual(1);
       });
       it("returns objects containing evalues > 1e-100", function() {
-        spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
+        LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.evalueFilter("1e-100");
         expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
@@ -341,6 +354,7 @@ describe("LSS", function() {
     });
     afterEach(function() {
       LSS.data = {};
+      LSS.algos = [];
     });
   });
 
@@ -414,8 +428,8 @@ describe("LSS", function() {
     });
     // TODO: Add specs that interact with the partition view.
     it("renders partition view", function() {
+      LSS.algos = ['foo'];
       spyOn(LSS, 'setData').andReturn(LSS.data);
-      spyOn(LSS, 'checkedAlgos').andReturn(['foo']);
       spyOn(window, 'innerHeight');
       LSS.renderPartition(LSS.data['foo']);
       expect($("#partition-results")).toContainHtml('</g></svg></div>');

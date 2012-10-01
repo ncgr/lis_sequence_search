@@ -52,20 +52,14 @@ LSS.data = LSS.data || {};
 LSS.leaf_data = LSS.leaf_data || {};
 
 //
-// Gather checked algos in the view.
+// Store enquequed algorithms.
 //
-LSS.checkedAlgos = function() {
+LSS.algos = LSS.algos || [];
 
-  var self = this,
-      algos = [];
-
-  $("input:checkbox:checked", "#algorithms").each(function() {
-    algos.push($(this).val().toLowerCase());
-  });
-
-  return algos;
-
-};
+//
+// Number of supported algorithms set by QUORUM.
+//
+LSS.numSupportedAlgos = QUORUM.algorithms.length;
 
 //
 // Highlight the selected view (table, partition, etc.).
@@ -238,7 +232,7 @@ LSS.setCurrentData = function() {
   var self = this,
       data,
       cached = "cached",
-      algos = self.checkedAlgos();
+      algos = self.algos;
 
   if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
     data = self.gatherCheckedData(algos);
@@ -273,7 +267,7 @@ LSS.setData = function(data) {
 LSS.expandTopHits = function() {
 
   var self = this,
-      algos = self.checkedAlgos(),
+      algos = self.algos,
       cached = "cached",
       data = [];
 
@@ -301,7 +295,7 @@ LSS.expandTopHits = function() {
 LSS.expandTopHitPerRefSeq = function() {
 
   var self = this,
-      algos = self.checkedAlgos(),
+      algos = self.algos,
       cached = "cached",
       found,
       tmp = [],
@@ -339,7 +333,7 @@ LSS.expandTopHitPerRefSeq = function() {
 LSS.expandTopHitPerRef = function() {
 
   var self = this,
-      algos = self.checkedAlgos(),
+      algos = self.algos,
       cached = "cached",
       found,
       tmp = [],
@@ -378,7 +372,7 @@ LSS.expandTopHitPerRef = function() {
 LSS.removeFilters = function() {
 
   var self = this,
-      algos = self.checkedAlgos(),
+      algos = self.algos,
       cached = "cached";
 
   // Return if checkedAlgos is empty.
@@ -399,7 +393,7 @@ LSS.removeFilters = function() {
 LSS.evalueFilter = function(value) {
 
   var self = this,
-      algos = self.checkedAlgos(),
+      algos = self.algos,
       cached = "cached",
       data,
       tmp = [],
@@ -573,7 +567,7 @@ LSS.formatResults = function(data, algos) {
 LSS.renderPartition = function(data) {
 
   var self = this,
-      algos = self.checkedAlgos(),
+      algos = self.algos,
       cached = "cached",
       results = "#partition-results",
       tools = "#tools",
@@ -788,8 +782,7 @@ LSS.renderTable = function(data) {
 //
 LSS.renderView = function(data, view, highlight) {
 
-  var self = this,
-      args;
+  var self = this;
 
   // Set default view to partition if current view is not set.
   self.currentView = self.currentView || self.renderPartition;
@@ -809,36 +802,14 @@ LSS.renderView = function(data, view, highlight) {
 //
 // Render interactive menu.
 //
-LSS.renderMenu = function(algo) {
+LSS.renderMenu = function() {
 
   var self = this,
-      view = $("#view"),
-      loading = $("#menu-loading"),
-      algorithms = $("#algorithms");
+      loading = $("#menu-loading");
 
-  if (_.isUndefined(algo) || _.isNull(algo) || _.isEmpty(algo)) {
-    return;
-  }
-
-  algo = algo.toLowerCase(),
   loading.empty();
 
-  algorithms.append(
-    "<input type='checkbox' id='" + algo + "' value='" + algo + "'/>" +
-    "<label for='" + algo + "'>" + algo + "</label>"
-  );
-
-  // Format the checkboxes
-  $(algorithms).buttonset();
-
-  // Add the click event handler
-  $("input:checkbox", algorithms).click(function() {
-    if ($("input:checkbox:checked", algorithms).length > 0) {
-      view.show();
-    } else {
-      view.hide();
-    }
-  });
+  self.renderView();
 
 };
 
@@ -856,9 +827,14 @@ LSS.collectResults = function(data, algo) {
   // If the algorithm wasn't enqueued, prepData returns null.
   self.data[algo] = self.prepData(data, algo);
 
-  // Render menu
+  // Add valid algo to array.
   if (!_.isNull(self.data[algo])) {
-    self.renderMenu(algo);
+    self.algos.push(algo);
+  }
+
+  // Render menu after all algorithms have returned.
+  if (_.keys(self.data).length >= self.numSupportedAlgos) {
+    self.renderMenu();
   }
 
 };

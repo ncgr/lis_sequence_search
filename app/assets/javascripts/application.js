@@ -15,10 +15,10 @@
 //= require jquery_ujs
 //= require d3.v2
 //= require underscore
+//= require quorum/quorum
 //= require lss
 //= require lss_urls
 //= require lss_data_export
 //= require lss_events
 //= require sequences
-//= require quorum/quorum
 //= require_tree .

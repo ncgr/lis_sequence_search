@@ -5,7 +5,7 @@
 //---------------------------------------------------------------------------//
 
 $(function() {
-  _.each(["#view", "#tools"], function(e) { $(e).hide(); });
+  _.each(["#tools"], function(e) { $(e).hide(); });
   $("input:checkbox, button", "#results-menu").button();
 
   // Filters menu.
@@ -25,12 +25,6 @@ $(function() {
       return false;
     })
     .parent().next().hide().menu();
-  });
-
-  // View
-  $("#view").click(function() {
-    LSS.data["cached"] = null;
-    LSS.renderView();
   });
 
   // Remove filters
@@ -61,20 +55,14 @@ $(function() {
   });
 
   // Width and height for menu.
-  var resultsWidth = $('#results').outerWidth(),
+  var resultsWidth = $('#results').outerWidth() - 12,
       aboveHeight = $('#results-menu').outerHeight();
-
-  // Update the width on click.
-  $('#view').click(function() {
-    var scrollBar = 12;
-    resultsWidth = $('#results').outerWidth() - scrollBar;
-  });
 
   // Enable fixed position menu.
   $(window).scroll(function() {
     if ($(window).scrollTop() > aboveHeight) {
       $('#results-menu').addClass('fixed').css('top','0')
-        .css('width',resultsWidth + 'px')
+        .css('width',(resultsWidth - 16) + 'px')
         .css('z-index', 1000);
     } else {
       $('#results-menu').removeClass('fixed')
