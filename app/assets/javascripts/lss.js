@@ -113,7 +113,7 @@ LSS.toArray = function(data) {
 };
 
 //
-// Flag top hit per sequence query by adding property "top_hit": true to each
+// Flag top hit per sequence query by adding property "top_hit:true" to each
 // object.
 //
 // Quorum returns results ordered by query, bit_score ascending so it's safe
@@ -209,12 +209,12 @@ LSS.prepData = function(data, algo) {
 //
 // Gather data set per algorithm.
 //
-LSS.gatherCheckedData = function(algos) {
+LSS.gatherDataByAlgorithm = function() {
 
   var self = this,
       data = [];
 
-  _.each(algos, function(a) {
+  _.each(self.algos, function(a) {
     data.push(self.data[a]);
   });
 
@@ -231,11 +231,10 @@ LSS.setCurrentData = function() {
 
   var self = this,
       data,
-      cached = "cached",
-      algos = self.algos;
+      cached = "cached";
 
   if (_.isNull(self.data[cached]) || _.isUndefined(self.data[cached])) {
-    data = self.gatherCheckedData(algos);
+    data = self.gatherDataByAlgorithm();
   } else {
     data = self.data[cached];
   }
@@ -339,7 +338,7 @@ LSS.expandTopHitPerRef = function() {
       tmp = [],
       ref = [];
 
-  // Return if checkedAlgos is empty.
+  // Return if algos is empty.
   if (_.isEmpty(algos)) {
     return;
   }
@@ -375,7 +374,7 @@ LSS.removeFilters = function() {
       algos = self.algos,
       cached = "cached";
 
-  // Return if checkedAlgos is empty.
+  // Return if algos is empty.
   if (_.isEmpty(algos)) {
     return;
   }
@@ -400,7 +399,7 @@ LSS.evalueFilter = function(value) {
       i,
       value = value || "0.0";
 
-  // Return if checkedAlgos is empty.
+  // Return if algos is empty.
   if (_.isEmpty(algos)) {
     return;
   }

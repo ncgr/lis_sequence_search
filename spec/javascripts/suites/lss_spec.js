@@ -196,11 +196,12 @@ describe("LSS", function() {
     });
   });
 
-  describe("gatherCheckedData", function() {
+  describe("gatherDataByAlgorithm", function() {
     it("combines cached data into an array of data", function() {
+      LSS.algos = ['foo', 'baz'];
       LSS.data["foo"] = "bar";
       LSS.data["baz"] = "bam";
-      expect(LSS.gatherCheckedData(['foo','baz'])).toEqual(['bar','bam']);
+      expect(LSS.gatherDataByAlgorithm()).toEqual(['bar','bam']);
     });
     afterEach(function() {
       LSS.data = {};
@@ -210,24 +211,24 @@ describe("LSS", function() {
   describe("setCurrentData", function() {
     it("gathers data when cached data is undefined", function() {
       LSS.algos = ['foo'];
-      spyOn(LSS, 'gatherCheckedData');
+      spyOn(LSS, 'gatherDataByAlgorithm');
       LSS.setCurrentData();
-      expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
+      expect(LSS.gatherDataByAlgorithm).toHaveBeenCalled();
     });
     it("gathers data when cached data is null", function() {
       LSS.data['cached'] = null;
       LSS.algos = ['foo'];
-      spyOn(LSS, 'gatherCheckedData');
+      spyOn(LSS, 'gatherDataByAlgorithm');
       LSS.setCurrentData();
-      expect(LSS.gatherCheckedData).toHaveBeenCalledWith(['foo']);
+      expect(LSS.gatherDataByAlgorithm).toHaveBeenCalled();
     });
     it("uses cached data if set", function() {
       LSS.data['foo'] = 'bar';
       LSS.data['cached'] = LSS.data['foo']; // Set cached data.
       LSS.algos = ['foo'];
-      spyOn(LSS, 'gatherCheckedData');
+      spyOn(LSS, 'gatherDataByAlgorithm');
       var data = LSS.setCurrentData();
-      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
+      expect(LSS.gatherDataByAlgorithm).not.toHaveBeenCalled();
       expect(data).toEqual(LSS.data['cached']);
     });
     afterEach(function() {
@@ -240,9 +241,9 @@ describe("LSS", function() {
     it("uses passed data when set", function() {
       var foo = {bar: "baz"};
       LSS.algos = ['foo'];
-      spyOn(LSS, 'gatherCheckedData');
+      spyOn(LSS, 'gatherDataByAlgorithm');
       var data = LSS.setData(foo);
-      expect(LSS.gatherCheckedData).not.toHaveBeenCalled();
+      expect(LSS.gatherDataByAlgorithm).not.toHaveBeenCalled();
       expect(data).toEqual(foo);
     });
     it("calls setCurrentData when passed data is undefined", function() {
