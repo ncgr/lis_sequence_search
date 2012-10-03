@@ -4,6 +4,7 @@ describe("LSS URLs", function() {
     it("returns an array of objects containing urls and names", function() {
       spyOn(LSS, 'addGbrowseLinkouts');
       var fake = {
+            hit_display_id: "foo:bar",
             ref: "foo",
             ref_id: "bar"
           },
@@ -17,6 +18,7 @@ describe("LSS URLs", function() {
     it("formats glyma_ linkout", function() {
       spyOn(LSS, 'addGlyma');
       var fake = {
+            hit_display_id: "glyma_foo:bar",
             ref: "glyma_foo",
             ref_id: "bar"
           },
@@ -27,6 +29,7 @@ describe("LSS URLs", function() {
     it("formats medtr_ linkout", function() {
       spyOn(LSS, 'addMedtr');
       var fake = {
+            hit_display_id: "medtr_foo:bar",
             ref: "medtr_foo",
             ref_id: "bar"
           },
@@ -37,6 +40,7 @@ describe("LSS URLs", function() {
     it("formats lotja_ linkout", function() {
       spyOn(LSS, 'addLotja');
       var fake = {
+            hit_display_id: "lotja_foo:bar",
             ref: "lotja_foo",
             ref_id: "bar"
           },
@@ -47,6 +51,7 @@ describe("LSS URLs", function() {
     it("formats cajca_ linkout", function() {
       spyOn(LSS, 'addCajca');
       var fake = {
+            hit_display_id: "cajca_foo:bar",
             ref: "cajca_foo",
             ref_id: "bar"
           },
@@ -57,6 +62,7 @@ describe("LSS URLs", function() {
     it("formats phavu_ linkout", function() {
       spyOn(LSS, 'addPhavu');
       var fake = {
+            hit_display_id: "phavu_foo:bar",
             ref: "phavu_foo",
             ref_id: "bar"
           },
@@ -67,6 +73,7 @@ describe("LSS URLs", function() {
     it("formats genefam linkout", function() {
       spyOn(LSS, 'addGenfam');
       var fake = {
+            hit_display_id: "genefam_foo:bar",
             ref: "genefam_foo",
             ref_id: "bar"
           },
@@ -80,6 +87,7 @@ describe("LSS URLs", function() {
     it("formats a url for Soybase", function() {
       spyOn(LSS, 'formatGbrowseUrl');
       var fake = {
+            hit_display_id: "glyma_foo:bar",
             ref: "glyma_foo",
             ref_id: "bar"
           },
@@ -95,6 +103,7 @@ describe("LSS URLs", function() {
 
   describe("addMedtr", function() {
     var fake = {
+          hit_display_id: "medtr_foo:bar",
           ref: "medtr_foo",
           ref_id: "bar"
         };
@@ -134,6 +143,7 @@ describe("LSS URLs", function() {
     it("formats a url for Kazusa", function() {
       spyOn(LSS, 'formatGbrowseUrl');
       var fake = {
+            hit_display_id: "lotja_foo:bar",
             ref: "lotja_foo",
             ref_id: "bar"
           },
@@ -151,6 +161,7 @@ describe("LSS URLs", function() {
     it("formats a url for Cajca LIS", function() {
       spyOn(LSS, 'formatGbrowseUrl');
       var fake = {
+            hit_display_id: "cajca_foo:bar",
             ref: "cajca_foo",
             ref_id: "bar"
           },
@@ -168,6 +179,7 @@ describe("LSS URLs", function() {
     it("formats a url for Phavu LIS", function() {
       spyOn(LSS, 'formatGbrowseUrl');
       var fake = {
+            hit_display_id: "phavu_foo:bar",
             ref: "phavu_foo",
             ref_id: "bar"
           },
@@ -184,6 +196,7 @@ describe("LSS URLs", function() {
     it("formats a url for Genefam LIS", function() {
       spyOn(LSS, 'formatGbrowseUrl');
       var gf = {
+            hit_display_id: "genefam_20120817_protein:12345",
             ref: "genefam_20120817_protein",
             ref_id: 12345
           },
@@ -355,6 +368,15 @@ describe("LSS URLs", function() {
       };
       var url = LSS.formatGbrowseUrl(prot, "http://google.com?foo=bar&baz=bam", "kazusa");
       expect(url).toEqual('http://google.com?name=CDS:1212');
+    });
+    it("Ignores gbrowse urls for hits transcriptomes", function() {
+      var trans = {
+        hit_display_id: "foo_transcriptome_bar:1212",
+        ref: "foo_transcriptome_bar",
+        ref_id: "1212"
+      };
+      var url = LSS.formatGbrowseUrl(trans, "http://google.com?foo=bar&baz=bam", "kazusa");
+      expect(url).toEqual('');
     });
   });
 

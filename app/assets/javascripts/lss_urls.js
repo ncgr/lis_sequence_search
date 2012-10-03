@@ -1,7 +1,5 @@
 //
 // LSS URLs
-//
-// Author: Ken Seal
 //----------------------------------------------------------------------------//
 
 //
@@ -79,6 +77,11 @@ LSS.formatGbrowseUrl = function(data, url, type) {
       proteome_genemodel = false;
 
   ref_id = data.ref_id;
+
+  // Ignore hits to transcriptomes
+  if (data.ref.search(/transcriptome/) >= 0) {
+    return "";
+  }
 
   //
   // Hit to a proteome or genemodel.
@@ -328,6 +331,10 @@ LSS.formatLinkouts = function(data) {
       hit,
       links = [];
 
+  if (_.isUndefined(data.hit_display_id) || _.isNull(data.hit_display_id)) {
+    return;
+  }
+
   // Add ref and ref_id properties if undefined.
   // This is only true if data was called via ajax without being passed
   // through LSS.prepData.
@@ -338,9 +345,12 @@ LSS.formatLinkouts = function(data) {
   }
 
   // Add the GBrowse linkouts to each hsp.
+  // Ignore linkouts with an empty name or url property.
   _.each(self.addGbrowseLinkouts(data), function(link) {
     _.each(link, function(l) {
-      links.push(l);
+      if (!_.isEmpty(l.url) && !_.isEmpty(l.name)) {
+        links.push(l);
+      }
     });
   });
 
