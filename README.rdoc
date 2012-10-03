@@ -1,8 +1,8 @@
 = LIS Sequence Search
 
-Prototype of the new LIS Sequence Search system.
+New and improved LIS Sequence Search system.
 
-See it in action: http://doc.comparative-legumes.org/quorum/jobs/new
+See it in action: http://search.comparative-legumes.org/quorum/jobs/new
 
 Dependencies:
 
