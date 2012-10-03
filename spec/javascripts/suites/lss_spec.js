@@ -68,7 +68,6 @@ describe("LSS", function() {
       expect(LSS.highlightView).toHaveBeenCalledWith("#table");
       expect(LSS.renderTable).toHaveBeenCalledWith(null);
     });
-
     it("renders partition view when view is not defined", function() {
       spyOn(LSS, 'renderPartition');
       spyOn(LSS, 'highlightView');
@@ -79,7 +78,14 @@ describe("LSS", function() {
       expect(LSS.highlightView).not.toHaveBeenCalled();
       expect(LSS.renderPartition).toHaveBeenCalledWith(null);
     });
+    it("renders empty reports", function() {
+      spyOn(LSS, 'renderPartition');
+      spyOn(LSS, 'highlightView');
+      spyOn(LSS, 'renderEmptyReports');
 
+      LSS.renderView(null);
+      expect(LSS.renderEmptyReports).toHaveBeenCalled();
+    });
     afterEach(function() {
       LSS.currentView = null;
     });
@@ -399,7 +405,10 @@ describe("LSS", function() {
 
   describe("flattenData", function() {
     it("flattens an array", function() {
-      expect(LSS.flattenData(['foo','bar','',[]])).toEqual(['foo','bar','']);
+      expect(LSS.flattenData([{foo:'bar'},'',[],{baz:'bam'}])).toEqual(['bar','bam']);
+    });
+    it("rejects objects with results property", function() {
+      expect(LSS.flattenData([{results: true},{foo: 'bar'}, '', []])).toEqual([true,'bar']);
     });
   });
 
@@ -409,13 +418,43 @@ describe("LSS", function() {
     });
   });
 
+  describe("renderEmptyReports", function() {
+    beforeEach(function() {
+      LSS.emptyReports = [{algo:'foo'}];
+      LSS.emptyReportDisplayed = false;
+      loadFixtures('results.html');
+    });
+    it("renders collaspable message when a blast report is empty", function() {
+      var msg = "<span class='ui-icon ui-icon-info' " +
+        "style='float: left; margin-right: .3em;'></span>" +
+        "foo report empty";
+      LSS.renderEmptyReports();
+      expect($(".empty-report")).toContainHtml(msg);
+      expect(LSS.emptyReportDisplayed).toBeTruthy();
+    });
+    it("returns when LSS.emptyReporDisplayed is true", function() {
+      var msg = "<span class='ui-icon ui-icon-info' " +
+        "style='float: left; margin-right: .3em;'></span>" +
+        "foo report empty";
+      LSS.emptyReportDisplayed = true;
+      LSS.renderEmptyReports();
+      expect($("body")).not.toContainHtml(msg);
+    });
+    afterEach(function() {
+      LSS.emptyReports = [];
+      LSS.emptyReportDisplayed = false;
+    });
+  });
+
   describe("renderTable", function() {
     beforeEach(function() {
       LSS.data['foo'] = LSS.formatResults([LSS.prepData(data, 'foo')], ['foo']);
     });
     it("renders table template", function() {
+      spyOn(LSS, 'flattenData');
       spyOn(_, 'template');
       LSS.renderTable(LSS.data['foo']);
+      expect(LSS.flattenData).toHaveBeenCalledWith(LSS.data['foo']);
       expect(_.template).toHaveBeenCalled();
     });
     afterEach(function() {

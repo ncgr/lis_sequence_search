@@ -47,6 +47,11 @@ LSS.namespace = function(ns) {
 LSS.data = LSS.data || {};
 
 //
+// Store empty blast reports.
+//
+LSS.emptyReports = LSS.emptyReports || [];
+
+//
 // Store the visible leaf node data.
 //
 LSS.leaf_data = LSS.leaf_data || {};
@@ -78,17 +83,20 @@ LSS.highlightView = function(el) {
 };
 
 //
-// Flatten a LSS object into an array of objects.
+// Flatten an array of arrays of objects into an array of objects.
 //
 // This method is useful for displaying objects in a table view.
 //
 LSS.flattenData = function(data) {
 
   var self = this,
+      hits,
       results = [];
 
   _.each(data, function(v, k) {
-    results.push(v);
+    // Reject objects with results property.
+    hits = _.reject(v, function(val) { return _.has(val, "results"); });
+    results.push(hits);
   });
 
   return _.flatten(results);
@@ -152,9 +160,10 @@ LSS.prepData = function(data, algo) {
   if (data[0].enqueued === false) {
     return null;
   }
-  // Return data without result set.
+  // Populate self.emptyReports and return data without result set.
   if (data[0].results === false) {
     _.extend(data[0], { "algo": algo });
+    self.emptyReports.push(data[0]);
     return data;
   }
 
@@ -778,6 +787,37 @@ LSS.renderTable = function(data) {
 
 
 //
+// Render empty reports.
+//
+LSS.renderEmptyReports = function() {
+
+  var self = this,
+      results = "#results-menu",
+      msg;
+
+  if (self.emptyReportDisplayed) {
+    return;
+  }
+
+  msg = "<div class='ui-state-highlight ui-corner-all empty-report' " +
+      "style='padding: 0 .7em;'><span class='ui-icon ui-icon-info' " +
+      "style='float: left; margin-right: .3em;'></span>" +
+      "%algo% report empty</div>";
+
+  _.each(self.emptyReports, function(r) {
+    $(msg.replace(/%algo%/, r.algo)).insertAfter(results);
+  });
+
+  // Make the message disappear when clicked.
+  $('.empty-report').click(function() {
+    $(this).slideUp();
+  });
+
+  self.emptyReportDisplayed = true;
+
+};
+
+//
 // Render view.
 //
 LSS.renderView = function(data, view, highlight) {
@@ -794,6 +834,8 @@ LSS.renderView = function(data, view, highlight) {
   if (_.isFunction(view)) {
     self.currentView = view;
   }
+
+  self.renderEmptyReports();
 
   self.currentView.call(self, data);
 
