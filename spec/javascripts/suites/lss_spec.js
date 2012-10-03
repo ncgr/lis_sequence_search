@@ -90,8 +90,10 @@ describe("LSS", function() {
       expect(LSS.prepData([{"enqueued":false}], 'blastn')).toBeNull();
     });
     it("returns data if results equals false", function() {
-      var objs = [{"results":false}];
-      expect(LSS.prepData(objs, 'blastn')).toEqual(objs);
+      var objs = [{"results":false}],
+          algo = 'blastn',
+          ret = _.extend(objs, { "algo": algo });
+      expect(LSS.prepData(objs, algo)).toEqual(ret);
     });
     it("preserves wanted props, adds additional props and returns top hit flagged data", function() {
       var prepared = LSS.prepData(data, 'blastn'),

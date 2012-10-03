@@ -154,6 +154,7 @@ LSS.prepData = function(data, algo) {
   }
   // Return data without result set.
   if (data[0].results === false) {
+    _.extend(data[0], { "algo": algo });
     return data;
   }
 

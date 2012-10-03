@@ -15,6 +15,8 @@ $(function() {
         "margin-right: .3em;';></span>Please upgrade to a modern browser." +
         "</p></div>";
       $(msg).insertAfter($('h1'));
+      $("input[type=submit]", this).val('Please upgrade to a modern browser')
+        .attr('disabled', 'disabled');
     }
   }
 
