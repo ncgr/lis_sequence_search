@@ -90,13 +90,10 @@ LSS.highlightView = function(el) {
 LSS.flattenData = function(data) {
 
   var self = this,
-      hits,
       results = [];
 
   _.each(data, function(v, k) {
-    // Reject objects with results property.
-    hits = _.reject(v, function(val) { return _.has(val, "results"); });
-    results.push(hits);
+    results.push(v);
   });
 
   return _.flatten(results);
@@ -160,11 +157,11 @@ LSS.prepData = function(data, algo) {
   if (data[0].enqueued === false) {
     return null;
   }
-  // Populate self.emptyReports and return data without result set.
+  // Populate self.emptyReports and return null without result set.
   if (data[0].results === false) {
     _.extend(data[0], { "algo": algo });
     self.emptyReports.push(data[0]);
-    return data;
+    return null;
   }
 
   // Properties to preserve.

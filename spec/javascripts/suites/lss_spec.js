@@ -95,11 +95,10 @@ describe("LSS", function() {
     it("returns null if enqueued equals false", function() {
       expect(LSS.prepData([{"enqueued":false}], 'blastn')).toBeNull();
     });
-    it("returns data if results equals false", function() {
+    it("returns null if results equal false", function() {
       var objs = [{"results":false}],
-          algo = 'blastn',
-          ret = _.extend(objs, { "algo": algo });
-      expect(LSS.prepData(objs, algo)).toEqual(ret);
+          algo = 'blastn';
+      expect(LSS.prepData(objs, algo)).toBeNull();
     });
     it("preserves wanted props, adds additional props and returns top hit flagged data", function() {
       var prepared = LSS.prepData(data, 'blastn'),
@@ -405,10 +404,7 @@ describe("LSS", function() {
 
   describe("flattenData", function() {
     it("flattens an array", function() {
-      expect(LSS.flattenData([{foo:'bar'},'',[],{baz:'bam'}])).toEqual(['bar','bam']);
-    });
-    it("rejects objects with results property", function() {
-      expect(LSS.flattenData([{results: true},{foo: 'bar'}, '', []])).toEqual([true,'bar']);
+      expect(LSS.flattenData([{foo:'bar'},{},[],{baz:'bam'}])).toEqual([{foo:'bar'},{},{baz:'bam'}]);
     });
   });
 
