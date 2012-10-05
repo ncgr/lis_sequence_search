@@ -6,22 +6,6 @@
 
 $(function() {
 
-  // Present message to IE < 9 users.
-  if ($.browser.msie) {
-    if ($.browser.version < 9.0) {
-      $('#example-sequences').remove();
-      $('form').remove();
-      $('#results').remove();
-      var msg = "<div class='ui-state-error ui-corner-all' " +
-        "style='padding: 0 .7em;'><p class='text'>" +
-        "<span class='ui-icon ui-icon-alert' style='float: left; " +
-        "margin-right: .3em;';></span>Please upgrade to a modern browser " +
-        "in order to access the features of this application." +
-        "</p></div>";
-      $(msg).insertAfter($('h1'));
-    }
-  }
-
   _.each(["#tools"], function(e) { $(e).hide(); });
   $("input:checkbox, button", "#results-menu").button();
 
