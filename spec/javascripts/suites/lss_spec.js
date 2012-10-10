@@ -32,7 +32,7 @@ describe("LSS", function() {
     it("calls renderMenu when all algorithms have returned", function() {
       var algo = 'blastn';
 
-      LSS.data = {a:1,b:2,c:3};
+      LSS.data = {a:1,b:2,c:3,d:4};
 
       spyOn(LSS, 'prepData');
       spyOn(LSS, 'renderMenu');

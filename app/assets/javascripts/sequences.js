@@ -182,7 +182,10 @@ SEQUENCES.addSequences = function(id) {
       tblastn_db = $("#job_tblastn_job_attributes_blast_dbs option"),
 
       blastp = $("#job_blastp_job_attributes_queue"),
-      blastp_db = $("#job_blastp_job_attributes_blast_dbs option");
+      blastp_db = $("#job_blastp_job_attributes_blast_dbs option"),
+
+      tblastx = $("#job_tblastx_job_attributes_queue"),
+      tblastx_db = $("#job_tblastx_job_attributes_blast_dbs option");
 
   if (id === "cdna") {
     sequence.removeClass("auto-hint").val(self.cdna);
@@ -198,6 +201,13 @@ SEQUENCES.addSequences = function(id) {
       blastx.prop("checked", true);
       $("#blastx").slideToggle();
       blastx_db.each(function() {
+        $(this).attr("selected", "selected");
+      });
+
+      tblastx.parent().show();
+      tblastx.prop("checked", true);
+      $("#tblastx").slideToggle();
+      tblastx_db.each(function() {
         $(this).attr("selected", "selected");
       });
     }
@@ -251,6 +261,13 @@ SEQUENCES.addSequences = function(id) {
       blastp_db.each(function() {
         $(this).attr("selected", "selected");
       });
+
+      tblastx.parent().show();
+      tblastx.prop("checked", true);
+      $("#tblastx").slideToggle();
+      tblastx_db.each(function() {
+        $(this).attr("selected", "selected");
+      });
     }
   }
 };
@@ -274,6 +291,9 @@ SEQUENCES.setGenomeSearch = function() {
 
       blastp = $("#job_blastp_job_attributes_queue");
 
+      tblastx = $("#job_tblastx_job_attributes_queue"),
+      tblastx_db = $("#job_tblastx_job_attributes_blast_dbs option"),
+
   blastx.parent().hide();
   blastp.parent().hide();
 
@@ -288,6 +308,15 @@ SEQUENCES.setGenomeSearch = function() {
 
   tblastn.prop("checked", true);
   tblastn_db.each(function() {
+    if ($(this).val().search(/genome/) >= 0) {
+      $(this).attr("selected", "selected");
+    } else {
+      $(this).remove();
+    }
+  });
+
+  tblastx.prop("checked", true);
+  tblastx_db.each(function() {
     if ($(this).val().search(/genome/) >= 0) {
       $(this).attr("selected", "selected");
     } else {
@@ -317,7 +346,10 @@ SEQUENCES.setGeneSearch = function() {
       tblastn_db = $("#job_tblastn_job_attributes_blast_dbs option"),
 
       blastp = $("#job_blastp_job_attributes_queue"),
-      blastp_db = $("#job_blastp_job_attributes_blast_dbs option");
+      blastp_db = $("#job_blastp_job_attributes_blast_dbs option"),
+
+      tblastx = $("#job_tblastx_job_attributes_queue"),
+      tblastx_db = $("#job_tblastx_job_attributes_blast_dbs option");
 
   blastn.prop("checked", true);
   blastn_db.each(function() {
@@ -349,6 +381,15 @@ SEQUENCES.setGeneSearch = function() {
   blastx.prop("checked", true);
   blastx_db.each(function() {
     if ($(this).val().search(/proteome|gene_families/) >= 0) {
+      $(this).attr("selected", "selected");
+    } else {
+      $(this).remove();
+    }
+  });
+
+  tblastx.prop("checked", true);
+  tblastx_db.each(function() {
+    if ($(this).val().search(/genemodel/) >= 0) {
       $(this).attr("selected", "selected");
     } else {
       $(this).remove();

@@ -22,6 +22,11 @@ describe("SEQUENCES", function() {
         expect($(this)).toBeSelected();
       });
 
+      expect($("#job_tblastx_job_attributes_queue")).toBeChecked();
+      $("#job_tblastx_job_attributes_blast_dbs option").each(function() {
+        expect($(this)).toBeSelected();
+      });
+
       expect($("#job_tblastn_job_attributes_queue")).not.toBeChecked();
       expect($("#job_blastp_job_attributes_queue")).not.toBeChecked();
     });
@@ -38,6 +43,7 @@ describe("SEQUENCES", function() {
       expect($("#job_blastx_job_attributes_queue")).not.toBeChecked();
       expect($("#job_tblastn_job_attributes_queue")).not.toBeChecked();
       expect($("#job_blastp_job_attributes_queue")).not.toBeChecked();
+      expect($("#job_tblastx_job_attributes_queue")).not.toBeChecked();
     });
 
     it("adds peptide sequences", function() {
@@ -58,6 +64,7 @@ describe("SEQUENCES", function() {
 
       expect($("#job_blastn_job_attributes_queue")).not.toBeChecked();
       expect($("#job_blastx_job_attributes_queue")).not.toBeChecked();
+      expect($("#job_tblastx_job_attributes_queue")).not.toBeChecked();
     });
 
     it("adds peptide sequences to special case", function() {
@@ -72,6 +79,7 @@ describe("SEQUENCES", function() {
       expect($("#job_blastx_job_attributes_queue")).not.toBeChecked();
       expect($("#job_tblastn_job_attributes_queue")).not.toBeChecked();
       expect($("#job_blastp_job_attributes_queue")).not.toBeChecked();
+      expect($("#job_tblastx_job_attributes_queue")).not.toBeChecked();
     });
 
     it("adds mixed sequences", function() {
@@ -99,6 +107,12 @@ describe("SEQUENCES", function() {
       $("#job_blastp_job_attributes_blast_dbs option").each(function() {
         expect($(this)).toBeSelected();
       });
+
+      expect($("#job_tblastx_job_attributes_queue")).toBeChecked();
+      $("#job_tblastx_job_attributes_blast_dbs option").each(function() {
+        expect($(this)).toBeSelected();
+      });
+
     });
 
     it("adds mixed sequences to special case", function() {
@@ -113,6 +127,7 @@ describe("SEQUENCES", function() {
       expect($("#job_blastx_job_attributes_queue")).not.toBeChecked();
       expect($("#job_tblastn_job_attributes_queue")).not.toBeChecked();
       expect($("#job_blastp_job_attributes_queue")).not.toBeChecked();
+      expect($("#job_tblastx_job_attributes_queue")).not.toBeChecked();
     });
 
   });
@@ -133,6 +148,12 @@ describe("SEQUENCES", function() {
 
       expect($("#job_tblastn_job_attributes_queue")).toBeChecked();
       $("#job_tblastn_job_attributes_blast_dbs option").each(function() {
+        expect($(this).val()).toMatch("genome");
+        expect($(this)).toBeSelected();
+      });
+
+      expect($("#job_tblastx_job_attributes_queue")).toBeChecked();
+      $("#job_tblastx_job_attributes_blast_dbs option").each(function() {
         expect($(this).val()).toMatch("genome");
         expect($(this)).toBeSelected();
       });
@@ -167,6 +188,12 @@ describe("SEQUENCES", function() {
       expect($("#job_blastp_job_attributes_queue")).toBeChecked();
       $("#job_blastp_job_attributes_blast_dbs option").each(function() {
         expect($(this).val()).toMatch(/proteome|gene_families/);
+        expect($(this)).toBeSelected();
+      });
+
+      expect($("#job_tblastx_job_attributes_queue")).toBeChecked();
+      $("#job_tblastx_job_attributes_blast_dbs option").each(function() {
+        expect($(this).val()).toMatch("genemodel");
         expect($(this)).toBeSelected();
       });
 

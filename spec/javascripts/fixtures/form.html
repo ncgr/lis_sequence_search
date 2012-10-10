@@ -376,6 +376,66 @@
         </table>
     </div>
 
+    <p>
+    <strong>tblastx</strong>
+    <input name="job[tblastx_job_attributes][queue]" type="hidden" value="0" /><input id="job_tblastx_job_attributes_queue" name="job[tblastx_job_attributes][queue]" type="checkbox" value="1" />
+    </p>
+    <div id="tblastx" class="toggle">
+        <table class="options">
+            <tr>
+                <td>
+                    <label>Database(s)</label>
+                </td>
+                <td>
+                    <input name="job[tblastx_job_attributes][blast_dbs][]" type="hidden" value="" /><select id="job_tblastx_job_attributes_blast_dbs" multiple="multiple" name="job[tblastx_job_attributes][blast_dbs][]"><option value="cajca_genome">Cajanus cajan genome</option>
+                        <option value="cajca_genemodels">Cajanus cajan gene models</option>
+                        <option value="cajca_transcriptome">Cajanus cajan transcriptome</option>
+                        <option value="cicar_transcriptome">Cicer arietinum transcriptome</option>
+                        <option value="glyma_genome">Glycine max genome</option>
+                        <option value="glyma_genemodels">Glycine max gene models</option>
+                        <option value="lotja_genome">Lotus japonicus genome</option>
+                        <option value="lotja_genemodels">Lotus japonicus gene models</option>
+                        <option value="medsa_transcriptome">Medicago sativa transcriptome</option>
+                        <option value="medtr_genome">Medicago truncatula genome</option>
+                        <option value="medtr_genemodels">Medicago truncatula gene models</option>
+                        <option value="phavu_genome">Phaseolus vulgaris genome</option>
+                        <option value="phavu_genemodels">Phaseolus vulgaris gene models</option></select>
+                </td>
+                <td>
+                    <label for="job_tblastx_job_attributes_filter">SEG</label>
+                </td>
+                <td>
+                    <select id="job_tblastx_job_attributes_filter" name="job[tblastx_job_attributes][filter]"><option value="true">Yes</option>
+                        <option value="false">No</option></select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_tblastx_job_attributes_expectation">Expectation</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_tblastx_job_attributes_expectation" name="job[tblastx_job_attributes][expectation]" size="15" title="5e-20" type="text" />
+                </td>
+                <td>
+                    <label for="job_tblastx_job_attributes_min_bit_score">Min bit score</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_tblastx_job_attributes_min_bit_score" name="job[tblastx_job_attributes][min_bit_score]" size="15" title="0" type="text" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="job_tblastx_job_attributes_max_target_seqs">Max target sequences</label>
+                </td>
+                <td>
+                    <input class="auto-hint" id="job_tblastx_job_attributes_max_target_seqs" name="job[tblastx_job_attributes][max_target_seqs]" size="15" title="25" type="text" />
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
 
     <div>
         <input name="commit" type="submit" value="Submit" />&nbsp;&nbsp;
