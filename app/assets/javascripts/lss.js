@@ -713,6 +713,9 @@ LSS.renderPartition = function(data) {
   $('#tab').unbind('click').bind('click', function() {
     exportDataSet(root, "tab", false);
   });
+  $('#gff').unbind('click').bind('click', function() {
+    exportDataSet(root, "gff", false);
+  });
 
 };
 
