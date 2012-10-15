@@ -53,11 +53,12 @@ var exportDataSet = function exportDataSet(data, type, encode) {
   //
   // Ex: foo?algo=a1,a2&a1_id=1,2&a2_id=3,4
   query += "algo=" + keys.join(",");
-  _.each(LSS.leaf_data, function(v, k) {
-    _.each(v, function(d) {
-      ids.push(d.id);
+  _.each(keys, function(k) {
+    _.each(LSS.leaf_data[k], function(d) {
+      ids.push(d.quorum_hit_id);
     });
     query += "&" + k + "_id=" + ids.join(",");
+    ids = [];
   });
 
   // Encode URI.

@@ -17,6 +17,7 @@
 //= require underscore
 //= require quorum/quorum
 //= require lss
+//= require lss_data
 //= require lss_urls
 //= require lss_data_export
 //= require lss_events

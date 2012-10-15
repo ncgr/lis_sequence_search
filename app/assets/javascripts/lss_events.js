@@ -28,6 +28,21 @@ $(function() {
     .parent().next().hide().menu();
   });
 
+  // View
+  $("#dual-view").click(function() {
+    LSS.renderView();
+  });
+
+  // View as partition
+  $("#partition-view").click(function() {
+    LSS.renderView(null, LSS.renderPartition, "#partition-view");
+  });
+
+  // View as table
+  $("#table-view").click(function() {
+    LSS.renderView(null, LSS.renderTable, "#table-view");
+  });
+
   // Remove filters
   $("#remove-filters").click(function() {
     LSS.removeFilters();
@@ -63,7 +78,7 @@ $(function() {
   $(window).scroll(function() {
     if ($(window).scrollTop() > aboveHeight) {
       $('#results-menu').addClass('fixed').css('top','0')
-        .css('width',(resultsWidth - 16) + 'px')
+        .css('width',(resultsWidth) + 'px')
         .css('z-index', 1000);
     } else {
       $('#results-menu').removeClass('fixed')
