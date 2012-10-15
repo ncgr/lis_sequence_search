@@ -12,11 +12,13 @@ var gatherVisibleLeafNodeData = function gatherVisibleLeafNodeData(data) {
   if (data.children) {
     data.children.forEach(gatherVisibleLeafNodeData);
   } else {
-    if (_.isArray(LSS.leaf_data[data.algo])) {
-      LSS.leaf_data[data.algo].push(data);
-    } else {
-      LSS.leaf_data[data.algo] = [];
-      LSS.leaf_data[data.algo].push(data);
+    if (!_.isUndefined(data.algo)) {
+      if (_.isArray(LSS.leaf_data[data.algo])) {
+        LSS.leaf_data[data.algo].push(data);
+      } else {
+        LSS.leaf_data[data.algo] = [];
+        LSS.leaf_data[data.algo].push(data);
+      }
     }
   }
 
