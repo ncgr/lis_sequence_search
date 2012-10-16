@@ -11,7 +11,9 @@ LSS.exportUrls = {
     "Components/cmtv/conf/cmtv_combined_map_style.xml%40--combined_display%40" +
     document.URL + "/get_quorum_search_results.gff%3F",
 
-  tab: document.URL + "/get_quorum_search_results.txt?"
+  tab: document.URL + "/get_quorum_search_results.txt?",
+
+  gff: document.URL + "/get_quorum_search_results.gff?"
 };
 
 //
