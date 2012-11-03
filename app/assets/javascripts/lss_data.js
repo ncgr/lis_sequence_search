@@ -23,7 +23,6 @@ LSS.flattenData = function(data) {
 //
 // Convert LSS object with algo properties to an array of arrays.
 //
-//
 LSS.toArray = function(data) {
 
   var self = this,
