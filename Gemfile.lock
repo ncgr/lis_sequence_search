@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/ncgr/quorum.git
-  revision: 3ec669ce57d592dd63772c2957a9d3fbf665a549
+  revision: 873f7d1014b76111c879095020aaa4c596e75914
   branch: data_export
   specs:
-    quorum (0.7.0)
+    quorum (0.7.1)
       bio-blastxmlparser (~> 1.1.0)
       jquery-rails
       net-ssh (~> 2.3.0)
