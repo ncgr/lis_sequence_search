@@ -233,41 +233,52 @@ LSS.removeFilters = function() {
 };
 
 //
-// Filter dataset on evalue.
+// Filter data property field by value.
 //
-LSS.evalueFilter = function(value) {
+// Performs the filter on the cached data if applicable.
+//
+LSS.filterFieldsByValue = function(props) {
 
   var self = this,
       algos = self.algos,
-      cached = "cached",
       data,
       tmp = [],
       i,
-      value = value || "0.0";
+      operators;
 
   // Return if algos is empty.
   if (_.isEmpty(algos)) {
     return;
   }
 
-  // Perform the filter on the cached data if applicable.
-  // Otherwise use the original data.
   data = self.setCurrentData();
+
+  if (_.isEmpty(props)) {
+    return self.renderView(data);
+  }
+
+  // Filter operators.
+  operators = {
+    bit_score: '<',
+    evalue: '>',
+    undefined: '<'
+  };
 
   for (i = 0; i < algos.length; i++) {
     tmp.push(_.reject(data[i], function(d) {
-      if (!_.isUndefined(d.evalue)) {
-        return parseFloat(d.evalue) > parseFloat(value);
-      }
+      var ret = false;
+      _.each(props, function(v, k) {
+        if (!ret) {
+          ret = eval("parseFloat(d[k]) " + operators[k] + " parseFloat(v)");
+        }
+      });
+      return ret;
     }));
   }
 
-  // Cache the result for further filtering.
-  self.data[cached] = tmp;
-
   self.renderView(tmp);
 
-};
+}
 
 //
 // Render both partition and table views.

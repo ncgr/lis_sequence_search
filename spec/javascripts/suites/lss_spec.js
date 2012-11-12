@@ -168,26 +168,37 @@ describe("LSS", function() {
       });
     });
 
-    describe("evalueFilter", function() {
+    describe("filterFieldsByValue", function() {
       it("returns when checkedAlgos is empty", function() {
         LSS.algos = [];
         spyOn(LSS, 'renderView');
-        LSS.evalueFilter();
+        LSS.filterFieldsByValue();
         expect(LSS.renderView).not.toHaveBeenCalled();
       });
-      it("returns objects containing evalues > 0.0", function() {
+      it("renders data when props is empty", function() {
         LSS.algos = ['foo'];
+        spyOn(_, 'reject');
         spyOn(LSS, 'renderView');
-        LSS.evalueFilter("0.0");
-        expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
-        expect(LSS.data['cached'][0].length).toEqual(1);
+        LSS.filterFieldsByValue({});
+        expect(_.reject).not.toHaveBeenCalled();
+        expect(LSS.renderView).toHaveBeenCalled();
       });
-      it("returns objects containing evalues > 1e-100", function() {
+      it("filters data by props", function() {
         LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
-        LSS.evalueFilter("1e-100");
-        expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
-        expect(LSS.data['cached'][0].length).toEqual(3);
+
+        LSS.data['foo'] = [
+          { bit_score: 100, evalue: "1e-200" },
+          { bit_score: 200, evalue: "1e-100" },
+          { bit_score: 300, evalue: "0.0" },
+        ];
+
+        var tmp = [[LSS.data['foo'][1], LSS.data['foo'][2]]];
+
+        var props = { bit_score: 200, evalue: "1e-100" };
+
+        LSS.filterFieldsByValue(props);
+        expect(LSS.renderView).toHaveBeenCalledWith(tmp);
       });
     });
     afterEach(function() {
