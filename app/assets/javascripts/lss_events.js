@@ -65,38 +65,19 @@ $(function() {
     LSS.expandTopHitPerRef();
   });
 
-  //
-  // Filters
-  //
-
-  var filter = function() {
-    var props = {},
-        values = ["bit_score", "evalue"],
-        evalue,
-        bit_score;
-
-    _.each(values, function(v) {
-      if (!_.isEmpty($("#" + v).val())) {
-        props[v] = $("#" + v).val();
-      }
-    });
-
-    LSS.filterFieldsByValue(props);
-  };
-
   // Evalue Filter
   $("#evalue").keyup(function() {
-    _.delay(filter, 500);
+    setTimeout(function() {
+      LSS.getFilterValues();
+    }, 500);
   });
 
   // Bit score Filter
   $("#bit_score").keyup(function() {
-    _.delay(filter, 500);
+    setTimeout(function() {
+      LSS.getFilterValues();
+    }, 500);
   });
-
-  //
-  // End Filters
-  //
 
   // Width and height for menu.
   var resultsWidth = $('#results').outerWidth() - 12,

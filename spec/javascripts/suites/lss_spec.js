@@ -168,6 +168,19 @@ describe("LSS", function() {
       });
     });
 
+    describe("getFilterValues", function() {
+      it("returns object containing filter value properties", function() {
+        loadFixtures('results.html');
+        spyOn(LSS, 'filterFieldsByValue');
+        $("#bit_score").val(20);
+        $("#evalue").val("1e-50");
+        LSS.getFilterValues();
+        expect(LSS.filterFieldsByValue).toHaveBeenCalledWith(
+          { bit_score: '20', evalue: '1e-50' }
+        );
+      });
+    });
+
     describe("filterFieldsByValue", function() {
       it("returns when checkedAlgos is empty", function() {
         LSS.algos = [];

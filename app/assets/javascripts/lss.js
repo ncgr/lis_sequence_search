@@ -130,7 +130,7 @@ LSS.expandTopHits = function() {
   // Cache the result for further filtering.
   self.data[cached] = data;
 
-  self.renderView(data);
+  self.getFilterValues();
 
 };
 
@@ -168,7 +168,7 @@ LSS.expandTopHitPerRefSeq = function() {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderView(ref);
+  self.getFilterValues();
 
 };
 
@@ -207,7 +207,7 @@ LSS.expandTopHitPerRef = function() {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.renderView(ref);
+  self.getFilterValues();
 
 };
 
@@ -229,6 +229,25 @@ LSS.removeFilters = function() {
   self.data[cached] = null;
 
   self.renderView(null);
+
+};
+
+//
+// Returns object containing filter value properties.
+//
+LSS.getFilterValues = function() {
+
+  var self = this,
+      props = {},
+      values = ["bit_score", "evalue"];
+
+  _.each(values, function(v) {
+    if (!_.isEmpty($("#" + v).val())) {
+      props[v] = $("#" + v).val();
+    }
+  });
+
+  self.filterFieldsByValue(props);
 
 };
 
@@ -408,7 +427,7 @@ LSS.renderPartition = function(data, dualView) {
 
     // Render table with leaf node data.
     updateTableData();
-   }
+  }
 
   function transform(d) {
     return "translate(8," + d.dx * ky / 2 + ")";
