@@ -146,9 +146,7 @@ LSS.setCurrentData = function() {
 };
 
 //
-// Helper to set data.
-//
-// If data is defined, return. Otherwise check for cached data.
+// Helper to set data and apply numeric filters.
 //
 LSS.setData = function(data) {
 
@@ -158,7 +156,7 @@ LSS.setData = function(data) {
     data = self.setCurrentData();
   }
 
-  return data;
+  return self.filterFieldsByValue(data);
 
 };
 

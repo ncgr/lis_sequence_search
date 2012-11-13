@@ -68,14 +68,14 @@ $(function() {
   // Evalue Filter
   $("#evalue").keyup(function() {
     setTimeout(function() {
-      LSS.getFilterValues();
+      LSS.renderView();
     }, 500);
   });
 
   // Bit score Filter
   $("#bit_score").keyup(function() {
     setTimeout(function() {
-      LSS.getFilterValues();
+      LSS.renderView();
     }, 500);
   });
 

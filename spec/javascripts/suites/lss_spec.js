@@ -114,7 +114,6 @@ describe("LSS", function() {
         LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.expandTopHits();
-        expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
         expect(LSS.data['cached'][0].length).toEqual(1);
       });
     });
@@ -130,7 +129,6 @@ describe("LSS", function() {
         LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.expandTopHitPerRefSeq();
-        expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
         expect(LSS.data['cached'][0].length).toEqual(4);
       });
     });
@@ -146,7 +144,6 @@ describe("LSS", function() {
         LSS.algos = ['foo'];
         spyOn(LSS, 'renderView');
         LSS.expandTopHitPerRef();
-        expect(LSS.renderView).toHaveBeenCalledWith(LSS.data['cached']);
         expect(LSS.data['cached'][0].length).toEqual(4);
       });
     });
@@ -163,7 +160,7 @@ describe("LSS", function() {
         spyOn(LSS, 'renderView');
         LSS.data['cached'] = LSS.data['foo'];
         LSS.removeFilters();
-        expect(LSS.renderView).toHaveBeenCalledWith(null);
+        expect(LSS.renderView).toHaveBeenCalled();
         expect(LSS.data['cached']).toBeNull();
       });
     });
@@ -171,52 +168,29 @@ describe("LSS", function() {
     describe("getFilterValues", function() {
       it("returns object containing filter value properties", function() {
         loadFixtures('results.html');
-        spyOn(LSS, 'filterFieldsByValue');
         $("#bit_score").val(20);
         $("#evalue").val("1e-50");
-        LSS.getFilterValues();
-        expect(LSS.filterFieldsByValue).toHaveBeenCalledWith(
+        expect(LSS.getFilterValues()).toEqual(
           { bit_score: '20', evalue: '1e-50' }
         );
       });
     });
 
     describe("filterFieldsByValue", function() {
-      it("returns when checkedAlgos is empty", function() {
-        LSS.algos = [];
-        spyOn(LSS, 'renderView');
-        LSS.filterFieldsByValue();
-        expect(LSS.renderView).not.toHaveBeenCalled();
-      });
-      it("renders data when props is empty", function() {
-        LSS.algos = ['foo'];
-        spyOn(_, 'reject');
-        spyOn(LSS, 'renderView');
-        LSS.filterFieldsByValue({});
-        expect(_.reject).not.toHaveBeenCalled();
-        expect(LSS.renderView).toHaveBeenCalled();
-      });
       it("filters data by props", function() {
-        LSS.algos = ['foo'];
-        spyOn(LSS, 'renderView');
+        var data, props, tmp;
 
-        LSS.data['foo'] = [
-          { bit_score: 100, evalue: "1e-200" },
-          { bit_score: 200, evalue: "1e-100" },
-          { bit_score: 300, evalue: "0.0" },
-        ];
+        data = [[
+            { bit_score: 100, evalue: "1e-200" },
+            { bit_score: 200, evalue: "1e-100" },
+            { bit_score: 300, evalue: "0.0" },
+        ]];
+        props = { bit_score: 200, evalue: "1e-100" };
+        tmp = [[data[0][1], data[0][2]]];
 
-        var tmp = [[LSS.data['foo'][1], LSS.data['foo'][2]]];
-
-        var props = { bit_score: 200, evalue: "1e-100" };
-
-        LSS.filterFieldsByValue(props);
-        expect(LSS.renderView).toHaveBeenCalledWith(tmp);
+        spyOn(LSS, 'getFilterValues').andReturn(props);
+        expect(LSS.filterFieldsByValue(data)).toEqual(tmp);
       });
-    });
-    afterEach(function() {
-      LSS.data = {};
-      LSS.algos = [];
     });
   });
 
@@ -289,6 +263,7 @@ describe("LSS", function() {
       LSS.data['foo'] = LSS.formatResults([LSS.prepData(data, 'foo')], ['foo']);
     });
     it("renders table template", function() {
+      spyOn(LSS, 'setData').andReturn(LSS.data['foo']);
       spyOn(LSS, 'flattenData');
       spyOn(_, 'template');
       LSS.renderTable(LSS.data['foo']);

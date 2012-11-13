@@ -130,7 +130,7 @@ LSS.expandTopHits = function() {
   // Cache the result for further filtering.
   self.data[cached] = data;
 
-  self.getFilterValues();
+  self.renderView();
 
 };
 
@@ -168,7 +168,7 @@ LSS.expandTopHitPerRefSeq = function() {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.getFilterValues();
+  self.renderView();
 
 };
 
@@ -207,7 +207,7 @@ LSS.expandTopHitPerRef = function() {
   // Cache the result for further filtering.
   self.data[cached] = ref;
 
-  self.getFilterValues();
+  self.renderView();
 
 };
 
@@ -228,7 +228,7 @@ LSS.removeFilters = function() {
   // Destroy any cached data.
   self.data[cached] = null;
 
-  self.renderView(null);
+  self.renderView();
 
 };
 
@@ -247,7 +247,7 @@ LSS.getFilterValues = function() {
     }
   });
 
-  self.filterFieldsByValue(props);
+  return props;
 
 };
 
@@ -256,25 +256,13 @@ LSS.getFilterValues = function() {
 //
 // Performs the filter on the cached data if applicable.
 //
-LSS.filterFieldsByValue = function(props) {
+LSS.filterFieldsByValue = function(data) {
 
   var self = this,
-      algos = self.algos,
-      data,
+      props = self.getFilterValues(),
       tmp = [],
       i,
       operators;
-
-  // Return if algos is empty.
-  if (_.isEmpty(algos)) {
-    return;
-  }
-
-  data = self.setCurrentData();
-
-  if (_.isEmpty(props)) {
-    return self.renderView(data);
-  }
 
   // Filter operators.
   operators = {
@@ -283,7 +271,7 @@ LSS.filterFieldsByValue = function(props) {
     undefined: '<'
   };
 
-  for (i = 0; i < algos.length; i++) {
+  for (i = 0; i < data.length; i++) {
     tmp.push(_.reject(data[i], function(d) {
       var ret = false;
       _.each(props, function(v, k) {
@@ -295,7 +283,7 @@ LSS.filterFieldsByValue = function(props) {
     }));
   }
 
-  self.renderView(tmp);
+  return tmp;
 
 }
 
@@ -438,7 +426,7 @@ LSS.renderPartition = function(data, dualView) {
     gatherVisibleLeafNodeData(root);
     self.data[cached] = self.toArray(self.leaf_data);
     if (dualView) {
-      self.renderTable(self.leaf_data);
+      self.renderTable(self.toArray(self.leaf_data));
     }
   }
 
@@ -451,8 +439,7 @@ LSS.renderPartition = function(data, dualView) {
   $('#table-view').unbind('click').bind('click', function() {
     self.leaf_data = {};
     gatherVisibleLeafNodeData(root);
-    self.data[cached] = self.toArray(self.leaf_data);
-    self.renderView(self.leaf_data, self.renderTable, "#table-view");
+    self.renderView(self.toArray(self.leaf_data), self.renderTable, "#table-view");
   });
   $('#cmtv').unbind('click').bind('click', function() {
     exportDataSet(root, "cmtv", true);
@@ -471,7 +458,8 @@ LSS.renderPartition = function(data, dualView) {
 //
 LSS.sortable = function(prop, dataType) {
 
-  var self = this;
+  var self = this,
+      data;
 
   data = self.tableData;
 
@@ -495,20 +483,23 @@ LSS.sortable = function(prop, dataType) {
     data = data.reverse();
   }
 
-  self.renderTable(data);
+  self.renderTable(data, true);
 
 };
 
 //
 // Render table view.
 //
-LSS.renderTable = function(data) {
+LSS.renderTable = function(data, set) {
 
   var self = this,
+      set = set || false,
       results = "#table-results",
       template;
 
-  data = self.setData(data);
+  if (!set) {
+    data = self.setData(data);
+  }
 
   // Flatten data before rendering table view.
   data = self.flattenData(data);
@@ -640,7 +631,7 @@ LSS.collectResults = function(data, algo) {
   var self = this;
 
   // Set Quorum Job id.
-  self.quorum_id = self.quorum_id || _.last(document.URL.split('/'));
+  self.quorum_id = self.quorum_id || parseInt(_.last(document.URL.split('/')), 10);
 
   // Copy datasets.
   // If the algorithm wasn't enqueued, prepData returns null.

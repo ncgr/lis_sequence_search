@@ -153,21 +153,15 @@ describe("LSS Data", function() {
   });
 
   describe("setData", function() {
-    it("uses passed data when set", function() {
-      var foo = {bar: "baz"};
-      LSS.algos = ['foo'];
-      spyOn(LSS, 'gatherDataByAlgorithm');
-      var data = LSS.setData(foo);
-      expect(LSS.gatherDataByAlgorithm).not.toHaveBeenCalled();
-      expect(data).toEqual(foo);
-    });
     it("calls setCurrentData when passed data is undefined", function() {
       spyOn(LSS, 'setCurrentData');
+      spyOn(LSS, 'filterFieldsByValue');
       LSS.setData();
       expect(LSS.setCurrentData).toHaveBeenCalled();
     });
     it("calls setCurrentData when passed data is null", function() {
       spyOn(LSS, 'setCurrentData');
+      spyOn(LSS, 'filterFieldsByValue');
       LSS.setData(null);
       expect(LSS.setCurrentData).toHaveBeenCalled();
     });
