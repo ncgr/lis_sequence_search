@@ -13,12 +13,9 @@ end
 gem 'jquery-rails'
 gem 'quorum', :git => 'https://github.com/ncgr/quorum.git', :branch => 'data_export'
 
-group :development do
+group :test, :development do
   gem 'debugger'
   gem 'thin'
-end
-
-group :test, :development do
   gem 'jasmine'
   gem 'jasmine-rails'
   gem 'jasmine-headless-webkit', '~> 0.9.0.rc.2'
