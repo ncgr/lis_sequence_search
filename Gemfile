@@ -11,7 +11,7 @@ group :assets do
 end
 
 gem 'jquery-rails'
-gem 'quorum', '~> 0.8.0'
+gem 'quorum', '~> 0.8.1'
 
 group :test, :development do
   gem 'debugger'
