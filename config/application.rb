@@ -64,5 +64,9 @@ module LisSequenceSearch
 
     # Version of your assets, change this if you want to expire all your assets
     config.assets.version = '1.0'
+
+    # Configure maintenance mode.
+    config.maintenance_mode.if = Proc.new { |env| false } # Set to true to enable.
+    config.maintenance_mode.response = Proc.new { |env| [503, {'Content-Type' => 'text/html'}, [Rails.root.join("public/503.html").read]] }
   end
 end
