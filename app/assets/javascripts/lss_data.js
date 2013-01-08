@@ -9,14 +9,9 @@
 //
 LSS.flattenData = function(data) {
 
-  var self = this,
-      results = [];
+  var self = this;
 
-  _.each(data, function(v, k) {
-    results.push(v);
-  });
-
-  return _.flatten(results);
+  return _.flatten(self.toArray(data));
 
 };
 
