@@ -170,8 +170,9 @@ describe("LSS", function() {
         loadFixtures('results.html');
         $("#bit_score").val(20);
         $("#evalue").val("1e-50");
+        $("#pct_identity").val("90.6");
         expect(LSS.getFilterValues()).toEqual(
-          { bit_score: '20', evalue: '1e-50' }
+          { bit_score: '20', evalue: '1e-50', pct_identity: '90.6' }
         );
       });
     });

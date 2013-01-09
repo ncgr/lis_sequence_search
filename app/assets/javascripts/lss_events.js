@@ -79,6 +79,13 @@ $(function() {
     }, 500);
   });
 
+  // Bit score Filter
+  $("#pct_identity").keyup(function() {
+    setTimeout(function() {
+      LSS.renderView();
+    }, 500);
+  });
+
   // Width and height for menu.
   var resultsWidth = $('#results').outerWidth() - 12,
       aboveHeight = $('#results-menu').outerHeight();

@@ -239,7 +239,7 @@ LSS.getFilterValues = function() {
 
   var self = this,
       props = {},
-      values = ["bit_score", "evalue"];
+      values = ["bit_score", "evalue", "pct_identity"];
 
   _.each(values, function(v) {
     if (!_.isEmpty($("#" + v).val())) {
@@ -268,7 +268,7 @@ LSS.filterFieldsByValue = function(data) {
   operators = {
     bit_score: '<',
     evalue: '>',
-    undefined: '<'
+    pct_identity: '<'
   };
 
   for (i = 0; i < data.length; i++) {
