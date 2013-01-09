@@ -12,31 +12,32 @@
                     <span id="menu-loading">
                         <p>Searching... <img alt="Loading" src="/assets/quorum/loading.gif" /></p>
                     </span>
-                    <span id="algorithms"></span>
-                    <button id="view">view selected</button>
                     <span id="tools">
                         <button id="remove-filters">remove filter(s)</button>
+
                         <span>
                             <button id="filters">select filter</button>
                         </span>
                         <ul>
-                            <li><a href="#" id="top-hits">top hit(s)</a></li>
-                            <li><a href="#" id="top-hits-per-ref">top hit(s) per reference</a></li>
-                            <li><a href="#" id="top-hits-per-ref-seq">top hit(s) per reference sequence</a></li>
+                            <li><a id="top-hits">top hit(s)</a></li>
+                            <li><a id="top-hits-per-ref">top hit(s) per reference</a></li>
+                            <li><a id="top-hits-per-ref-seq">top hit(s) per reference sequence</a></li>
                         </ul>
+
                         <input size=10 type="text" name="evalue" id="evalue" value="" placeholder="Evalue" />
                         <input size=10 type="text" name="bit_score" id="bit_score" value="" placeholder="Bit Score" />
-                        <button id="filter-evalue">filter</button>
+                        <input size=10 type="text" name="pct_identity" id="pct_identity" value="" placeholder="% Identity" />
+
                         <span>
-                            <button id='view-tree'>view as</button>
+                            <button id='view-as'>view as</button>
                         </span>
                         <ul id="views">
-                            <li id="dual-view"><a href="#">dual view</a></li>
-                            <li id="partition-view"><a href="#">partition</a></li>
-                            <li id="table-view"><a href="#">table</a></li>
-                            <li id="cmtv"><a href="#">cmtv</a></li>
-                            <li id="tab"><a href="#">tab delimited</a></li>
-                            <li id="gff"><a href="#">gff</a></li>
+                            <li id="dual-view"><a>dual view</a></li>
+                            <li id="partition-view"><a>partition</a></li>
+                            <li id="table-view"><a>table</a></li>
+                            <li id="cmtv"><a>cmtv</a></li>
+                            <li id="tab"><a>tab delimited</a></li>
+                            <li id="gff"><a>gff</a></li>
                         </ul>
                     </span>
                 </div>
