@@ -1,0 +1,50 @@
+development:
+  max_sequence_size:
+  blast:
+    remote: false
+    ssh_host:
+    ssh_user:
+    ssh_options:
+    bin: "%{RAILS_ROOT}/quorum/bin"
+    log_dir: "%{RAILS_ROOT}/quorum/log"
+    tmp_dir: "%{RAILS_ROOT}/quorum/tmp"
+    blast_db: "%{RAILS_ROOT}/quorum/blastdb"
+    blastn:
+    blastx:
+    tblastn:
+    blastp:
+    blast_threads:
+
+test:
+  max_sequence_size:
+  blast:
+    remote: false
+    ssh_host:
+    ssh_user:
+    ssh_options:
+    bin: "%{RAILS_ROOT}/quorum/bin"
+    log_dir: "%{RAILS_ROOT}/quorum/log"
+    tmp_dir: "%{RAILS_ROOT}/quorum/tmp"
+    blast_db: "%{RAILS_ROOT}/quorum/blastdb"
+    blastn:
+    blastx:
+    tblastn:
+    blastp:
+    blast_threads:
+
+production:
+  max_sequence_size:
+  blast:
+    remote: true
+    ssh_host:
+    ssh_user:
+    ssh_options:
+    bin:
+    log_dir:
+    tmp_dir:
+    blast_db:
+    blastn:
+    blastx:
+    tblastn:
+    blastp:
+    blast_threads:

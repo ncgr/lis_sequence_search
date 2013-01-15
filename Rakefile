@@ -13,7 +13,7 @@ namespace :travis do
 
   task :install do
     Rake::Task["travis:create_db_config"].execute
-    Rake::Task["travis:quorum_install"].execute
+    Rake::Task["travis:quorum_settings"].execute
     Rake::Task["travis:db_migrate"].execute
   end
 
@@ -24,7 +24,7 @@ namespace :travis do
       system("export DISPLAY=:99.0 && bundle exec #{cmd}")
       raise "#{cmd} failed!" unless $?.exitstatus == 0
     end
-    Rake::Task["travis:remove"].execute
+    Rake::Task["travis:remove_db_config"].execute
   end
 
   task :db_migrate => :environment do
@@ -41,12 +41,11 @@ namespace :travis do
 
   end
 
-  task :quorum_install => :environment do
-    puts "Installing quorum..."
-    ["rails g quorum:install"].each do |cmd|
-      system("bundle exec #{cmd}")
-      raise "#{cmd} failed!" unless $?.exitstatus == 0
-    end
+  task :quorum_settings => :environment do
+    puts "Installing quorum_settings..."
+    settings = File.expand_path("../spec/config/quorum_settings.yml", __FILE__)
+    config = File.expand_path("../config", __FILE__)
+    FileUtils.cp settings, config
   end
 
   task :create_db_config do
