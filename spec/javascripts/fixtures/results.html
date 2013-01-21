@@ -162,31 +162,30 @@
                     {{ }); }}
             </table>
         </script>
-
-
-
         <script type="text/javascript">
             $(function() {
-                    QUORUM.pollResults(LSS.collectResults, LSS);
-                    });
-                </script>
+                 QUORUM.pollResults(LSS.collectResults, LSS);
+            });
+        </script>
+    </body>
+    <script type="text/javascript">
+        var upgrade = "<div class='ui-state-error ui-corner-all' " +
+            "style='padding: 0 .7em;'><p class='text'>" +
+            "<span class='ui-icon ui-icon-alert' style='float: left; " +
+            "margin-right: .3em;';></span>Please upgrade to a modern browser " +
+            "in order to access the features of this application." +
+            "</p></div>";
 
-            </body>
-            <script type="text/javascript">
-                // Present message to IE < 9 users.
-            if ($.browser.msie) {
-                if ($.browser.version < 9.0) {
-                    $('#example-sequences').remove();
-                    $('form').remove();
-                    $('#results').remove();
-                    var msg = "<div class='ui-state-error ui-corner-all' " +
-                        "style='padding: 0 .7em;'><p class='text'>" +
-                        "<span class='ui-icon ui-icon-alert' style='float: left; " +
-                        "margin-right: .3em;';></span>Please upgrade to a modern browser " +
-                        "in order to access the features of this application." +
-                        "</p></div>";
-                    $(msg).insertAfter($('h1'));
-                }
+        // SVG test taken from Modernizr 2.0
+        var svgWarning = function svgWarning() {
+            if (!!document.createElementNS &&
+                !!document.createElementNS('http://www.w3.org/2000/svg', 'svg').createSVGRect) {
+                return;
             }
-</script>
+            // Time to upgrade...
+            $(upgrade).insertAfter($('h1'));
+        };
+
+        svgWarning();
+    </script>
 </html>
