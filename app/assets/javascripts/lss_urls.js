@@ -57,6 +57,10 @@ LSS.gbrowseUrls = {
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
+  cicar_lis: "http://cicar.comparative-legumes.org/gb2/gbrowse/1.0/?" +
+    "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
+    "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+
   genfam_lis: "http://leggle.comparative-legumes.org/gene_families/name=" +
     "%ref_id%",
 
@@ -128,6 +132,9 @@ LSS.formatGbrowseUrl = function(data, url, type) {
       if (hit.search(/CcLG[0-9]+/) !== -1) {
         hit = "Cc" + hit.substring(4);
       }
+      break;
+    case "cicar-lis":
+      hit = hit.replace(/0/g, '');
       break;
     case "kazusa":
       if (proteome_genemodel) {
@@ -253,6 +260,24 @@ LSS.addCajca = function(data) {
 };
 
 //
+// Add Cicar url.
+//
+LSS.addCicar = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.cicar_lis,
+      urls = [];
+
+  urls.push({
+    "name": "Cicer arietinum - LIS",
+    "url": self.formatGbrowseUrl(data, url, "cicar-lis")
+  });
+
+  return urls;
+
+};
+
+//
 // Add Genfam (gene family) url.
 //
 LSS.addGenfam = function(data) {
@@ -311,6 +336,9 @@ LSS.addGbrowseLinkouts = function(data) {
   }
   if (hit.search(/cajca_/) === 0) {
     links.push(self.addCajca(data));
+  }
+  if (hit.search(/cicar_/) === 0) {
+    links.push(self.addCicar(data));
   }
   if (hit.search(/phavu_/) === 0) {
     links.push(self.addPhavu(data));

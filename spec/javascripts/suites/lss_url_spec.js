@@ -59,6 +59,17 @@ describe("LSS URLs", function() {
       expect(LSS.addCajca).toHaveBeenCalledWith(fake);
       expect(_.isArray(links)).toBeTruthy();
     });
+    it("formats cicar_ linkout", function() {
+      spyOn(LSS, 'addCicar');
+      var fake = {
+            hit_display_id: "cicar_foo:bar",
+            ref: "cicar_foo",
+            ref_id: "bar"
+          },
+          links = LSS.formatLinkouts(fake);
+      expect(LSS.addCicar).toHaveBeenCalledWith(fake);
+      expect(_.isArray(links)).toBeTruthy();
+    });
     it("formats phavu_ linkout", function() {
       spyOn(LSS, 'addPhavu');
       var fake = {
@@ -174,6 +185,25 @@ describe("LSS URLs", function() {
       );
     });
   });
+
+  describe("addCicar", function() {
+    it("formats a url for Cicar LIS", function() {
+      spyOn(LSS, 'formatGbrowseUrl');
+      var fake = {
+            hit_display_id: "cicar_foo:bar",
+            ref: "cicar_foo",
+            ref_id: "bar"
+          },
+          url = LSS.addCicar(fake);
+      expect(url[0].name).toEqual("Cicer arietinum - LIS");
+      expect(LSS.formatGbrowseUrl).toHaveBeenCalledWith(
+        fake,
+        LSS.gbrowseUrls.cicar_lis,
+        "cicar-lis"
+      );
+    });
+  });
+
 
   describe("addPhavu", function() {
     it("formats a url for Phavu LIS", function() {
