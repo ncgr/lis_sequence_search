@@ -356,7 +356,20 @@ describe("LSS URLs", function() {
           },
           url = LSS.formatGbrowseUrl(fake, LSS.gbrowseUrls.cajca_lis, "cajca-lis");
       expect(url).not.toMatch('%');
-      expect(url).toEqual('http://cajca.comparative-legumes.org/gb2/gbrowse/1.0/?ref=Cc01;start=1;stop=50101;width=1024;version=100;flip=0;grid=1;add=Cc01+LIS+LIS_Query_q+100..101');
+      expect(url).toEqual('http://cajca.comparative-legumes.org/gb2/gbrowse/Cc1.0/?ref=Cc01;start=1;stop=50101;width=1024;version=100;flip=0;grid=1;add=Cc01+LIS+LIS_Query_q+100..101');
+    });
+    it("formats gbrowse url for cicar-lis", function() {
+      var fake = {
+            hit_display_id: "cicar_foo:Ca01",
+            ref: "cicar_foo",
+            ref_id: "Ca01",
+            hit_from: 100,
+            hit_to: 101,
+            query: "q"
+          },
+          url = LSS.formatGbrowseUrl(fake, LSS.gbrowseUrls.cicar_lis, "cicar-lis");
+      expect(url).not.toMatch('%');
+      expect(url).toEqual('http://cicar.comparative-legumes.org/gb2/gbrowse/Ca1.0/?ref=Ca1;start=1;stop=50101;width=1024;version=100;flip=0;grid=1;add=Ca1+LIS+LIS_Query_q+100..101');
     });
     // kazusa is the only url with valid %%s
     it("formats gbrowse url for kazusa", function() {
