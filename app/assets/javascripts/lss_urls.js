@@ -53,11 +53,11 @@ LSS.gbrowseUrls = {
     "blastx-marker;grid=on;add=%ref%+LIS+LIS_Query_%query%+" +
     "%hit_from%..%hit_to%",
 
-  cajca_lis: "http://cajca.comparative-legumes.org/gb2/gbrowse/1.0/?" +
+  cajca_lis: "http://cajca.comparative-legumes.org/gb2/gbrowse/Cc1.0/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  cicar_lis: "http://cicar.comparative-legumes.org/gb2/gbrowse/1.0/?" +
+  cicar_lis: "http://cicar.comparative-legumes.org/gb2/gbrowse/Ca1.0/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
