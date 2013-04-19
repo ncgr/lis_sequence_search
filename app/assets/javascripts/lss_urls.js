@@ -35,7 +35,7 @@ LSS.gbrowseUrls = {
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  medtr_hapmap: "http://www.medicagohapmap.org/cgi-bin/gbrowse/mthapmap/?" +
+  medtr_hapmap: "http://www.medicagohapmap.org/fgb2/gbrowse/mt35/?" +
     "q=%ref%:%start%..%stop%;t=Genes+Transcript+ReadingFrame+Translation+" +
     "SNP+SNP_HM005+CovU_HM005+SNP_HM006+CovU_HM006+SNP_HM029+CovU_HM029;c=1;" +
     "add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
@@ -64,7 +64,7 @@ LSS.gbrowseUrls = {
   genfam_lis: "http://leggle.comparative-legumes.org/gene_families/name=" +
     "%ref_id%",
 
-  phavu_phytozome: "http://www.phytozome.net/cgi-bin/gbrowse/commonbean_er/?" +
+  phavu_phytozome: "http://www.phytozome.net/cgi-bin/gbrowse/commonbean/?" +
     "name=%ref%%3A%hit_from%..%hit_to%"
 };
 
