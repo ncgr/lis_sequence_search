@@ -47,7 +47,7 @@ LSS.gbrowseUrls = {
     "drag_and_drop=on;show_tooltips=on;grid=on;add=%ref%+LIS+" +
     "LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  lotja_kazusa: "http://gsv.kazusa.or.jp/cgi-bin/gbrowse/lotus/?" +
+  lotja_kazusa: "http://gsv.kazusa.or.jp/cgi-bin/gb2/gbrowse/lotus/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;" +
     "label=contig-phase3-phase1%%2C2-annotation-GMhmm-GenScan-blastn-tigrgi-" +
     "blastx-marker;grid=on;add=%ref%+LIS+LIS_Query_%query%+" +
@@ -121,12 +121,10 @@ LSS.formatGbrowseUrl = function(data, url, type) {
       }
       break;
     case "medtr-lis":
+    case "hapmap":
       if (hit.search(/chr[0-9]/) !== -1) {
         hit = "Mt" + hit.substring(3);
       }
-      break;
-    case "hapmap":
-      hit = hit.replace(/0/g, '');
       break;
     case "cajca-lis":
       if (hit.search(/CcLG[0-9]+/) !== -1) {
