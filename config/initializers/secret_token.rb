@@ -4,4 +4,4 @@
 # If you change this key, all old signed cookies will become invalid!
 # Make sure the secret is at least 30 characters and all random,
 # no regular words or you'll be exposed to dictionary attacks.
-LisSequenceSearch::Application.config.secret_token = ENV['LIS_SECRET_TOKEN'] || %x{ openssl rand -hex 64 }
+LisSequenceSearch::Application.config.secret_token = ENV['LIS_SECRET_TOKEN'] || %x{ openssl rand -base64 64 }
