@@ -22,6 +22,13 @@ LSS.exportUrls = {
 // Substitute placeholders %foo% with actual values before creating links.
 //
 LSS.gbrowseUrls = {
+  //medtrv4_jcvi: "http://medicago.jcvi.org/medicago/jbrowse/?data=data%2Fjson%2Fmedicago&loc=%ref%%3A%start%..%stop%&tracks=DNA%2Cgene_models&highlight=%ref%%3A%start%..%stop%",
+  medtrv4_jcvi: "http://medicago.jcvi.org/medicago/jbrowse/?data=data%2Fjson%2Fmedicago&loc=%ref%%3A%start%..%stop%&tracks=DNA%2Cgene_models&highlight=",
+
+  medtrv4_lis: "http://medtr.comparative-legumes.org/gb2/gbrowse/4.0/?" +
+    "name=%ref%:%start%..%stop%;width=1024;version=100;flip=0;" +
+    "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+
   medtr_jcvi: "http://www.jcvi.org/cgi-bin/gb2/gbrowse/mtruncatula/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;i" +
     "cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=Gene-" +
@@ -47,7 +54,7 @@ LSS.gbrowseUrls = {
     "drag_and_drop=on;show_tooltips=on;grid=on;add=%ref%+LIS+" +
     "LIS_Query_%query%+%hit_from%..%hit_to%",
 
-  lotja_kazusa: "http://gsv.kazusa.or.jp/cgi-bin/gb2/gbrowse/lotus/?" +
+  lotja_kazusa: "http://gsv.kazusa.or.jp/cgi-bin/gbrowse/lotus/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;" +
     "label=contig-phase3-phase1%%2C2-annotation-GMhmm-GenScan-blastn-tigrgi-" +
     "blastx-marker;grid=on;add=%ref%+LIS+LIS_Query_%query%+" +
@@ -95,8 +102,14 @@ LSS.formatGbrowseUrl = function(data, url, type) {
 
   if (data.ref.search(/proteome/) >= 0 || data.ref.search(/genemodel/) >= 0) {
     // Remove the query string and add name=ref_id.
-    url = url.slice(0, url.lastIndexOf('?') + 1) + 'name=%ref_id%';
+    if (url.search(/jbrowse/) >= 0) {
+        url = url.replace("loc=%ref%%3A%start%..%stop%","loc=%ref_id%");
+    }
+    else {
+        url = url.slice(0, url.lastIndexOf('?') + 1) + 'name=%ref_id%';
+    }
     proteome_genemodel = true;
+
   }
 
   //
@@ -121,10 +134,12 @@ LSS.formatGbrowseUrl = function(data, url, type) {
       }
       break;
     case "medtr-lis":
-    case "hapmap":
       if (hit.search(/chr[0-9]/) !== -1) {
         hit = "Mt" + hit.substring(3);
       }
+      break;
+    case "hapmap":
+      hit = hit.replace(/0/g, '');
       break;
     case "cajca-lis":
       if (hit.search(/CcLG[0-9]+/) !== -1) {
@@ -165,16 +180,17 @@ LSS.formatGbrowseUrl = function(data, url, type) {
   }
 
   url = url.replace(/%ref%/g, hit);
-  url = url.replace(/%start%/, hit_from);
-  url = url.replace(/%stop%/, hit_to);
-  url = url.replace(/%query%/, data.query);
-  url = url.replace(/%hit_from%/, data.hit_from);
-  url = url.replace(/%hit_to%/, data.hit_to);
-  url = url.replace(/%ref_id%/, ref_id);
+  url = url.replace(/%start%/g, hit_from);
+  url = url.replace(/%stop%/g, hit_to);
+  url = url.replace(/%query%/g, data.query);
+  url = url.replace(/%hit_from%/g, data.hit_from);
+  url = url.replace(/%hit_to%/g, data.hit_to);
+  url = url.replace(/%ref_id%/g, ref_id);
 
   return url;
 
 }
+
 
 //
 // Add Glyma url.
@@ -221,6 +237,27 @@ LSS.addMedtr = function(data) {
 
 };
 
+//
+// Add Medtr v4 urls.
+//
+LSS.addMedtrv4 = function(data) {
+
+  var self = this,
+      urls = [];
+
+  urls.push({
+    "name": "Medicago truncatula - JCVI",
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.medtrv4_jcvi, "jcvi")
+  });
+
+  urls.push({
+    "name": "Medicago truncatula - LIS",
+    "url": self.formatGbrowseUrl(data, self.gbrowseUrls.medtrv4_lis, "medtr-lis")
+  });
+
+  return urls;
+
+};
 //
 // Add Lotja url.
 //
@@ -326,7 +363,10 @@ LSS.addGbrowseLinkouts = function(data) {
   if (hit.search(/glyma_/) === 0) {
     links.push(self.addGlyma(data));
   }
-  if (hit.search(/medtr_/) === 0) {
+  if (hit.search(/medtr_.*4/) === 0) {
+    links.push(self.addMedtrv4(data));
+  }
+  else if (hit.search(/medtr_/) === 0) {
     links.push(self.addMedtr(data));
   }
   if (hit.search(/lotja_/) === 0) {
