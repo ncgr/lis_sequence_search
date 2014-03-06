@@ -1,0 +1,158 @@
+development:
+  max_sequence_size:
+  blast:
+    remote: false
+    ssh_host:
+    ssh_user:
+    ssh_options:
+    bin: "%{RAILS_ROOT}/lss_quorum/bin"
+    log_dir: "%{RAILS_ROOT}/lss_quorum/log"
+    tmp_dir: "%{RAILS_ROOT}/lss_quorum/tmp"
+    blast_db: "/home/lis/projects/lis_sequence_search/blastdb"
+    blastn:
+      "Cajanus cajan genome": cajca_genome
+      "Cajanus cajan gene models": cajca_genemodels
+      "Cajanus cajan transcriptome": cajca_transcriptome
+      "Cicer arietinum genome": cicar_genome
+      "Cicer arietinum gene models": cicar_genemodels
+      "Cicer arietinum transcriptome": cicar_transcriptome
+      "Glycine max genome": glyma_genome
+      "Glycine max gene models": glyma_genemodels
+      "Lotus japonicus genome": lotja_genome
+      "Lotus japonicus gene models": lotja_genemodels
+      "Lupinus albus transcriptome": lupal_transcriptome
+      "Lupinus angustifolius genome": lupan_genome
+      "Medicago sativa transcriptome": medsa_transcriptome
+      "Medicago truncatula v4 genome": medtr_genome-v4.0
+      "Medicago truncatula v4 gene models": medtr_genemodels-4.0v1
+      "Medicago truncatula v3.5 genome": medtr_genome-3.5
+      "Medicago truncatula v3.5 gene models": medtr_genemodels-3.5
+      "Phaseolus vulgaris genome": phavu_genome
+      "Phaseolus vulgaris gene models": phavu_genemodels
+    blastx:
+      "Cajanus cajan proteome": cajca_proteome
+      "Cicer arietinum proteome": cicar_proteome
+      "Gene family consensus seqs": gene_families
+      "Glycine max proteome": glyma_proteome
+      "Lotus japonicus proteome": lotja_proteome
+      "Medicago truncatula v4.0 proteome": medtr_proteome-4.0v1
+      "Medicago truncatula v3.5 proteome": medtr_proteome-3.5
+      "Phaseolus vulgaris proteome": phavu_proteome
+    tblastn:
+      "Cajanus cajan genome": cajca_genome
+      "Cajanus cajan gene models": cajca_genemodels
+      "Cajanus cajan transcriptome": cajca_transcriptome
+      "Cicer arietinum genome": cicar_genome
+      "Cicer arietinum gene models": cicar_genemodels
+      "Cicer arietinum transcriptome": cicar_transcriptome
+      "Glycine max genome": glyma_genome
+      "Glycine max gene models": glyma_genemodels
+      "Lotus japonicus genome": lotja_genome
+      "Lotus japonicus gene models": lotja_genemodels
+      "Lupinus albus transcriptome": lupal_transcriptome
+      "Lupinus angustifolius genome": lupan_genome
+      "Medicago sativa transcriptome": medsa_transcriptome
+      "Medicago truncatula v4 genome": medtr_genome-v4.0
+      "Medicago truncatula v4 gene models": medtr_genemodels-4.0v1
+      "Medicago truncatula v3.5 genome": medtr_genome-v3.5
+      "Medicago truncatula v3.5 gene models": medtr_genemodels-3.5
+      "Phaseolus vulgaris genome": phavu_genome
+      "Phaseolus vulgaris gene models": phavu_genemodels
+    blastp:
+      "Cajanus cajan proteome": cajca_proteome
+      "Cicer arietinum proteome": cicar_proteome
+      "Gene family consensus seqs": gene_families
+      "Glycine max proteome": glyma_proteome
+      "Lotus japonicus proteome": lotja_proteome
+      "Medicago truncatula v4.0 proteome": medtr_proteome-4.0v1
+      "Medicago truncatula v3.5 proteome": medtr_proteome-3.5
+      "Phaseolus vulgaris proteome": phavu_proteome
+    blast_threads: 4
+
+test:
+  max_sequence_size:
+  blast:
+    remote: false
+    ssh_host:
+    ssh_user:
+    ssh_options:
+    bin: "%{RAILS_ROOT}/lss_quorum/bin"
+    log_dir: "%{RAILS_ROOT}/lss_quorum/log"
+    tmp_dir: "%{RAILS_ROOT}/lss_quorum/tmp"
+    blast_db: "%{RAILS_ROOT}/lss_quorum/blastdb"
+    blastn:
+    blastx:
+    tblastn:
+    blastp:
+    blast_threads:
+
+production:
+  max_sequence_size:
+  blast:
+    remote: false
+    ssh_host: 
+    ssh_user: legs
+    ssh_options:
+    bin: "/user/legs/lss_quorum/bin"
+    log_dir: "/user/legs/lss_quorum/log"
+    tmp_dir: "/user/legs/lss_quorum/tmp"
+    blast_db: "/user/legs/lss_quorum/blastdb"
+    blastn:
+      "Cajanus cajan genome": cajca_genome
+      "Cajanus cajan gene models": cajca_genemodels
+      "Cajanus cajan transcriptome": cajca_transcriptome
+      "Cicer arietinum genome": cicar_genome
+      "Cicer arietinum gene models": cicar_genemodels
+      "Cicer arietinum transcriptome": cicar_transcriptome
+      "Glycine max genome": glyma_genome
+      "Glycine max gene models": glyma_genemodels
+      "Lotus japonicus genome": lotja_genome
+      "Lotus japonicus gene models": lotja_genemodels
+      "Lupinus albus transcriptome": lupal_transcriptome
+      "Lupinus angustifolius genome": lupan_genome
+      "Medicago sativa transcriptome": medsa_transcriptome
+      "Medicago truncatula v4 genome": medtr_genome-v4.0
+      "Medicago truncatula v4 gene models": medtr_genemodels-4.0v1
+      "Medicago truncatula v3.5 genome": medtr_genome-v3.5
+      "Medicago truncatula v3.5 gene models": medtr_genemodels-3.5
+      "Phaseolus vulgaris genome": phavu_genome
+      "Phaseolus vulgaris gene models": phavu_genemodels
+    blastx:
+      "Cajanus cajan proteome": cajca_proteome
+      "Cicer arietinum proteome": cicar_proteome
+      "Gene family consensus seqs": gene_families
+      "Glycine max proteome": glyma_proteome
+      "Lotus japonicus proteome": lotja_proteome
+      "Medicago truncatula v4.0 proteome": medtr_proteome-4.0v1
+      "Medicago truncatula v3.5 proteome": medtr_proteome-3.5
+      "Phaseolus vulgaris proteome": phavu_proteome
+    tblastn:
+      "Cajanus cajan genome": cajca_genome
+      "Cajanus cajan gene models": cajca_genemodels
+      "Cajanus cajan transcriptome": cajca_transcriptome
+      "Cicer arietinum genome": cicar_genome
+      "Cicer arietinum gene models": cicar_genemodels
+      "Cicer arietinum transcriptome": cicar_transcriptome
+      "Glycine max genome": glyma_genome
+      "Glycine max gene models": glyma_genemodels
+      "Lotus japonicus genome": lotja_genome
+      "Lotus japonicus gene models": lotja_genemodels
+      "Lupinus albus transcriptome": lupal_transcriptome
+      "Lupinus angustifolius genome": lupan_genome
+      "Medicago sativa transcriptome": medsa_transcriptome
+      "Medicago truncatula v4 genome": medtr_genome-v4.0
+      "Medicago truncatula v4 gene models": medtr_genemodels-4.0v1
+      "Medicago truncatula v3.5 genome": medtr_genome-v3.5
+      "Medicago truncatula v3.5 gene models": medtr_genemodels-3.5
+      "Phaseolus vulgaris genome": phavu_genome
+      "Phaseolus vulgaris gene models": phavu_genemodels
+    blastp:
+      "Cajanus cajan proteome": cajca_proteome
+      "Cicer arietinum proteome": cicar_proteome
+      "Gene family consensus seqs": gene_families
+      "Glycine max proteome": glyma_proteome
+      "Lotus japonicus proteome": lotja_proteome
+      "Medicago truncatula v4.0 proteome": medtr_proteome-4.0v1
+      "Medicago truncatula v3.5 proteome": medtr_proteome-3.5
+      "Phaseolus vulgaris proteome": phavu_proteome
+    blast_threads: 8
