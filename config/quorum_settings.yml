@@ -10,6 +10,8 @@ development:
     tmp_dir: "%{RAILS_ROOT}/lss_quorum/tmp"
     blast_db: "/home/lis/projects/lis_sequence_search/blastdb"
     blastn:
+      "Arachis duranensis genome": aradu_genome
+      "Arachis ipaensis genome": araip_genome
       "Cajanus cajan genome": cajca_genome
       "Cajanus cajan gene models": cajca_genemodels
       "Cajanus cajan transcriptome": cajca_transcriptome
@@ -39,6 +41,8 @@ development:
       "Medicago truncatula v3.5 proteome": medtr_proteome-3.5
       "Phaseolus vulgaris proteome": phavu_proteome
     tblastn:
+      "Arachis duranensis genome": aradu_genome
+      "Arachis ipaensis genome": araip_genome
       "Cajanus cajan genome": cajca_genome
       "Cajanus cajan gene models": cajca_genemodels
       "Cajanus cajan transcriptome": cajca_transcriptome
@@ -98,6 +102,8 @@ production:
     tmp_dir: "/user/legs/lss_quorum/tmp"
     blast_db: "/user/legs/lss_quorum/blastdb"
     blastn:
+      "Arachis duranensis genome": aradu_genome
+      "Arachis ipaensis genome": araip_genome
       "Cajanus cajan genome": cajca_genome
       "Cajanus cajan gene models": cajca_genemodels
       "Cajanus cajan transcriptome": cajca_transcriptome
@@ -127,6 +133,8 @@ production:
       "Medicago truncatula v3.5 proteome": medtr_proteome-3.5
       "Phaseolus vulgaris proteome": phavu_proteome
     tblastn:
+      "Arachis duranensis genome": aradu_genome
+      "Arachis ipaensis genome": araip_genome
       "Cajanus cajan genome": cajca_genome
       "Cajanus cajan gene models": cajca_genemodels
       "Cajanus cajan transcriptome": cajca_transcriptome
