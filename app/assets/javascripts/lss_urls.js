@@ -29,6 +29,14 @@ LSS.gbrowseUrls = {
     "name=%ref%:%start%..%stop%;width=1024;version=100;flip=0;" +
     "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
 
+  aradu_peanutbase: "http://peanutbase.org/gb2/gbrowse/Aradu1.0/?" +
+    "name=%ref%:%start%..%stop%;width=1024;version=100;flip=0;" +
+    "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+
+  araip_peanutbase: "http://peanutbase.org/gb2/gbrowse/Araip1.0/?" +
+    "name=%ref%:%start%..%stop%;width=1024;version=100;flip=0;" +
+    "grid=1;add=%ref%+LIS+LIS_Query_%query%+%hit_from%..%hit_to%",
+
   medtr_jcvi: "http://www.jcvi.org/cgi-bin/gb2/gbrowse/mtruncatula/?" +
     "ref=%ref%;start=%start%;stop=%stop%;width=1024;version=100;i" +
     "cache=on;drag_and_drop=on;show_tooltips=on;grid=on;label=Gene-" +
@@ -277,6 +285,42 @@ LSS.addLotja = function(data) {
 };
 
 //
+// Add Aradu url.
+//
+LSS.addAradu = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.aradu_peanutbase,
+      urls = [];
+
+  urls.push({
+    "name": "Arachis duranensis - Peanutbase",
+    "url": self.formatGbrowseUrl(data, url)
+  });
+
+  return urls;
+
+};
+
+//
+// Add Aradu url.
+//
+LSS.addAraip = function(data) {
+
+  var self = this,
+      url = self.gbrowseUrls.araip_peanutbase,
+      urls = [];
+
+  urls.push({
+    "name": "Arachis ipaensis - Peanutbase",
+    "url": self.formatGbrowseUrl(data, url)
+  });
+
+  return urls;
+
+};
+
+//
 // Add Cajca url.
 //
 LSS.addCajca = function(data) {
@@ -371,6 +415,12 @@ LSS.addGbrowseLinkouts = function(data) {
   }
   if (hit.search(/lotja_/) === 0) {
     links.push(self.addLotja(data));
+  }
+  if (hit.search(/aradu_/) === 0) {
+    links.push(self.addAradu(data));
+  }
+  if (hit.search(/araip_/) === 0) {
+    links.push(self.addAraip(data));
   }
   if (hit.search(/cajca_/) === 0) {
     links.push(self.addCajca(data));
